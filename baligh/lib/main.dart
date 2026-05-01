@@ -31,8 +31,8 @@ class BalighApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Baligh',
       debugShowCheckedModeBanner: false,
-      themeMode: themeMode,
-      theme: AppTheme.darkTheme, // We primarily use Dark Theme as requested
+      themeMode: ThemeMode.light,
+      theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       routerConfig: appRouter,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

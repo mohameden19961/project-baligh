@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/widgets/alert_card.dart';
+import '../../../core/theme/app_theme.dart';
 
 class AlertFeedScreen extends StatelessWidget {
   const AlertFeedScreen({super.key});
@@ -10,36 +11,50 @@ class AlertFeedScreen extends StatelessWidget {
     final List<Map<String, dynamic>> mockAlerts = [
       {
         'id': '1',
-        'title': 'Power Outage',
-        'neighborhood': 'Tevragh Zeina',
-        'time': '10 mins ago',
+        'title': 'انقطاع تيار كهربائي',
+        'neighborhood': 'تفرغ زينة',
+        'time': 'منذ 10 دقائق',
         'icon': Icons.bolt,
         'credibility': 92,
       },
       {
         'id': '2',
-        'title': 'Broken Water Pipe',
-        'neighborhood': 'Ksar',
-        'time': '35 mins ago',
+        'title': 'كسر في أنبوب مياه',
+        'neighborhood': 'القصار',
+        'time': 'منذ 35 دقيقة',
         'icon': Icons.opacity,
         'credibility': 75,
       },
       {
         'id': '3',
-        'title': 'Road Damage',
-        'neighborhood': 'Arafat',
-        'time': '1 hour ago',
+        'title': 'حفرة في الطريق',
+        'neighborhood': 'عرفات',
+        'time': 'منذ ساعة',
         'icon': Icons.directions_car,
         'credibility': 45,
+      },
+      {
+        'id': '4',
+        'title': 'تجمع نفايات',
+        'neighborhood': 'دار النعيم',
+        'time': 'منذ ساعتين',
+        'icon': Icons.delete_outline,
+        'credibility': 88,
       },
     ];
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Community Alerts'),
+        backgroundColor: AppTheme.primaryGreen,
+        title: const Text(
+          'تغذية البلاغات',
+          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.tune),
+            icon: const Icon(Icons.tune, color: Colors.white),
             onPressed: () {},
           ),
         ],
@@ -62,3 +77,4 @@ class AlertFeedScreen extends StatelessWidget {
     );
   }
 }
+

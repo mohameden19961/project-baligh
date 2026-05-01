@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class AppTextField extends StatelessWidget {
   final String label;
@@ -21,26 +22,40 @@ class AppTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white70,
+        if (label.isNotEmpty) ...[
+          Text(
+            label,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppTheme.primaryGreen,
+              fontFamily: 'Cairo',
+              fontSize: 14,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          obscureText: isPassword,
-          keyboardType: keyboardType,
-          validator: validator,
-          decoration: InputDecoration(
-            hintText: hint,
+          const SizedBox(height: 8),
+        ],
+        Directionality(
+          textDirection: TextDirection.rtl,
+          child: TextFormField(
+            controller: controller,
+            obscureText: isPassword,
+            keyboardType: keyboardType,
+            validator: validator,
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontFamily: 'Cairo', fontSize: 14),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(color: Colors.grey[400], fontFamily: 'Cairo', fontSize: 13),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              fillColor: Colors.grey[50],
+            ),
           ),
         ),
       ],
     );
   }
 }
+

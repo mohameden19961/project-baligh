@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'credibility_badge.dart';
+import '../theme/app_theme.dart';
 
 class AlertCard extends StatelessWidget {
   final IconData categoryIcon;
@@ -22,70 +21,95 @@ class AlertCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      color: Colors.white.withOpacity(0.05),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
+          child: Row(
+            textDirection: TextDirection.rtl,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(categoryIcon, color: Theme.of(context).primaryColor, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGreen.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(categoryIcon, color: AppTheme.primaryGreen, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  textDirection: TextDirection.rtl,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      textDirection: TextDirection.rtl,
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Cairo',
+                            color: AppTheme.darkText,
+                          ),
                         ),
                         Text(
-                          neighborhood,
-                          style: const TextStyle(color: Colors.grey, fontSize: 13),
+                          time,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                            fontFamily: 'Cairo',
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  CredibilityBadge(score: credibility),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(time, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                  Row(
-                    children: [
-                      _ActionButton(
-                        icon: Icons.check_circle_outline,
-                        label: 'Confirm',
-                        color: Colors.green,
-                        onPressed: () {},
+                    const SizedBox(height: 4),
+                    Text(
+                      neighborhood,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                        fontFamily: 'Cairo',
                       ),
-                      const SizedBox(width: 8),
-                      _ActionButton(
-                        icon: Icons.cancel_outlined,
-                        label: 'False',
-                        color: Colors.red,
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      textDirection: TextDirection.rtl,
+                      children: [
+                        _buildCredibilityIndicator(credibility),
+                        const Spacer(),
+                        _buildActionButton(
+                          icon: Icons.close,
+                          label: 'غير صحيح',
+                          color: Colors.red,
+                        ),
+                        const SizedBox(width: 8),
+                        _buildActionButton(
+                          icon: Icons.check,
+                          label: 'تأكيد',
+                          color: Colors.green,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -93,32 +117,53 @@ class AlertCard extends StatelessWidget {
       ),
     );
   }
-}
 
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onPressed;
+  Widget _buildCredibilityIndicator(int score) {
+    Color color = Colors.red;
+    if (score > 70) color = Colors.green;
+    else if (score > 40) color = Colors.orange;
 
-  const _ActionButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        foregroundColor: color,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        visualDensity: VisualDensity.compact,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
       ),
-      icon: Icon(icon, size: 16),
-      label: Text(label, style: const TextStyle(fontSize: 12)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.verified, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            '%$score موثوقية',
+            style: TextStyle(
+              fontSize: 10,
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Cairo',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({required IconData icon, required String label, required Color color}) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: color,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Cairo',
+          ),
+        ),
+        const SizedBox(width: 4),
+        Icon(icon, color: color, size: 14),
+      ],
     );
   }
 }
+

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/theme/app_theme.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -12,58 +13,70 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: AppTheme.primaryGreen,
+        title: const Text(
+          'الإعدادات',
+          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildSectionHeader('APPLICATION'),
+          _buildSectionHeader('تطبيق بلّغ'),
           _buildSettingTile(
             icon: Icons.language,
-            title: 'Language',
+            title: 'اللغة',
             subtitle: _getLanguageName(currentLocale.languageCode),
             onTap: () => _showLanguageDialog(context, ref),
           ),
           _buildSettingTile(
             icon: Icons.dark_mode_outlined,
-            title: 'Dark Mode',
+            title: 'الوضع الليلي',
             trailing: Switch(
               value: themeMode == ThemeMode.dark,
               onChanged: (_) => ref.read(themeProvider.notifier).toggleTheme(),
-              activeColor: Theme.of(context).primaryColor,
+              activeColor: AppTheme.primaryGreen,
             ),
           ),
           const SizedBox(height: 24),
-          _buildSectionHeader('ALERTS & GPS'),
+          _buildSectionHeader('التنبيهات والموقع'),
           _buildSettingTile(
             icon: Icons.notifications_active_outlined,
-            title: 'Push Notifications',
+            title: 'تنبيهات الهاتف',
             trailing: Switch(
               value: true,
               onChanged: (val) {},
-              activeColor: Theme.of(context).primaryColor,
+              activeColor: AppTheme.primaryGreen,
             ),
           ),
           _buildSettingTile(
             icon: Icons.gps_fixed,
-            title: 'GPS Accuracy',
-            subtitle: 'Balanced (Recommended)',
+            title: 'دقة الموقع (GPS)',
+            subtitle: 'متوازن (موصى به)',
             onTap: () {},
           ),
           const SizedBox(height: 24),
-          _buildSectionHeader('ACCOUNT'),
+          _buildSectionHeader('الحساب'),
           _buildSettingTile(
             icon: Icons.security_outlined,
-            title: 'Privacy Policy',
+            title: 'سياسة الخصوصية',
             onTap: () {},
           ),
           _buildSettingTile(
             icon: Icons.info_outline,
-            title: 'About Baligh',
+            title: 'عن تطبيق بلّغ',
             onTap: () {},
           ),
           _buildSettingTile(
             icon: Icons.logout,
-            title: 'Logout',
+            title: 'تسجيل الخروج',
             titleColor: Colors.red,
             onTap: () => context.go('/login'),
           ),
@@ -85,8 +98,12 @@ class SettingsScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Choose Language'),
-        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text(
+          'اختر اللغة',
+          textAlign: TextAlign.right,
+          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -100,12 +117,18 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildLangOption(BuildContext context, WidgetRef ref, String code, String name) {
-    return ListTile(
-      title: Text(name),
-      onTap: () {
-        ref.read(localeProvider.notifier).setLocale(code);
-        Navigator.pop(context);
-      },
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: ListTile(
+        title: Text(
+          name,
+          style: const TextStyle(fontFamily: 'Cairo'),
+        ),
+        onTap: () {
+          ref.read(localeProvider.notifier).setLocale(code);
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
@@ -114,11 +137,12 @@ class SettingsScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Text(
         title,
+        textAlign: TextAlign.right,
         style: const TextStyle(
           color: Colors.grey,
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: FontWeight.bold,
-          letterSpacing: 1.2,
+          fontFamily: 'Cairo',
         ),
       ),
     );
@@ -132,12 +156,35 @@ class SettingsScreen extends ConsumerWidget {
     VoidCallback? onTap,
     Color? titleColor,
   }) {
-    return ListTile(
-      onTap: onTap,
-      leading: Icon(icon, color: titleColor ?? Colors.white70),
-      title: Text(title, style: TextStyle(color: titleColor ?? Colors.white)),
-      subtitle: subtitle != null ? Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)) : null,
-      trailing: trailing ?? const Icon(Icons.chevron_right, color: Colors.grey, size: 18),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[100]!),
+      ),
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: ListTile(
+          onTap: onTap,
+          leading: Icon(icon, color: titleColor ?? AppTheme.primaryGreen),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: titleColor ?? AppTheme.darkText,
+              fontFamily: 'Cairo',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          subtitle: subtitle != null ? Text(
+            subtitle,
+            style: const TextStyle(color: Colors.grey, fontSize: 12, fontFamily: 'Cairo'),
+          ) : null,
+          trailing: trailing ?? const Icon(Icons.chevron_left, color: Colors.grey, size: 20),
+        ),
+      ),
+
     );
   }
 }
+

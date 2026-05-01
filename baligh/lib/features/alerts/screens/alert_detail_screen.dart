@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_button.dart';
-import '../../../core/widgets/credibility_badge.dart';
 
 class AlertDetailScreen extends StatelessWidget {
   final String id;
@@ -10,16 +10,28 @@ class AlertDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 250,
+            expandedHeight: 200,
             pinned: true,
+            backgroundColor: AppTheme.primaryGreen,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                color: Colors.grey[900],
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [AppTheme.primaryGreen, AppTheme.secondaryGreen],
+                  ),
+                ),
                 child: const Center(
-                  child: Icon(Icons.map, size: 80, color: Colors.white24),
+                  child: Icon(Icons.map_outlined, size: 80, color: Colors.white24),
                 ),
               ),
             ),
@@ -28,94 +40,164 @@ class AlertDetailScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                textDirection: TextDirection.rtl,
                 children: [
                   Row(
+                    textDirection: TextDirection.rtl,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Power Outage',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        'انقطاع تيار كهربائي',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Cairo',
+                          color: AppTheme.darkText,
+                        ),
                       ),
-                      const CredibilityBadge(score: 92),
+                      _buildCredibilityBadge(92),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   const Row(
+                    textDirection: TextDirection.rtl,
                     children: [
                       Icon(Icons.access_time, size: 16, color: Colors.grey),
                       SizedBox(width: 4),
-                      Text('10 mins ago', style: TextStyle(color: Colors.grey)),
-                      SizedBox(width: 16),
+                      Text(
+                        'منذ 10 دقائق',
+                        style: TextStyle(color: Colors.grey, fontFamily: 'Cairo', fontSize: 13),
+                      ),
+                      SizedBox(width: 24),
                       Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
                       SizedBox(width: 4),
-                      Text('Tevragh Zeina', style: TextStyle(color: Colors.grey)),
+                      Text(
+                        'تفرغ زينة، قطاع 4',
+                        style: TextStyle(color: Colors.grey, fontFamily: 'Cairo', fontSize: 13),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 32),
                   const Text(
-                    'Description',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'الوصف',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Cairo',
+                      color: AppTheme.darkText,
+                    ),
+                    textAlign: TextAlign.right,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   const Text(
-                    'The power has been out in the entire block since 9:00 PM. Several neighbors have confirmed this issue.',
-                    style: TextStyle(color: Colors.white70, height: 1.5),
+                    'انقطع التيار الكهربائي عن الحي بأكمله منذ الساعة 9:00 مساءً. قمنا بالتواصل مع الشركة ولم يتم الرد حتى الآن. نرجو الحذر.',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      height: 1.6,
+                      fontFamily: 'Cairo',
+                      fontSize: 15,
+                    ),
+                    textAlign: TextAlign.right,
                   ),
                   const SizedBox(height: 32),
                   const Text(
-                    'Photos',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'الصور المرفقة',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Cairo',
+                      color: AppTheme.darkText,
+                    ),
+                    textAlign: TextAlign.right,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   SizedBox(
-                    height: 100,
+                    height: 120,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
+                      reverse: true,
                       itemCount: 3,
                       itemBuilder: (context, index) => Container(
-                        width: 100,
-                        margin: const EdgeInsets.only(right: 12),
+                        width: 160,
+                        margin: const EdgeInsets.only(left: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(16),
+                          image: const DecorationImage(
+                            image: NetworkImage('https://picsum.photos/400/300'),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        child: const Icon(Icons.image_outlined, color: Colors.grey),
                       ),
                     ),
                   ),
                   const SizedBox(height: 40),
                   const Text(
-                    'Community Validation',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'تأكيدات المجتمع',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Cairo',
+                      color: AppTheme.darkText,
+                    ),
+                    textAlign: TextAlign.right,
                   ),
                   const SizedBox(height: 16),
-                  const LinearProgressIndicator(
-                    value: 0.92,
-                    backgroundColor: Colors.red,
-                    color: Colors.green,
-                    minHeight: 10,
+                  Stack(
+                    children: [
+                      Container(
+                        height: 12,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      Container(
+                        height: 12,
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   const Row(
+                    textDirection: TextDirection.rtl,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('92 Confirmations', style: TextStyle(color: Colors.green, fontSize: 12)),
-                      Text('8 False Reports', style: TextStyle(color: Colors.red, fontSize: 12)),
+                      Text(
+                        '92 شخصاً أكدوا البلاغ',
+                        style: TextStyle(color: Colors.green, fontSize: 13, fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '8 أشخاص قالوا إنه خاطئ',
+                        style: TextStyle(color: Colors.red, fontSize: 13, fontFamily: 'Cairo'),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 48),
-                  AppButton(
-                    text: 'Confirm this issue',
-                    backgroundColor: Colors.green.withOpacity(0.8),
-                    onPressed: () {},
-                  ),
-                  const SizedBox(height: 12),
-                  AppButton(
-                    text: 'Mark as false report',
-                    backgroundColor: Colors.red.withOpacity(0.8),
-                    onPressed: () {},
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppButton(
+                          text: 'بلاغ خاطئ',
+                          backgroundColor: Colors.white,
+                          onPressed: () {},
+                          // Border and text color for secondary button
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: AppButton(
+                          text: 'تأكيد البلاغ',
+                          onPressed: () {},
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 40),
                 ],
@@ -126,4 +208,24 @@ class AlertDetailScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildCredibilityBadge(int score) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.green.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        '%$score موثوق',
+        style: const TextStyle(
+          color: Colors.green,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Cairo',
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
 }
+

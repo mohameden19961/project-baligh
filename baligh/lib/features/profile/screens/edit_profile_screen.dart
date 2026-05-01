@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 
@@ -8,7 +9,19 @@ class EditProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: AppTheme.primaryGreen,
+        title: const Text(
+          'تعديل الملف الشخصي',
+          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -17,37 +30,46 @@ class EditProfileScreen extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 60,
-                  backgroundColor: Color(0xFF1E1E1E),
-                  child: Icon(Icons.person, size: 80, color: Colors.grey),
+                  backgroundColor: AppTheme.primaryGreen,
+                  child: CircleAvatar(
+                    radius: 57,
+                    backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=abdy'),
+                  ),
                 ),
                 Positioned(
                   bottom: 0,
                   right: 0,
                   child: Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.accentGold,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                    child: const Icon(Icons.camera_alt, size: 20, color: AppTheme.primaryGreen),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 48),
             const AppTextField(
-              label: 'Full Name',
-              hint: 'Abdy El Housseine',
+              label: 'الاسم الكامل',
+              hint: 'عبد الهادي الحسيني',
             ),
             const SizedBox(height: 20),
             const AppTextField(
-              label: 'Phone Number',
+              label: 'رقم الهاتف',
               hint: '+222 47 00 00 00',
               keyboardType: TextInputType.phone,
             ),
+            const SizedBox(height: 20),
+            const AppTextField(
+              label: 'البريد الإلكتروني',
+              hint: 'abdy@mail.com',
+              keyboardType: TextInputType.emailAddress,
+            ),
             const SizedBox(height: 48),
             AppButton(
-              text: 'Save Changes',
+              text: 'حفظ التغييرات',
               onPressed: () => Navigator.pop(context),
             ),
           ],
@@ -56,3 +78,4 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 }
+
