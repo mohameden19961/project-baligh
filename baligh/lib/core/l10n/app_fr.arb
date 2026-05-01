@@ -1,0 +1,22 @@
+{
+  "@@locale": "fr",
+  "appName": "Baligh",
+  "onboardingTitle1": "Signaler les Problèmes",
+  "onboardingDesc1": "Signalez facilement les problèmes urbains dans votre quartier.",
+  "onboardingTitle2": "Localisez Précisément",
+  "onboardingDesc2": "Marquez l'emplacement exact du problème sur la carte.",
+  "onboardingTitle3": "Recevez des Alertes",
+  "onboardingDesc3": "Restez informé des signalements de la communauté en temps réel.",
+  "login": "Connexion",
+  "register": "S'inscrire",
+  "email": "Email",
+  "password": "Mot de passe",
+  "forgotPassword": "Mot de passe oublié ?",
+  "getStarted": "Commencer",
+  "home": "Accueil",
+  "map": "Carte",
+  "alerts": "Alertes",
+  "profile": "Profil",
+  "settings": "Paramètres",
+  "reportNow": "Signaler maintenant"
+}
