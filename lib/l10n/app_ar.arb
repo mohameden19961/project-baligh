@@ -1,0 +1,270 @@
+{
+  "@@locale": "ar",
+  "@@author": "Baligh Team",
+
+  "appName": "بلّغ",
+  "@appName": { "description": "The name of the application" },
+
+  "appTagline": "صوتك يصنع الفرق",
+  "@appTagline": { "description": "App tagline shown on splash/onboarding" },
+
+  "language": "اللغة",
+  "@language": { "description": "Language setting label" },
+
+  "arabic": "العربية",
+  "@arabic": { "description": "Arabic language option" },
+
+  "french": "الفرنسية",
+  "@french": { "description": "French language option" },
+
+  "continueButton": "متابعة",
+  "@continueButton": { "description": "Generic continue button" },
+
+  "saveButton": "حفظ",
+  "@saveButton": { "description": "Generic save button" },
+
+  "cancelButton": "إلغاء",
+  "@cancelButton": { "description": "Generic cancel button" },
+
+  "deleteButton": "حذف",
+  "@deleteButton": { "description": "Generic delete button" },
+
+  "confirmButton": "تأكيد",
+  "@confirmButton": { "description": "Generic confirm button" },
+
+  "backButton": "رجوع",
+  "@backButton": { "description": "Generic back button" },
+
+  "loading": "جارٍ التحميل...",
+  "@loading": { "description": "Generic loading indicator text" },
+
+  "error": "خطأ",
+  "@error": { "description": "Generic error label" },
+
+  "success": "تم بنجاح",
+  "@success": { "description": "Generic success label" },
+
+  "retry": "إعادة المحاولة",
+  "@retry": { "description": "Retry button label" },
+
+  "navHome": "الرئيسية",
+  "@navHome": { "description": "Bottom nav: Home tab" },
+
+  "navMap": "الخريطة",
+  "@navMap": { "description": "Bottom nav: Map tab" },
+
+  "navReport": "إبلاغ",
+  "@navReport": { "description": "Bottom nav: Report tab" },
+
+  "navMyReports": "تقاريري",
+  "@navMyReports": { "description": "Bottom nav: My Reports tab" },
+
+  "navSettings": "الإعدادات",
+  "@navSettings": { "description": "Bottom nav: Settings tab" },
+
+  "homeWelcome": "مرحباً بك في بلّغ",
+  "@homeWelcome": { "description": "Home screen welcome title" },
+
+  "homeSubtitle": "ساهم في تحسين مدينتك بالإبلاغ عن المشكلات",
+  "@homeSubtitle": { "description": "Home screen subtitle" },
+
+  "homeRecentReports": "أحدث البلاغات",
+  "@homeRecentReports": { "description": "Section title for recent reports on home" },
+
+  "homeNoReports": "لا توجد بلاغات حتى الآن. كن أول من يبلّغ!",
+  "@homeNoReports": { "description": "Empty state message on home screen" },
+
+  "homeQuickReport": "بلاغ سريع",
+  "@homeQuickReport": { "description": "Quick report button label on home" },
+
+  "homeViewMap": "عرض الخريطة",
+  "@homeViewMap": { "description": "View map button on home" },
+
+  "reportTitle": "إنشاء بلاغ جديد",
+  "@reportTitle": { "description": "Title for the create report screen" },
+
+  "reportCategory": "فئة المشكلة",
+  "@reportCategory": { "description": "Report form: category field label" },
+
+  "reportSelectCategory": "اختر فئة",
+  "@reportSelectCategory": { "description": "Report form: category hint text" },
+
+  "reportDescription": "وصف المشكلة",
+  "@reportDescription": { "description": "Report form: description field label" },
+
+  "reportDescriptionHint": "اشرح المشكلة بالتفصيل...",
+  "@reportDescriptionHint": { "description": "Report form: description hint text" },
+
+  "reportLocation": "الموقع",
+  "@reportLocation": { "description": "Report form: location field label" },
+
+  "reportLocationHint": "اختر الموقع على الخريطة",
+  "@reportLocationHint": { "description": "Report form: location hint text" },
+
+  "reportPhoto": "صورة المشكلة",
+  "@reportPhoto": { "description": "Report form: photo field label" },
+
+  "reportAddPhoto": "إضافة صورة",
+  "@reportAddPhoto": { "description": "Report form: add photo button" },
+
+  "reportChangePhoto": "تغيير الصورة",
+  "@reportChangePhoto": { "description": "Report form: change photo button" },
+
+  "reportSubmit": "إرسال البلاغ",
+  "@reportSubmit": { "description": "Report form: submit button" },
+
+  "reportSubmitSuccess": "تم إرسال بلاغك بنجاح!",
+  "@reportSubmitSuccess": { "description": "Success message after submitting a report" },
+
+  "reportSubmitError": "فشل إرسال البلاغ. حاول مجدداً.",
+  "@reportSubmitError": { "description": "Error message when report submission fails" },
+
+  "reportValidationCategory": "الرجاء اختيار فئة المشكلة",
+  "@reportValidationCategory": { "description": "Validation message for category field" },
+
+  "reportValidationDescription": "الرجاء إدخال وصف للمشكلة",
+  "@reportValidationDescription": { "description": "Validation message for description field" },
+
+  "reportValidationLocation": "الرجاء تحديد موقع المشكلة",
+  "@reportValidationLocation": { "description": "Validation message for location field" },
+
+  "categoryRoads": "طرق وأرصفة",
+  "@categoryRoads": { "description": "Report category: Roads" },
+
+  "categoryLighting": "إنارة عامة",
+  "@categoryLighting": { "description": "Report category: Public Lighting" },
+
+  "categoryWaste": "نفايات وصرف صحي",
+  "@categoryWaste": { "description": "Report category: Waste & Sanitation" },
+
+  "categoryWater": "ماء وكهرباء",
+  "@categoryWater": { "description": "Report category: Water & Electricity" },
+
+  "categoryParks": "حدائق ومساحات خضراء",
+  "@categoryParks": { "description": "Report category: Parks & Green Spaces" },
+
+  "categoryOther": "أخرى",
+  "@categoryOther": { "description": "Report category: Other" },
+
+  "statusPending": "قيد الانتظار",
+  "@statusPending": { "description": "Report status: Pending" },
+
+  "statusInProgress": "قيد المعالجة",
+  "@statusInProgress": { "description": "Report status: In Progress" },
+
+  "statusResolved": "تم الحل",
+  "@statusResolved": { "description": "Report status: Resolved" },
+
+  "statusRejected": "مرفوض",
+  "@statusRejected": { "description": "Report status: Rejected" },
+
+  "myReportsTitle": "تقاريري",
+  "@myReportsTitle": { "description": "My Reports screen title" },
+
+  "myReportsEmpty": "لم تقم بإنشاء أي بلاغات بعد.",
+  "@myReportsEmpty": { "description": "Empty state for my reports screen" },
+
+  "myReportsFilter": "تصفية",
+  "@myReportsFilter": { "description": "Filter button label on my reports" },
+
+  "myReportsAll": "الكل",
+  "@myReportsAll": { "description": "Filter: All reports" },
+
+  "reportDetailTitle": "تفاصيل البلاغ",
+  "@reportDetailTitle": { "description": "Report detail screen title" },
+
+  "reportDetailDate": "تاريخ الإبلاغ",
+  "@reportDetailDate": { "description": "Report detail: date label" },
+
+  "reportDetailStatus": "الحالة",
+  "@reportDetailStatus": { "description": "Report detail: status label" },
+
+  "reportDetailCategory": "الفئة",
+  "@reportDetailCategory": { "description": "Report detail: category label" },
+
+  "reportDetailDescription": "الوصف",
+  "@reportDetailDescription": { "description": "Report detail: description label" },
+
+  "reportDetailLocation": "الموقع",
+  "@reportDetailLocation": { "description": "Report detail: location label" },
+
+  "mapTitle": "خريطة البلاغات",
+  "@mapTitle": { "description": "Map screen title" },
+
+  "mapFilterAll": "الكل",
+  "@mapFilterAll": { "description": "Map filter: All reports" },
+
+  "mapLoading": "جارٍ تحميل الخريطة...",
+  "@mapLoading": { "description": "Map loading message" },
+
+  "mapNoLocation": "تعذّر تحديد موقعك",
+  "@mapNoLocation": { "description": "Map: error getting user location" },
+
+  "mapSelectLocation": "اضغط لتحديد الموقع",
+  "@mapSelectLocation": { "description": "Map: instruction to select a location" },
+
+  "settingsTitle": "الإعدادات",
+  "@settingsTitle": { "description": "Settings screen title" },
+
+  "settingsLanguage": "اللغة",
+  "@settingsLanguage": { "description": "Settings: language section label" },
+
+  "settingsNotifications": "الإشعارات",
+  "@settingsNotifications": { "description": "Settings: notifications toggle label" },
+
+  "settingsNotificationsSubtitle": "استقبل إشعارات عند تحديث بلاغاتك",
+  "@settingsNotificationsSubtitle": { "description": "Settings: notifications subtitle" },
+
+  "settingsAbout": "عن التطبيق",
+  "@settingsAbout": { "description": "Settings: about section label" },
+
+  "settingsVersion": "الإصدار",
+  "@settingsVersion": { "description": "Settings: app version label" },
+
+  "settingsPrivacy": "سياسة الخصوصية",
+  "@settingsPrivacy": { "description": "Settings: privacy policy label" },
+
+  "settingsContact": "تواصل معنا",
+  "@settingsContact": { "description": "Settings: contact us label" },
+
+  "settingsTheme": "المظهر",
+  "@settingsTheme": { "description": "Settings: theme label" },
+
+  "settingsThemeLight": "فاتح",
+  "@settingsThemeLight": { "description": "Settings: light theme" },
+
+  "settingsThemeDark": "داكن",
+  "@settingsThemeDark": { "description": "Settings: dark theme" },
+
+  "settingsThemeSystem": "تلقائي",
+  "@settingsThemeSystem": { "description": "Settings: system theme" },
+
+  "permissionLocationTitle": "إذن الموقع",
+  "@permissionLocationTitle": { "description": "Location permission dialog title" },
+
+  "permissionLocationMessage": "يحتاج التطبيق إلى إذن الوصول لموقعك لتحديد مكان المشكلة بدقة.",
+  "@permissionLocationMessage": { "description": "Location permission dialog message" },
+
+  "permissionLocationGrant": "منح الإذن",
+  "@permissionLocationGrant": { "description": "Grant location permission button" },
+
+  "permissionLocationDeny": "رفض",
+  "@permissionLocationDeny": { "description": "Deny location permission button" },
+
+  "navAlerts": "تنبيهات",
+  "navAccount": "حسابي",
+
+  "networkError": "تعذّر الاتصال بالشبكة. تحقق من اتصالك بالإنترنت.",
+  "@networkError": { "description": "Generic network error message" },
+
+  "unknownError": "حدث خطأ غير متوقع. حاول مجدداً.",
+  "@unknownError": { "description": "Generic unknown error message" },
+
+  "reportCount": "{count, plural, =0{لا توجد بلاغات} =1{بلاغ واحد} =2{بلاغان} few{{count} بلاغات} many{{count} بلاغاً} other{{count} بلاغ}}",
+  "@reportCount": {
+    "description": "Pluralized report count",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  }
+}
