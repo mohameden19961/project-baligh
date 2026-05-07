@@ -46,62 +46,92 @@ class _HomeViewState extends State<HomeView> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: Consumer<ReportProvider>(
-        builder: (context, provider, _) {
-          return RefreshIndicator(
-            onRefresh: _onRefresh,
-            color: theme.colorScheme.primary,
-            backgroundColor: theme.colorScheme.surface,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                // ── Collapsing App Bar ────────────────────────────
-                _HomeAppBar(l10n: l10n, theme: theme),
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        color: theme.colorScheme.primary,
+        backgroundColor: theme.colorScheme.surface,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            // ── AppBar: static — no provider dependency ───────────
+            _HomeAppBar(l10n: l10n, theme: theme),
 
-                // ── Stats summary bar ─────────────────────────────
-                SliverToBoxAdapter(
-                  child: _StatsBar(provider: provider, l10n: l10n, theme: theme),
+            // ── Stats bar: rebuilds only when counts change ───────
+            // Selector extracts (total, pending, resolved) as a
+            // record; the widget only repaints when those 3 ints
+            // change, not on every status/filter notification.
+            SliverToBoxAdapter(
+              child: Selector<ReportProvider,
+                  (int total, int pending, int resolved)>(
+                selector: (_, p) => (
+                  p.allReports.length,
+                  p.pendingReports.length,
+                  p.resolvedReports.length,
                 ),
-
-                // ── Section header ────────────────────────────────
-                SliverToBoxAdapter(
-                  child: _SectionHeader(l10n: l10n, theme: theme),
+                builder: (_, counts, __) => _StatsBar(
+                  totalCount: counts.$1,
+                  pendingCount: counts.$2,
+                  resolvedCount: counts.$3,
+                  l10n: l10n,
+                  theme: theme,
                 ),
+              ),
+            ),
 
-                // ── Category filter chips ─────────────────────────
-                SliverToBoxAdapter(
-                  child: _CategoryFilterBar(
-                      provider: provider, l10n: l10n, theme: theme),
+            // ── Section header: fully static ──────────────────────
+            SliverToBoxAdapter(
+              child: _SectionHeader(l10n: l10n, theme: theme),
+            ),
+
+            // ── Category filter chips: rebuilds on activeCategory ─
+            SliverToBoxAdapter(
+              child: Selector<ReportProvider, ReportCategory?>(
+                selector: (_, p) => p.activeCategory,
+                builder: (ctx, activeCategory, __) => _CategoryFilterBar(
+                  activeCategory: activeCategory,
+                  onCategorySelected: (cat) =>
+                      ctx.read<ReportProvider>().filterByCategory(cat),
+                  l10n: l10n,
+                  theme: theme,
                 ),
+              ),
+            ),
 
-                // ── Main content ──────────────────────────────────
-                if (provider.isLoading)
-                  const SliverFillRemaining(child: _LoadingBody())
-                else if (provider.status == ReportProviderStatus.error)
-                  SliverFillRemaining(
+            // ── List body: rebuilds on status + filteredReports ───
+            // Consumer is appropriate here because this section
+            // genuinely needs to react to every status transition
+            // (loading → idle → error → idle).
+            Consumer<ReportProvider>(
+              builder: (context, provider, _) {
+                if (provider.isLoading) {
+                  return const SliverFillRemaining(child: _LoadingBody());
+                }
+                if (provider.status == ReportProviderStatus.error) {
+                  return SliverFillRemaining(
                     child: _ErrorBody(
                       message: provider.errorMessage,
                       onRetry: () => provider.fetchReports(),
                       l10n: l10n,
                       theme: theme,
                     ),
-                  )
-                else if (provider.filteredReports.isEmpty)
-                  SliverFillRemaining(
+                  );
+                }
+                if (provider.filteredReports.isEmpty) {
+                  return SliverFillRemaining(
                     child: _EmptyBody(l10n: l10n, theme: theme),
-                  )
-                else
-                  _ReportList(
-                    reports: provider.filteredReports,
-                    l10n: l10n,
-                  ),
-
-                // ── Bottom padding so last card clears the FAB ────
-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
-              ],
+                  );
+                }
+                return _ReportList(
+                  reports: provider.filteredReports,
+                  l10n: l10n,
+                );
+              },
             ),
-          );
-        },
+
+            // ── Bottom padding so last card clears the FAB ────────
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          ],
+        ),
       ),
     );
   }
@@ -121,13 +151,17 @@ class _HomeAppBar extends StatelessWidget {
     const lightGreen = Color(0xFF388E3C);
 
     return SliverAppBar(
-      expandedHeight: 148,
+      // ── Audit Step 3: corrected AppBar sizing ──────────────────
+      expandedHeight: 120,
+      collapsedHeight: 56,
       pinned: true,
       elevation: 0,
       backgroundColor: primaryGreen,
       automaticallyImplyLeading: false,
       flexibleSpace: FlexibleSpaceBar(
-        collapseMode: CollapseMode.pin,
+        // Parallax keeps the gradient background moving at a slower
+        // rate than the scroll, preventing the abrupt snap of CollapseMode.pin.
+        collapseMode: CollapseMode.parallax,
         background: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -138,7 +172,8 @@ class _HomeAppBar extends StatelessWidget {
           ),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              // Reduced top padding to fit within the smaller expandedHeight.
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,7 +185,8 @@ class _HomeAppBar extends StatelessWidget {
                         l10n.appName,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 26,
+                          // Reduced from 26 → 22 to fit the tighter header
+                          fontSize: 22,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
                         ),
@@ -160,24 +196,27 @@ class _HomeAppBar extends StatelessWidget {
                         l10n.homeSubtitle,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.80),
-                          fontSize: 12,
+                          // Reduced from 12 → 11 for the tighter layout
+                          fontSize: 11,
                         ),
                       ),
                     ],
                   ),
+                  // Reduced icon container from 42 → 36 for the tighter header
                   Container(
-                    width: 42,
-                    height: 42,
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.18),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                       border:
                           Border.all(color: Colors.white.withOpacity(0.30)),
                     ),
                     child: const Icon(
                       Icons.notifications_outlined,
                       color: Colors.white,
-                      size: 22,
+                      // Reduced from 22 → 18
+                      size: 18,
                     ),
                   ),
                 ],
@@ -186,21 +225,35 @@ class _HomeAppBar extends StatelessWidget {
           ),
         ),
       ),
+      title: Text(
+        l10n.appName,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w800,
+          fontSize: 17,
+        ),
+      ),
     );
   }
 }
 
 // ════════════════════════════════════════════════════════════════
 // _StatsBar — 3 stat pills: total / pending / resolved
+// Audit Step 4: accepts pre-extracted int counts, not the full
+// provider, so the Selector above controls rebuild granularity.
 // ════════════════════════════════════════════════════════════════
 class _StatsBar extends StatelessWidget {
   const _StatsBar({
-    required this.provider,
+    required this.totalCount,
+    required this.pendingCount,
+    required this.resolvedCount,
     required this.l10n,
     required this.theme,
   });
 
-  final ReportProvider provider;
+  final int totalCount;
+  final int pendingCount;
+  final int resolvedCount;
   final AppLocalizations l10n;
   final ThemeData theme;
 
@@ -227,7 +280,7 @@ class _StatsBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _StatPill(
-              value: provider.allReports.length,
+              value: totalCount,
               label: l10n.myReportsAll,
               color: theme.colorScheme.primary,
             ),
@@ -236,7 +289,7 @@ class _StatsBar extends StatelessWidget {
               thickness: 1,
             ),
             _StatPill(
-              value: provider.pendingReports.length,
+              value: pendingCount,
               label: l10n.statusPending,
               color: const Color(0xFFF9A825),
             ),
@@ -245,7 +298,7 @@ class _StatsBar extends StatelessWidget {
               thickness: 1,
             ),
             _StatPill(
-              value: provider.resolvedReports.length,
+              value: resolvedCount,
               label: l10n.statusResolved,
               color: const Color(0xFF2E7D32),
             ),
@@ -327,15 +380,19 @@ class _SectionHeader extends StatelessWidget {
 
 // ════════════════════════════════════════════════════════════════
 // _CategoryFilterBar — horizontally scrollable filter chips
+// Audit Step 4: accepts activeCategory + callback, not the full
+// provider, so the Selector above controls rebuild granularity.
 // ════════════════════════════════════════════════════════════════
 class _CategoryFilterBar extends StatelessWidget {
   const _CategoryFilterBar({
-    required this.provider,
+    required this.activeCategory,
+    required this.onCategorySelected,
     required this.l10n,
     required this.theme,
   });
 
-  final ReportProvider provider;
+  final ReportCategory? activeCategory;
+  final ValueChanged<ReportCategory?> onCategorySelected;
   final AppLocalizations l10n;
   final ThemeData theme;
 
@@ -362,12 +419,12 @@ class _CategoryFilterBar extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final cat = categories[i];
-          final isSelected = provider.activeCategory == cat;
+          final isSelected = activeCategory == cat;
 
           return FilterChip(
             label: Text(_label(cat)),
             selected: isSelected,
-            onSelected: (_) => provider.filterByCategory(cat),
+            onSelected: (_) => onCategorySelected(cat),
             selectedColor: theme.colorScheme.primary.withOpacity(0.15),
             checkmarkColor: theme.colorScheme.primary,
             showCheckmark: false,

@@ -13,6 +13,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
@@ -48,41 +49,50 @@ class _MapViewState extends State<MapView>
     super.dispose();
   }
 
-  // ── Build markers from the current report list ────────────────────
-// ── Build markers from the current report list ────────────────────
+  // ── Build flutter_map Marker list from the current report list ───
   List<Marker> _buildMarkers({
     required List<ReportModel> reports,
     required MapProvider mapProvider,
   }) {
     return reports.map((report) {
       final isSelected = mapProvider.selectedReport?.id == report.id;
-      // Note: You will need to make sure mapProvider.markerHue returns a 
-      // Flutter Color object now, instead of a Google Maps hue double.
-      final markerColor = MapProvider.markerColor(report.category);
+      final color = MapProvider.markerColor(report.category);
 
       return Marker(
         point: LatLng(
           report.location.latitude,
           report.location.longitude,
         ),
-        // Make the hit-box larger if selected
-        width: isSelected ? 45.0 : 32.0,
-        height: isSelected ? 45.0 : 32.0,
-        alignment: Alignment.center,
+        width: isSelected ? 48 : 38,
+        height: isSelected ? 48 : 38,
         child: GestureDetector(
           onTap: () {
             HapticFeedback.selectionClick();
             mapProvider.selectReport(report);
             mapProvider.focusOn(report.location);
           },
-          child: Icon(
-            Icons.location_on, // Or any custom SVG/Icon you want
-            color: markerColor,
-            size: isSelected ? 45.0 : 32.0,
-            shadows: [
-              if (isSelected)
-                const Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 4))
-            ],
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white,
+                width: isSelected ? 3 : 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.45),
+                  blurRadius: isSelected ? 14 : 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Icon(
+              MapProvider.markerIcon(report.category),
+              color: Colors.white,
+              size: isSelected ? 22 : 17,
+            ),
           ),
         ),
       );
@@ -165,10 +175,8 @@ class _MapViewState extends State<MapView>
 }
 
 // ════════════════════════════════════════════════════════════════
-// _BalighMap — the GoogleMap widget with styling
-// ════════════════════════════════════════════════════════════════
-// ════════════════════════════════════════════════════════════════
-// _BalighMap — the FlutterMap widget with OpenStreetMap tiles
+// _BalighMap — flutter_map widget with FMTC-cached OSM TileLayer
+// (Audit Step 2: maxConcurrent: 12, retries: 3)
 // ════════════════════════════════════════════════════════════════
 class _BalighMap extends StatelessWidget {
   const _BalighMap({required this.markers, required this.mapProvider});
@@ -179,27 +187,33 @@ class _BalighMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlutterMap(
-      // Pass your mapController from your provider so you can animate the camera
-      mapController: mapProvider.mapController, 
+      mapController: mapProvider.mapController,
       options: MapOptions(
-        initialCenter: const LatLng(18.0735, -15.9582), // Nouakchott coordinates
+        initialCenter: kNouakchottLatLng,
         initialZoom: 13.0,
-        // Tap on empty area → dismiss selected report.
+        minZoom: 5.0,
+        maxZoom: 19.0,
+        // Dismiss the preview sheet when the user pans the map.
         onTap: (_, __) => mapProvider.clearSelection(),
-        onPositionChanged: (position, hasGesture) {
-          // Optionally dismiss sheet when user starts panning.
-        },
       ),
       children: [
-        // 1. The base map layer
+        // ── FMTC-cached OSM tile layer (Audit Step 2) ─────────────
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          // VERY IMPORTANT: OSM requires you to declare your app's package name
-          userAgentPackageName: 'com.your_company.baligh', 
+          userAgentPackageName: 'com.baligh.app',
+          tileProvider: const FMTCStore('osm_cache').getTileProvider(
+            loadingStrategy: BrowseLoadingStrategy.cacheFirst,
+            cachedValidDuration: Duration(days: 30),
+          ),
+          maxNativeZoom: 19,
+          errorTileCallback: (tile, error, stackTrace) {
+            debugPrint('[TileLayer] tile error: $error');
+          },
         ),
-        // 2. The markers layer
+        // ── Report markers ────────────────────────────────────────
         MarkerLayer(
           markers: markers,
+          rotate: false,
         ),
       ],
     );

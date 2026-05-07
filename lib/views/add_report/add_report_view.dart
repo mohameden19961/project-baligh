@@ -12,12 +12,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
-import '../../../l10n/app_localizations.dart';
-import '../../../models/report_model.dart';
-import '../../../providers/add_report_provider.dart';
+import '../../l10n/app_localizations.dart';
+import '../../models/report_model.dart';
+import '../../providers/add_report_provider.dart';
+import '../../providers/map_provider.dart' show kNouakchottLatLng;
 
 // ════════════════════════════════════════════════════════════════
 // AddReportView  — the Navigator route pushed by the FAB
@@ -45,7 +47,10 @@ class _AddReportScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final provider = context.watch<AddReportProvider>();
+    // ── Audit Step 4: removed global context.watch<AddReportProvider>().
+    // Only the two widgets that actually depend on provider state are
+    // wrapped in Consumer below — the AppBar title, leading icon, and
+    // backgroundColor never change so they don't need to rebuild.
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -65,36 +70,42 @@ class _AddReportScaffold extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        // ── Consumer #1: only _StepProgressBar needs currentStepIndex ──
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
-          child: _StepProgressBar(
-            currentStep: provider.currentStepIndex,
-            totalSteps: FormStep.values.length,
-            theme: theme,
+          child: Consumer<AddReportProvider>(
+            builder: (_, provider, __) => _StepProgressBar(
+              currentStep: provider.currentStepIndex,
+              totalSteps: FormStep.values.length,
+              theme: theme,
+            ),
           ),
         ),
       ),
-      // Route body based on current step.
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 320),
-        transitionBuilder: (child, animation) {
-          final slide = Tween<Offset>(
-            begin: const Offset(0.08, 0),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
-          return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(position: slide, child: child),
-          );
-        },
-        child: KeyedSubtree(
-          key: ValueKey(provider.currentStep),
-          child: switch (provider.currentStep) {
-            FormStep.category => const _Step1CategoryBody(),
-            FormStep.location => const _Step2LocationBody(),
-            FormStep.photo    => const _StepPlaceholder(icon: Icons.camera_alt_rounded,  stepNumber: 3),
-            FormStep.review   => const _StepPlaceholder(icon: Icons.check_circle_rounded, stepNumber: 4),
+      // ── Consumer #2: AnimatedSwitcher body needs currentStep ───────
+      body: Consumer<AddReportProvider>(
+        builder: (_, provider, __) => AnimatedSwitcher(
+          duration: const Duration(milliseconds: 320),
+          transitionBuilder: (child, animation) {
+            final slide = Tween<Offset>(
+              begin: const Offset(0.08, 0),
+              end: Offset.zero,
+            ).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(position: slide, child: child),
+            );
           },
+          child: KeyedSubtree(
+            key: ValueKey(provider.currentStep),
+            child: switch (provider.currentStep) {
+              FormStep.category => const _Step1CategoryBody(),
+              FormStep.location => const _LocationPickerBody(),
+              FormStep.photo    => const _StepPlaceholder(icon: Icons.camera_alt_rounded,  stepNumber: 3),
+              FormStep.review   => const _StepPlaceholder(icon: Icons.check_circle_rounded, stepNumber: 4),
+            },
+          ),
         ),
       ),
     );
@@ -272,9 +283,23 @@ const List<_CatDef> _kCategories = [
   _CatDef(ReportCategory.water,    Icons.water_drop_outlined,        Color(0xFF0277BD)),
   _CatDef(ReportCategory.parks,    Icons.park_outlined,              Color(0xFF388E3C)),
   _CatDef(ReportCategory.other,    Icons.report_problem_outlined,    Color(0xFF7B1FA2)),
+  // Extended 12-category set (mapped to existing enum values + other)
+  _CatDef(ReportCategory.other,    Icons.flood_outlined,             Color(0xFF00838F)), // Flood
+  _CatDef(ReportCategory.other,    Icons.local_fire_department_outlined, Color(0xFFB71C1C)), // Fire hazard
+  _CatDef(ReportCategory.roads,    Icons.traffic_rounded,            Color(0xFFE65100)), // Traffic
+  _CatDef(ReportCategory.water,    Icons.plumbing_rounded,           Color(0xFF1565C0)), // Plumbing
+  _CatDef(ReportCategory.other,    Icons.security_rounded,           Color(0xFF37474F)), // Security
+  _CatDef(ReportCategory.parks,    Icons.grass_rounded,              Color(0xFF2E7D32)), // Vegetation
 ];
 
 String _catLabel(ReportCategory cat, IconData icon, AppLocalizations l10n) {
+  // Map by icon to give unique labels to the extended set.
+  if (icon == Icons.flood_outlined)               return 'فيضانات';
+  if (icon == Icons.local_fire_department_outlined) return 'حريق';
+  if (icon == Icons.traffic_rounded)              return 'مرور';
+  if (icon == Icons.plumbing_rounded)             return 'سباكة';
+  if (icon == Icons.security_rounded)             return 'أمن';
+  if (icon == Icons.grass_rounded)               return 'نباتات';
   return switch (cat) {
     ReportCategory.roads    => l10n.categoryRoads,
     ReportCategory.lighting => l10n.categoryLighting,
@@ -306,7 +331,12 @@ class _CategoryGrid extends StatelessWidget {
       itemBuilder: (context, i) {
         final def = _kCategories[i];
         final label = _catLabel(def.category, def.icon, l10n);
-        final isSelected = provider.selectedCategory == def.category;
+        final isSelected = provider.selectedCategory == def.category &&
+            // For the extended "other" mappings, match by icon identity.
+            (def.category != ReportCategory.other ||
+                provider.selectedCategory == def.category &&
+                    i == _kCategories.indexWhere(
+                        (d) => d.category == provider.selectedCategory));
 
         return _CategoryTile(
           def: def,
@@ -843,107 +873,8 @@ class _ErrorBanner extends StatelessWidget {
 }
 
 // ════════════════════════════════════════════════════════════════
-// _StepPlaceholder — temporary body for Steps 2, 3, 4
-// Replace each with its own widget in future prompts.
-// ════════════════════════════════════════════════════════════════
-class _Step2LocationBody extends StatelessWidget {
-  const _Step2LocationBody();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final provider = context.watch<AddReportProvider>();
-
-    return Column(
-      children: [
-        Expanded(
-          child: Stack(
-            children: [
-              FlutterMap(
-                options: MapOptions(
-                  initialCenter: const LatLng(18.0735, -15.9582),
-                  initialZoom: 14.0,
-                  onTap: (_, point) {
-                    provider.setLocation(
-                      ReportLocation(
-                        latitude: point.latitude,
-                        longitude: point.longitude,
-                      ),
-                    );
-                  },
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.your_company.baligh',
-                  ),
-                  if (provider.selectedLocation != null)
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          point: LatLng(
-                            provider.selectedLocation!.latitude,
-                            provider.selectedLocation!.longitude,
-                          ),
-                          width: 40,
-                          height: 40,
-                          child: const Icon(
-                            Icons.location_pin,
-                            color: Color(0xFF2E7D32),
-                            size: 40,
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-              if (provider.selectedLocation == null)
-                Positioned(
-                  bottom: 16,
-                  left: 16,
-                  right: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surface.withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.12),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.touch_app_rounded, color: theme.colorScheme.primary, size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Tap on the map to pin your location',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: theme.colorScheme.onSurface,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const _BottomActionBar(),
-      ],
-    );
-  }
-}
-
-// ════════════════════════════════════════════════════════════════
 // _StepPlaceholder — temporary body for Steps 3, 4
-// Replace each with its own widget in future prompts.
+// Step 2 is now fully implemented as _LocationPickerBody below.
 // ════════════════════════════════════════════════════════════════
 class _StepPlaceholder extends StatelessWidget {
   const _StepPlaceholder({required this.icon, required this.stepNumber});
@@ -953,7 +884,6 @@ class _StepPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final provider = context.read<AddReportProvider>();
 
     return Column(
       children: [
@@ -980,3 +910,185 @@ class _StepPlaceholder extends StatelessWidget {
     );
   }
 }
+
+// ════════════════════════════════════════════════════════════════
+// _LocationPickerBody — Step 2: full-screen OSM map with a centre
+// pin. User drags the map; the pin stays fixed in the middle.
+// Tapping "Confirm" reads the map centre and saves it to the
+// AddReportProvider. Uses the FMTC-cached TileLayer (Audit Step 2).
+// ════════════════════════════════════════════════════════════════
+class _LocationPickerBody extends StatefulWidget {
+  const _LocationPickerBody();
+
+  @override
+  State<_LocationPickerBody> createState() => _LocationPickerBodyState();
+}
+
+class _LocationPickerBodyState extends State<_LocationPickerBody> {
+  late final MapController _mapController;
+  LatLng _pickedPoint = kNouakchottLatLng;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  void _onPositionChanged(MapCamera camera, bool hasGesture) {
+    if (hasGesture) {
+      setState(() => _pickedPoint = camera.center);
+    }
+  }
+
+  void _confirmLocation() {
+    context.read<AddReportProvider>().setLocation(
+          ReportLocation(
+            latitude: _pickedPoint.latitude,
+            longitude: _pickedPoint.longitude,
+          ),
+        );
+    context.read<AddReportProvider>().nextStep();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Column(
+      children: [
+        // ── Instruction banner ──────────────────────────────────
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          color: theme.colorScheme.primary.withOpacity(0.07),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline_rounded,
+                  size: 16, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.mapSelectLocation,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // ── Map + centre pin ────────────────────────────────────
+        Expanded(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              FlutterMap(
+                mapController: _mapController,
+                options: MapOptions(
+                  initialCenter: kNouakchottLatLng,
+                  initialZoom: 14.0,
+                  minZoom: 5.0,
+                  maxZoom: 19.0,
+                  onPositionChanged: _onPositionChanged,
+                ),
+                children: [
+                  // ── FMTC-cached OSM TileLayer (Audit Step 2) ──
+                  TileLayer(
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.baligh.app',
+                    tileProvider: const FMTCStore('osm_cache').getTileProvider(
+                      loadingStrategy: BrowseLoadingStrategy.cacheFirst,
+                      cachedValidDuration: Duration(days: 30),
+                    ),
+                    maxNativeZoom: 19,
+                  ),
+                ],
+              ),
+
+              // ── Fixed centre pin ──────────────────────────────
+              IgnorePointer(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary,
+                        shape: BoxShape.circle,
+                        border:
+                            Border.all(color: Colors.white, width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                theme.colorScheme.primary.withOpacity(0.40),
+                            blurRadius: 14,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.location_on_rounded,
+                          color: Colors.white, size: 22),
+                    ),
+                    // Pin shadow dot
+                    Container(
+                      width: 10,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // ── Confirm button ──────────────────────────────────────
+        Container(
+          padding: EdgeInsets.fromLTRB(
+              20, 14, 20, MediaQuery.of(context).padding.bottom + 16),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            border: Border(
+              top: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.08)),
+            ),
+          ),
+          child: Row(
+            children: [
+              _OutlineActionButton(
+                label: l10n.backButton,
+                icon: Icons.arrow_back_ios_new_rounded,
+                onTap: () => context.read<AddReportProvider>().previousStep(),
+                theme: theme,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _PrimaryActionButton(
+                  label: l10n.reportLocation,
+                  onTap: _confirmLocation,
+                  theme: theme,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+

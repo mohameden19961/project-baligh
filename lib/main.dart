@@ -3,18 +3,19 @@
 // Entry point for the Baligh (بلّغ) application.
 // Architecture : MVC  |  State : Provider  |  i18n : AppLocalizations
 // ─────────────────────────────────────────────────────────────
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:provider/provider.dart';
 import 'providers/navigation_provider.dart';
 import 'providers/report_provider.dart';
 import 'views/main_layout.dart';
 
-// ── Generated localization class (created by `flutter gen-l10n`) ──
-import 'package:baligh_app/l10n/app_localizations.dart';
+
+// ── Generated localization class (manual path — no flutter_gen phantom) ──
+import 'l10n/app_localizations.dart';
 
 // ── Providers (Controllers) ───────────────────────────────────────
 import 'providers/locale_provider.dart';
@@ -46,13 +47,20 @@ void main() async {
     ),
   );
 
+  // ── FMTC tile-cache initialization (Audit Step 1) ──────────────
+  // Must complete before runApp so the TileLayer can hit the cache
+  // on the very first paint without a cold-start miss.
+  await FMTCObjectBoxBackend().initialise();
+  await const FMTCStore('osm_cache').manage.create();
+  // ───────────────────────────────────────────────────────────────
+
   runApp(
     // ── Register all Providers at the root ───────────────────────
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-	      ChangeNotifierProvider(create: (_) => ReportProvider()),
+        ChangeNotifierProvider(create: (_) => ReportProvider()),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
       ],
       child: const BalighApp(),
@@ -105,8 +113,7 @@ class BalighApp extends StatelessWidget {
       },
 
       // ── Navigation ───────────────────────────────────────────────
-      // Replace with the real home screen once created.
-      home:  const MainLayout(),
+      home: const MainLayout(),
 
       // Named routes will be added here as screens are built:
       // routes: {
@@ -132,10 +139,6 @@ class _PlaceholderHome extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-
-    Future.microtask(() {
-      context.read<ReportProvider>().fetchReports();
-    });
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -501,7 +504,6 @@ class AppTheme {
         backgroundColor: lightGreen,
         foregroundColor: white,
       ),
-      textTheme: GoogleFonts.cairoTextTheme(),
     );
   }
 }

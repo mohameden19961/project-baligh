@@ -13,13 +13,10 @@ import '../l10n/app_localizations.dart';
 import '../providers/navigation_provider.dart';
 
 // ── Tab views ─────────────────────────────────────────────────────
-import 'account/account_view.dart';
 import 'home/home_view.dart';
 import 'my_reports/my_reports_view.dart';
 import 'alerts/alerts_view.dart';
-import 'map/map_view.dart';
 import 'account/account_view.dart';
-import 'add_report/add_report_view.dart';
 import 'add_report/add_report_view.dart';
 
 // ════════════════════════════════════════════════════════════════
@@ -46,14 +43,6 @@ class _MainLayoutState extends State<MainLayout>
     AlertsView(),
     AccountView(),
   ];
-
-  final List<Widget> _screens = [
-  const HomeView(),    // Replace the placeholder with this!
-  const MapView(),     // Use your new OSM MapView here!
-  const SizedBox(),    // Placeholder for the FAB gap
-  const AlertsView(),
-  const AccountView(),
-];
 
   @override
   void initState() {
@@ -113,23 +102,17 @@ class _MainLayoutState extends State<MainLayout>
       ),
 
       // ── FAB ──────────────────────────────────────────────────────
-      // floatingActionButton: ScaleTransition(
-      //   scale: _fabScale,
-      //   child: _BalighFab(onTap: () => _onFabTapped(context)),
-      // ),
- 
-
-  floatingActionButton: FloatingActionButton(
-  onPressed: () {
-    // This opens your new Add Report screen!
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AddReportView()),
-    );
-  },
-  child: const Icon(Icons.add),
-),
- floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // Audit Step 3: explicit SizedBox constrains the hit target
+      // and prevents layout jitter when the entrance animation runs.
+      floatingActionButton: SizedBox(
+        width: 56,
+        height: 56,
+        child: ScaleTransition(
+          scale: _fabScale,
+          child: _BalighFab(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddReportView()))),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
       // ── Bottom Navigation Bar ─────────────────────────────────────
       bottomNavigationBar: _BalighBottomNav(
@@ -283,10 +266,13 @@ class _BalighBottomNav extends StatelessWidget {
     // BottomAppBar gives us the notch cutout for the FAB.
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
-      notchMargin: 8.0,
+      // Audit Step 3: tightened from 8.0 → 6.0 for a snugger FAB fit.
+      notchMargin: 6.0,
       color: theme.colorScheme.surface,
       elevation: 12,
       shadowColor: Colors.black.withOpacity(0.15),
+      // Audit Step 3: clip prevents ink/shadow from bleeding outside the notch.
+      clipBehavior: Clip.antiAlias,
       child: SizedBox(
         height: 64,
         child: Row(

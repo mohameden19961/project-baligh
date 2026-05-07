@@ -1,28 +1,23 @@
 // lib/providers/map_provider.dart
 // ─────────────────────────────────────────────────────────────────
 // Controller layer — owns all state for the Map screen.
-// Responsibilities:
-//   • Track the GoogleMapController (camera movement).
-//   • Maintain active category filter and search query.
-//   • Derive the visible filtered report list for marker rendering.
-//   • Own the selected report (drives the bottom detail sheet).
+// Stack: flutter_map + latlong2  (OSM — no Google Maps API key)
 // ─────────────────────────────────────────────────────────────────
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Colors, IconData, Icons, Color;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/report_model.dart';
 
 // ════════════════════════════════════════════════════════════════
-// Default camera: Nouakchott, Mauritania
+// Default centre: Nouakchott, Mauritania
 // ════════════════════════════════════════════════════════════════
-const LatLng kNouakchottCenter = LatLng(18.0735, -15.9582);
-const double kDefaultZoom = 13.0;
+const LatLng kNouakchottLatLng = LatLng(18.0735, -15.9582);
 
 class MapProvider extends ChangeNotifier {
-  // ── GoogleMapController ──────────────────────────────────────────
-
+  // ── flutter_map controller ───────────────────────────────────────
+  // Created eagerly — passed to FlutterMap via mapController parameter.
   final MapController mapController = MapController();
 
   // ── Filter & search state ────────────────────────────────────────
@@ -43,16 +38,10 @@ class MapProvider extends ChangeNotifier {
   bool get hasActiveFilter =>
       _activeCategory != null || _searchQuery.isNotEmpty;
 
-  // ── Map controller lifecycle ─────────────────────────────────────
-
-  void disposeController() {
-    mapController.dispose();
-  }
-
   // ── Camera helpers ───────────────────────────────────────────────
 
   /// Animate the camera to a specific report's location.
-Future<void> focusOn(ReportLocation location) async {
+  void focusOn(ReportLocation location) {
     mapController.move(
       LatLng(location.latitude, location.longitude),
       16.0,
@@ -60,8 +49,8 @@ Future<void> focusOn(ReportLocation location) async {
   }
 
   /// Animate back to the default city-level view.
-void resetCamera() {
-    mapController.move(kNouakchottCenter, kDefaultZoom);
+  void resetCamera() {
+    mapController.move(kNouakchottLatLng, 13.0);
   }
 
   // ── Filtering ────────────────────────────────────────────────────
@@ -69,7 +58,6 @@ void resetCamera() {
   void setCategory(ReportCategory? category) {
     if (_activeCategory == category) return;
     _activeCategory = category;
-    // Deselect any open preview when filter changes.
     _selectedReport = null;
     notifyListeners();
   }
@@ -92,23 +80,18 @@ void resetCamera() {
 
   // ── Derive visible reports ───────────────────────────────────────
 
-  /// Returns only the reports that match the active filters.
-  /// Called by the View to build the Markers set.
   List<ReportModel> filteredReports(List<ReportModel> all) {
     return all.where((r) {
       final matchesCategory =
           _activeCategory == null || r.category == _activeCategory;
       final matchesSearch = _searchQuery.isEmpty ||
           r.description.toLowerCase().contains(_searchQuery) ||
-          (r.location.address
-                  ?.toLowerCase()
-                  .contains(_searchQuery) ??
-              false);
+          (r.location.address?.toLowerCase().contains(_searchQuery) ?? false);
       return matchesCategory && matchesSearch;
     }).toList();
   }
 
-  // ── Selected report (marker tap / sheet) ─────────────────────────
+  // ── Selected report ──────────────────────────────────────────────
 
   void selectReport(ReportModel report) {
     _selectedReport = report;
@@ -127,35 +110,35 @@ void resetCamera() {
     if (currentPosition == null) return;
     _isLocating = true;
     notifyListeners();
-    
+    mapController.move(currentPosition, 15.5);
     _isLocating = false;
     notifyListeners();
   }
 
-  // ── Marker colour per category ───────────────────────────────────
-  // Maps each category to a Google Maps hue value (0-360).
+  // ── Marker colour per category (Flutter Color — no Google hue) ───
 
-static Color markerColor(ReportCategory? category) {
-    switch (category) {
-      case ReportCategory.roads:
-        return const Color(0xFFEF6C00);
-      case ReportCategory.lighting:
-        return const Color(0xFFF9A825);
-      case ReportCategory.waste:
-        return const Color(0xFF6D4C41);
-      case ReportCategory.water:
-        return const Color(0xFF0277BD);
-      case ReportCategory.parks:
-        return const Color(0xFF388E3C);
-      case ReportCategory.other:
-        return const Color(0xFF7B1FA2);
-      default:
-        return Colors.blue; // Fallback
-    }
+  static Color markerColor(ReportCategory cat) => switch (cat) {
+        ReportCategory.roads    => const Color(0xFFEF6C00),
+        ReportCategory.lighting => const Color(0xFFF9A825),
+        ReportCategory.waste    => const Color(0xFF6D4C41),
+        ReportCategory.water    => const Color(0xFF0277BD),
+        ReportCategory.parks    => const Color(0xFF388E3C),
+        ReportCategory.other    => const Color(0xFF7B1FA2),
+      };
+
+  static IconData markerIcon(ReportCategory cat) => switch (cat) {
+        ReportCategory.roads    => Icons.construction_rounded,
+        ReportCategory.lighting => Icons.lightbulb_outline_rounded,
+        ReportCategory.waste    => Icons.delete_outline_rounded,
+        ReportCategory.water    => Icons.water_drop_outlined,
+        ReportCategory.parks    => Icons.park_outlined,
+        ReportCategory.other    => Icons.report_problem_outlined,
+      };
+
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
   }
 }
-  // @override
-  // void dispose() {
-  //   disposeController();
-  //   super.dispose();
-  // }
+
