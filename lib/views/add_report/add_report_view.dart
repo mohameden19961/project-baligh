@@ -283,32 +283,16 @@ const List<_CatDef> _kCategories = [
   _CatDef(ReportCategory.water,    Icons.water_drop_outlined,        Color(0xFF0277BD)),
   _CatDef(ReportCategory.parks,    Icons.park_outlined,              Color(0xFF388E3C)),
   _CatDef(ReportCategory.other,    Icons.report_problem_outlined,    Color(0xFF7B1FA2)),
-  // Extended 12-category set (mapped to existing enum values + other)
-  _CatDef(ReportCategory.other,    Icons.flood_outlined,             Color(0xFF00838F)), // Flood
-  _CatDef(ReportCategory.other,    Icons.local_fire_department_outlined, Color(0xFFB71C1C)), // Fire hazard
-  _CatDef(ReportCategory.roads,    Icons.traffic_rounded,            Color(0xFFE65100)), // Traffic
-  _CatDef(ReportCategory.water,    Icons.plumbing_rounded,           Color(0xFF1565C0)), // Plumbing
-  _CatDef(ReportCategory.other,    Icons.security_rounded,           Color(0xFF37474F)), // Security
-  _CatDef(ReportCategory.parks,    Icons.grass_rounded,              Color(0xFF2E7D32)), // Vegetation
 ];
 
-String _catLabel(ReportCategory cat, IconData icon, AppLocalizations l10n) {
-  // Map by icon to give unique labels to the extended set.
-  if (icon == Icons.flood_outlined)               return 'فيضانات';
-  if (icon == Icons.local_fire_department_outlined) return 'حريق';
-  if (icon == Icons.traffic_rounded)              return 'مرور';
-  if (icon == Icons.plumbing_rounded)             return 'سباكة';
-  if (icon == Icons.security_rounded)             return 'أمن';
-  if (icon == Icons.grass_rounded)               return 'نباتات';
-  return switch (cat) {
-    ReportCategory.roads    => l10n.categoryRoads,
-    ReportCategory.lighting => l10n.categoryLighting,
-    ReportCategory.waste    => l10n.categoryWaste,
-    ReportCategory.water    => l10n.categoryWater,
-    ReportCategory.parks    => l10n.categoryParks,
-    ReportCategory.other    => l10n.categoryOther,
-  };
-}
+String _catLabel(ReportCategory cat, AppLocalizations l10n) => switch (cat) {
+      ReportCategory.roads    => l10n.categoryRoads,
+      ReportCategory.lighting => l10n.categoryLighting,
+      ReportCategory.waste    => l10n.categoryWaste,
+      ReportCategory.water    => l10n.categoryWater,
+      ReportCategory.parks    => l10n.categoryParks,
+      ReportCategory.other    => l10n.categoryOther,
+    };
 
 class _CategoryGrid extends StatelessWidget {
   const _CategoryGrid();
@@ -330,13 +314,8 @@ class _CategoryGrid extends StatelessWidget {
       itemCount: _kCategories.length,
       itemBuilder: (context, i) {
         final def = _kCategories[i];
-        final label = _catLabel(def.category, def.icon, l10n);
-        final isSelected = provider.selectedCategory == def.category &&
-            // For the extended "other" mappings, match by icon identity.
-            (def.category != ReportCategory.other ||
-                provider.selectedCategory == def.category &&
-                    i == _kCategories.indexWhere(
-                        (d) => d.category == provider.selectedCategory));
+        final label = _catLabel(def.category, l10n);
+        final isSelected = provider.selectedCategory == def.category;
 
         return _CategoryTile(
           def: def,
