@@ -1,0 +1,22 @@
+{
+  "@@locale": "ar",
+  "appName": "بلّغ",
+  "onboardingTitle1": "بلّغ عن المشاكل",
+  "onboardingDesc1": "أبلغ بسهولة عن المشاكل الحضرية في حيك.",
+  "onboardingTitle2": "حدد الموقع بدقة",
+  "onboardingDesc2": "حدد الموقع الدقيق للمشكلة على الخريطة.",
+  "onboardingTitle3": "احصل على تنبيهات",
+  "onboardingDesc3": "ابق على اطلاع بخصوص بلاغات المجتمع في الوقت الفعلي.",
+  "login": "تسجيل الدخول",
+  "register": "إنشاء حساب",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "forgotPassword": "هل نسيت كلمة المرور؟",
+  "getStarted": "ابدأ الآن",
+  "home": "الرئيسية",
+  "map": "الخريطة",
+  "alerts": "التنبيهات",
+  "profile": "الحساب",
+  "settings": "الإعدادات",
+  "reportNow": "بلّغ الآن"
+}

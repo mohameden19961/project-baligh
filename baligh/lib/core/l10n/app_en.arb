@@ -1,0 +1,22 @@
+{
+  "@@locale": "en",
+  "appName": "Baligh",
+  "onboardingTitle1": "Report Issues",
+  "onboardingDesc1": "Easily report urban issues in your neighborhood.",
+  "onboardingTitle2": "Locate Precisely",
+  "onboardingDesc2": "Mark the exact location of the problem on the map.",
+  "onboardingTitle3": "Get Alerts",
+  "onboardingDesc3": "Stay informed about community reports in real-time.",
+  "login": "Login",
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "forgotPassword": "Forgot Password?",
+  "getStarted": "Get Started",
+  "home": "Home",
+  "map": "Map",
+  "alerts": "Alerts",
+  "profile": "Profile",
+  "settings": "Settings",
+  "reportNow": "Report Now"
+}
