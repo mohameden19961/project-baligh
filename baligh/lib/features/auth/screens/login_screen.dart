@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:baligh/core/l10n/generated/app_localizations.dart';
-import '../../../core/widgets/app_button.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_text_field.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -12,81 +12,126 @@ class LoginScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.login)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+      backgroundColor: AppTheme.primaryGreen,
+      body: SafeArea(
+        bottom: false,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 40),
-            Text(
-              l10n.appName,
-              style: TextStyle(
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
+            // Header Section
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.accentGold,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.campaign,
+                      size: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'بلّغ',
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: 'Cairo',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'نظام التنبيهات الجماعية — Lite',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white70,
+                      fontFamily: 'Cairo',
+                    ),
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 60),
-            AppTextField(
-              label: l10n.email,
-              hint: 'email@example.com',
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 20),
-            AppTextField(
-              label: l10n.password,
-              hint: '••••••••',
-              isPassword: true,
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => context.push('/forgot-password'),
-                child: Text(l10n.forgotPassword),
-              ),
-            ),
-            const SizedBox(height: 32),
-            AppButton(
-              text: l10n.login,
-              onPressed: () => context.go('/home'),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                const Expanded(child: Divider()),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text('OR', style: TextStyle(color: Colors.grey[600])),
+            // Form Section
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                 ),
-                const Expanded(child: Divider()),
-              ],
-            ),
-            const SizedBox(height: 24),
-            OutlinedButton.icon(
-              onPressed: () {
-                // Mock Google Login
-                context.go('/home');
-              },
-              icon: const Icon(Icons.g_mobiledata, size: 28),
-              label: const Text('Sign in with Google'),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 56),
-                side: BorderSide(color: Colors.white.withOpacity(0.1)),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Don't have an account?"),
-                TextButton(
-                  onPressed: () => context.push('/register'),
-                  child: Text(l10n.register),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'تسجيل الدخول',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryGreen,
+                          fontFamily: 'Cairo',
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      AppTextField(
+                        label: 'البريد الإلكتروني',
+                        hint: 'example@mail.com',
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 20),
+                      AppTextField(
+                        label: 'كلمة المرور',
+                        hint: '••••••••',
+                        isPassword: true,
+                      ),
+                      const SizedBox(height: 40),
+                      ElevatedButton(
+                        onPressed: () => context.go('/home'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryGreen,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'دخول ← (يفتح الرئيسية)',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Cairo',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("ما عندك حساب؟ ", style: TextStyle(fontFamily: 'Cairo')),
+                          TextButton(
+                            onPressed: () => context.push('/register'),
+                            child: const Text(
+                              'سجل الآن - (شاشة التسجيل)',
+                              style: TextStyle(
+                                color: AppTheme.primaryGreen,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Cairo',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           ],
         ),

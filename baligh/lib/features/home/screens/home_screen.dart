@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:baligh/core/l10n/generated/app_localizations.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../../core/theme/app_theme.dart';
 import 'home_content.dart';
 import '../../alerts/screens/alert_feed_screen.dart';
 import '../../profile/screens/profile_screen.dart';
@@ -16,52 +15,72 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = [
-    HomeContent(), // This will be the Map View with markers
-    MapPlaceholder(), // Simple map view
-    AlertFeedScreen(),
-    ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return Scaffold(
+      backgroundColor: AppTheme.primaryGreen,
       body: IndexedStack(
         index: _selectedIndex,
-        children: [
-           const HomeContent(),
-           const MapPlaceholder(),
-           const AlertFeedScreen(),
-           const ProfileScreen(),
+        children: const [
+          HomeContent(),
+          Center(child: Text('الخريطة', style: TextStyle(color: Colors.white, fontFamily: 'Cairo'))),
+          AlertFeedScreen(),
+          ProfileScreen(),
         ],
       ),
-      floatingActionButton: _selectedIndex == 0 || _selectedIndex == 1 
-          ? FloatingActionButton.extended(
-              onPressed: () => context.push('/report'),
-              backgroundColor: Theme.of(context).primaryColor,
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: Text(l10n.reportNow, style: const TextStyle(color: Colors.white)),
-            )
-          : null,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF1E1E1E),
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.home_filled), label: l10n.home),
-          BottomNavigationBarItem(icon: const Icon(Icons.map_outlined), label: l10n.map),
-          BottomNavigationBarItem(icon: const Icon(Icons.notifications_outlined), label: l10n.alerts),
-          BottomNavigationBarItem(icon: const Icon(Icons.person_outline), label: l10n.profile),
-        ],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/report'),
+        backgroundColor: AppTheme.accentGold,
+        icon: const Icon(Icons.add, color: AppTheme.primaryGreen, size: 28),
+        label: const Text(
+          'بلاغ جديد',
+          style: TextStyle(
+            color: AppTheme.primaryGreen,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Cairo',
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8,
+        color: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.home_filled,
+                color: _selectedIndex == 0 ? AppTheme.primaryGreen : Colors.grey,
+              ),
+              onPressed: () => setState(() => _selectedIndex = 0),
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.map_outlined,
+                color: _selectedIndex == 1 ? AppTheme.primaryGreen : Colors.grey,
+              ),
+              onPressed: () => setState(() => _selectedIndex = 1),
+            ),
+            const SizedBox(width: 48), // Space for FAB
+            IconButton(
+              icon: Icon(
+                Icons.notifications_outlined,
+                color: _selectedIndex == 2 ? AppTheme.primaryGreen : Colors.grey,
+              ),
+              onPressed: () => setState(() => _selectedIndex = 2),
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.person_outline,
+                color: _selectedIndex == 3 ? AppTheme.primaryGreen : Colors.grey,
+              ),
+              onPressed: () => setState(() => _selectedIndex = 3),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-

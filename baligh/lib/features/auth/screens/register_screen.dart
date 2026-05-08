@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:baligh/core/l10n/generated/app_localizations.dart';
-import '../../../core/widgets/app_button.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_text_field.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -12,67 +12,123 @@ class RegisterScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.register)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+      backgroundColor: AppTheme.primaryGreen,
+      body: SafeArea(
+        bottom: false,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Join the Baligh Community',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
+            // Header Section
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.accentGold,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.campaign,
+                      size: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'بلّغ Lite',
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: 'Cairo',
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Start reporting and improving your city today.',
-              style: TextStyle(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 40),
-            const AppTextField(
-              label: 'Full Name',
-              hint: 'Mohamed Lemine',
-            ),
-            const SizedBox(height: 20),
-            AppTextField(
-              label: l10n.email,
-              hint: 'email@example.com',
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 20),
-            const AppTextField(
-              label: 'Phone Number',
-              hint: '+222 ••••••••',
-              keyboardType: TextInputType.phone,
-            ),
-            const SizedBox(height: 20),
-            AppTextField(
-              label: l10n.password,
-              hint: '••••••••',
-              isPassword: true,
-            ),
-            const SizedBox(height: 20),
-            const AppTextField(
-              label: 'Confirm Password',
-              hint: '••••••••',
-              isPassword: true,
-            ),
-            const SizedBox(height: 40),
-            AppButton(
-              text: l10n.register,
-              onPressed: () => context.go('/home'),
-            ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Already have an account?"),
-                TextButton(
-                  onPressed: () => context.pop(),
-                  child: Text(l10n.login),
+            // Form Section
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                 ),
-              ],
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'إنشاء حساب جديد',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryGreen,
+                          fontFamily: 'Cairo',
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      AppTextField(
+                        label: 'اسم المستخدم',
+                        hint: 'Ahmed_mr',
+                      ),
+                      const SizedBox(height: 20),
+                      AppTextField(
+                        label: 'البريد الإلكتروني',
+                        hint: 'example@mail.com',
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 20),
+                      AppTextField(
+                        label: 'كلمة المرور',
+                        hint: '••••••••',
+                        isPassword: true,
+                      ),
+                      const SizedBox(height: 40),
+                      ElevatedButton(
+                        onPressed: () => context.go('/home'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.accentGold,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'إنشاء الحساب ← (يفتح الرئيسية)',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Cairo',
+                            color: AppTheme.darkText,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("عندك حساب؟ ", style: TextStyle(fontFamily: 'Cairo')),
+                          TextButton(
+                            onPressed: () => context.pop(),
+                            child: const Text(
+                              'سجل الدخول -',
+                              style: TextStyle(
+                                color: AppTheme.primaryGreen,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Cairo',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),
