@@ -19,7 +19,7 @@ dependencies:
   shared_preferences: ^2.3.2
 
   # Map (OSM stack — replaces google_maps_flutter)
-  flutter_map: ^7.0.2
+  flutter_map: ^8.3.0
   latlong2: ^0.9.1
 
   # ── AUDIT ADDITIONS (Step 1) ──────────────────────────────────
@@ -38,7 +38,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   generate: true        # enables flutter gen-l10n → AppLocalizations

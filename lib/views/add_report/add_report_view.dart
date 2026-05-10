@@ -9,6 +9,7 @@
 // progress bar at the top gives the user a sense of forward motion.
 // ─────────────────────────────────────────────────────────────────
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -20,6 +21,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
 import '../../providers/add_report_provider.dart';
 import '../../providers/map_provider.dart' show kNouakchottLatLng;
+import '../../providers/report_provider.dart';
 
 // ════════════════════════════════════════════════════════════════
 // AddReportView  — the Navigator route pushed by the FAB
@@ -102,8 +104,8 @@ class _AddReportScaffold extends StatelessWidget {
             child: switch (provider.currentStep) {
               FormStep.category => const _Step1CategoryBody(),
               FormStep.location => const _LocationPickerBody(),
-              FormStep.photo    => const _StepPlaceholder(icon: Icons.camera_alt_rounded,  stepNumber: 3),
-              FormStep.review   => const _StepPlaceholder(icon: Icons.check_circle_rounded, stepNumber: 4),
+              FormStep.photo    => const _Step3PhotoBody(),
+              FormStep.review   => const _Step4ReviewBody(),
             },
           ),
         ),
@@ -852,45 +854,6 @@ class _ErrorBanner extends StatelessWidget {
 }
 
 // ════════════════════════════════════════════════════════════════
-// _StepPlaceholder — temporary body for Steps 3, 4
-// Step 2 is now fully implemented as _LocationPickerBody below.
-// ════════════════════════════════════════════════════════════════
-class _StepPlaceholder extends StatelessWidget {
-  const _StepPlaceholder({required this.icon, required this.stepNumber});
-  final IconData icon;
-  final int stepNumber;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      children: [
-        Expanded(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 72,
-                    color: theme.colorScheme.primary.withOpacity(0.25)),
-                const SizedBox(height: 16),
-                Text(
-                  'Step $stepNumber — Coming Soon',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.40),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const _BottomActionBar(),
-      ],
-    );
-  }
-}
-
-// ════════════════════════════════════════════════════════════════
 // _LocationPickerBody — Step 2: full-screen OSM map with a centre
 // pin. User drags the map; the pin stays fixed in the middle.
 // Tapping "Confirm" reads the map centre and saves it to the
@@ -921,7 +884,7 @@ class _LocationPickerBodyState extends State<_LocationPickerBody> {
 
   void _onPositionChanged(MapCamera camera, bool hasGesture) {
     if (hasGesture) {
-      setState(() => _pickedPoint = camera.center);
+      _pickedPoint = camera.center;
     }
   }
 
@@ -986,10 +949,12 @@ class _LocationPickerBodyState extends State<_LocationPickerBody> {
                     urlTemplate:
                         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.baligh.app',
-                    tileProvider: const FMTCStore('osm_cache').getTileProvider(
-                      loadingStrategy: BrowseLoadingStrategy.cacheFirst,
-                      cachedValidDuration: Duration(days: 30),
-                    ),
+                    tileProvider: kIsWeb
+                        ? NetworkTileProvider()
+                        : const FMTCStore('osm_cache').getTileProvider(
+                            loadingStrategy: BrowseLoadingStrategy.cacheFirst,
+                            cachedValidDuration: Duration(days: 30),
+                          ),
                     maxNativeZoom: 19,
                   ),
                 ],
@@ -1067,6 +1032,388 @@ class _LocationPickerBodyState extends State<_LocationPickerBody> {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// _Step3PhotoBody — Step 3: Photo (optional, skippable)
+// No camera logic yet — "Continue" advances to the review step.
+// ════════════════════════════════════════════════════════════════
+class _Step3PhotoBody extends StatelessWidget {
+  const _Step3PhotoBody();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 40, 20, 16),
+            child: Column(
+              children: [
+                // ── Camera icon ─────────────────────────────────
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withOpacity(0.07),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.camera_alt_rounded,
+                    size: 46,
+                    color: theme.colorScheme.primary.withOpacity(0.35),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  l10n.reportPhoto,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // ── Disabled "Add Photo" placeholder ────────────
+                Opacity(
+                  opacity: 0.38,
+                  child: Container(
+                    height: 52,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: theme.colorScheme.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt_rounded,
+                            size: 20, color: theme.colorScheme.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.reportAddPhoto,
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // ── Standard bottom bar: "Continue" = Skip photo ────────
+        const _BottomActionBar(),
+      ],
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// _Step4ReviewBody — Step 4: Summary + Submit
+// Shows a read-only summary of the draft and wires the submit
+// button to AddReportProvider.buildDraft() → ReportProvider.addReport().
+// ════════════════════════════════════════════════════════════════
+class _Step4ReviewBody extends StatefulWidget {
+  const _Step4ReviewBody();
+
+  @override
+  State<_Step4ReviewBody> createState() => _Step4ReviewBodyState();
+}
+
+class _Step4ReviewBodyState extends State<_Step4ReviewBody> {
+  bool _isSubmitting = false;
+
+  Future<void> _submit() async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
+    // Capture context-dependent refs before the async gap.
+    final addProvider = context.read<AddReportProvider>();
+    final reportProvider = context.read<ReportProvider>();
+    final l10n = AppLocalizations.of(context)!;
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    final draft = addProvider.buildDraft();
+    final success = await reportProvider.addReport(draft);
+
+    if (!mounted) return;
+
+    if (success) {
+      // addReport()'s final notifyListeners() marks HomeView dirty in the
+      // current frame. Calling navigator.pop() in that same frame causes
+      // MouseTracker.updateAllDevices (scheduled by the route change) to
+      // hit-test _BottomAppBarClipper.getClip() before ScaffoldGeometry is
+      // set → "must only be accessed during the paint phase" assertion.
+      // addPostFrameCallback lets frame N flush all pending rebuilds and
+      // repaint the Scaffold; frame N+1 then pops into a clean geometry.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.reportSubmitSuccess),
+            backgroundColor: const Color(0xFF2E7D32),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        navigator.pop();
+      });
+    } else {
+      setState(() => _isSubmitting = false);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.reportSubmitError),
+          backgroundColor: Colors.red[700],
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final provider = context.watch<AddReportProvider>();
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    final catDef = _kCategories.firstWhere(
+      (d) => d.category == provider.selectedCategory,
+      orElse: () => _kCategories.last,
+    );
+
+    return Column(
+      children: [
+        // ── Scrollable summary ──────────────────────────────────
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.reportDetailTitle,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                _ReviewRow(
+                  icon: catDef.icon,
+                  iconColor: catDef.color,
+                  label: l10n.reportCategory,
+                  value: _catLabel(catDef.category, l10n),
+                  theme: theme,
+                ),
+                Divider(
+                  height: 1,
+                  color: theme.colorScheme.outline.withOpacity(0.12),
+                ),
+                _ReviewRow(
+                  icon: Icons.description_outlined,
+                  iconColor: theme.colorScheme.primary,
+                  label: l10n.reportDescription,
+                  value: provider.description.isEmpty
+                      ? '—'
+                      : provider.description,
+                  theme: theme,
+                ),
+                Divider(
+                  height: 1,
+                  color: theme.colorScheme.outline.withOpacity(0.12),
+                ),
+                _ReviewRow(
+                  icon: Icons.location_on_rounded,
+                  iconColor: theme.colorScheme.primary,
+                  label: l10n.reportLocation,
+                  value: provider.selectedLocation != null
+                      ? '${provider.selectedLocation!.latitude.toStringAsFixed(4)}, '
+                          '${provider.selectedLocation!.longitude.toStringAsFixed(4)}'
+                      : '—',
+                  theme: theme,
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // ── Submit bottom bar ───────────────────────────────────
+        Container(
+          padding: EdgeInsets.fromLTRB(20, 14, 20, bottomPadding + 16),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            border: Border(
+              top: BorderSide(
+                color: theme.colorScheme.outline.withOpacity(0.08),
+              ),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 12,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              _OutlineActionButton(
+                label: l10n.backButton,
+                icon: Icons.arrow_back_ios_new_rounded,
+                onTap: _isSubmitting
+                    ? () {}
+                    : () {
+                        HapticFeedback.selectionClick();
+                        context.read<AddReportProvider>().previousStep();
+                      },
+                theme: theme,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _SubmitButton(
+                  label: l10n.reportSubmit,
+                  isLoading: _isSubmitting,
+                  onTap: _submit,
+                  theme: theme,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// _ReviewRow — single labelled row in the Step 4 summary card
+// ════════════════════════════════════════════════════════════════
+class _ReviewRow extends StatelessWidget {
+  const _ReviewRow({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+    required this.theme,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String value;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.10),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 20, color: iconColor),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.50),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// _SubmitButton — primary action button with loading state
+// ════════════════════════════════════════════════════════════════
+class _SubmitButton extends StatelessWidget {
+  const _SubmitButton({
+    required this.label,
+    required this.isLoading,
+    required this.onTap,
+    required this.theme,
+  });
+
+  final String label;
+  final bool isLoading;
+  final VoidCallback onTap;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = theme.colorScheme.primary;
+    return GestureDetector(
+      onTap: isLoading ? null : onTap,
+      child: Container(
+        height: 52,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.35),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Center(
+          child: isLoading
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
+        ),
+      ),
     );
   }
 }

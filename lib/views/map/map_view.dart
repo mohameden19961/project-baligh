@@ -10,6 +10,7 @@
 //   [5] Sliding report preview sheet (appears on marker tap)
 // ─────────────────────────────────────────────────────────────────
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -201,10 +202,12 @@ class _BalighMap extends StatelessWidget {
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.baligh.app',
-          tileProvider: const FMTCStore('osm_cache').getTileProvider(
-            loadingStrategy: BrowseLoadingStrategy.cacheFirst,
-            cachedValidDuration: Duration(days: 30),
-          ),
+          tileProvider: kIsWeb
+              ? NetworkTileProvider()
+              : const FMTCStore('osm_cache').getTileProvider(
+                  loadingStrategy: BrowseLoadingStrategy.cacheFirst,
+                  cachedValidDuration: Duration(days: 30),
+                ),
           maxNativeZoom: 19,
           errorTileCallback: (tile, error, stackTrace) {
             debugPrint('[TileLayer] tile error: $error');

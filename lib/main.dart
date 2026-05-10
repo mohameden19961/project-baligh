@@ -3,6 +3,7 @@
 // Entry point for the Baligh (بلّغ) application.
 // Architecture : MVC  |  State : Provider  |  i18n : AppLocalizations
 // ─────────────────────────────────────────────────────────────
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -47,11 +48,13 @@ void main() async {
     ),
   );
 
-  // ── FMTC tile-cache initialization (Audit Step 1) ──────────────
-  // Must complete before runApp so the TileLayer can hit the cache
-  // on the very first paint without a cold-start miss.
-  await FMTCObjectBoxBackend().initialise();
-  await const FMTCStore('osm_cache').manage.create();
+  // ── FMTC tile-cache initialization (native platforms only) ──────
+  // FMTCObjectBoxBackend uses FFI and is not available on web.
+  // On web, TileLayers fall back to NetworkTileProvider directly.
+  if (!kIsWeb) {
+    await FMTCObjectBoxBackend().initialise();
+    await const FMTCStore('osm_cache').manage.create();
+  }
   // ───────────────────────────────────────────────────────────────
 
   runApp(

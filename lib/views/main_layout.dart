@@ -86,44 +86,52 @@ class _MainLayoutState extends State<MainLayout>
 
   @override
   Widget build(BuildContext context) {
-    // context.watch → rebuilds whenever NavigationProvider notifies.
-    final navProvider = context.watch<NavigationProvider>();
+    // NavigationProvider is consumed only via Selector — the Scaffold shell
+    // (FAB + BottomAppBar + its notch clipper) never rebuilds from provider
+    // notifications. Only the two widgets that actually need currentIndex do.
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isRtl = Directionality.of(context) == TextDirection.rtl;
 
     return Scaffold(
       // ── Tab body ─────────────────────────────────────────────────
-      // IndexedStack renders all tabs once and hides inactive ones,
-      // which preserves scroll position and avoids re-fetch on every switch.
-      body: IndexedStack(
-        index: navProvider.currentIndex,
-        children: _tabBodies,
+      body: Selector<NavigationProvider, int>(
+        selector: (_, nav) => nav.currentIndex,
+        builder: (_, index, __) => IndexedStack(
+          index: index,
+          children: _tabBodies,
+        ),
       ),
 
       // ── FAB ──────────────────────────────────────────────────────
-      // Audit Step 3: explicit SizedBox constrains the hit target
-      // and prevents layout jitter when the entrance animation runs.
       floatingActionButton: SizedBox(
         width: 56,
         height: 56,
         child: ScaleTransition(
           scale: _fabScale,
-          child: _BalighFab(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddReportView()))),
+          child: _BalighFab(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AddReportView()),
+            ),
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
       // ── Bottom Navigation Bar ─────────────────────────────────────
-      bottomNavigationBar: _BalighBottomNav(
-        currentIndex: navProvider.currentIndex,
-        onTap: (index) {
-          HapticFeedback.selectionClick();
-          navProvider.navigateToIndex(index);
-        },
-        l10n: l10n,
-        theme: theme,
-        isRtl: isRtl,
+      bottomNavigationBar: Selector<NavigationProvider, int>(
+        selector: (_, nav) => nav.currentIndex,
+        builder: (_, index, __) => _BalighBottomNav(
+          currentIndex: index,
+          onTap: (i) {
+            HapticFeedback.selectionClick();
+            context.read<NavigationProvider>().navigateToIndex(i);
+          },
+          l10n: l10n,
+          theme: theme,
+          isRtl: isRtl,
+        ),
       ),
     );
   }
