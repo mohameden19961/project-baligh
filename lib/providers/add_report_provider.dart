@@ -146,10 +146,19 @@ class AddReportProvider extends ChangeNotifier {
 
   /// Assembles the complete [ReportModel] draft from current state.
   /// Caller (ReportProvider) assigns the id after server response.
+  ///
+  /// Throws [StateError] if no category is selected — the wizard
+  /// gates this via [validateStep1], but the runtime guard prevents
+  /// a release-mode null-pointer crash if that contract is ever broken.
   ReportModel buildDraft() {
-    assert(hasCategory, 'Category must be set before building draft');
+    final category = _selectedCategory;
+    if (category == null) {
+      debugPrint('AddReportProvider.buildDraft: category is null — '
+          'draft cannot be built. Step 1 validation was bypassed.');
+      throw StateError('Cannot build report draft: category is required.');
+    }
     return ReportModel(
-      category: _selectedCategory!,
+      category: category,
       description: _description.trim(),
       location: _selectedLocation ??
           // Fallback to Nouakchott city centre if location step skipped.

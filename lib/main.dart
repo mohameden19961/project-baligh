@@ -51,9 +51,17 @@ void main() async {
   // ── FMTC tile-cache initialization (native platforms only) ──────
   // FMTCObjectBoxBackend uses FFI and is not available on web.
   // On web, TileLayers fall back to NetworkTileProvider directly.
+  // Wrapped in try/catch: a corrupted ObjectBox DB or unavailable store
+  // must NOT crash the boot sequence — TileLayer will fall back to
+  // NetworkTileProvider transparently if FMTC isn't ready.
   if (!kIsWeb) {
-    await FMTCObjectBoxBackend().initialise();
-    await const FMTCStore('osm_cache').manage.create();
+    try {
+      await FMTCObjectBoxBackend().initialise();
+      await const FMTCStore('osm_cache').manage.create();
+    } catch (e, stack) {
+      debugPrint('FMTC init failed — continuing without tile cache: $e');
+      debugPrintStack(stackTrace: stack);
+    }
   }
   // ───────────────────────────────────────────────────────────────
 
