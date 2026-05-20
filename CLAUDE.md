@@ -27,7 +27,7 @@ Before implementing:
 - No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
-
+- **No AI Co-Authorship:** When executing git commands or writing commit messages, NEVER add a `Co-Authored-By` tag or mention Claude/AI in the commit message. All commits must remain strictly under the user's sole identity.
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
 ## 3. Surgical Changes
