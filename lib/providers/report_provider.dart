@@ -182,15 +182,10 @@ class ReportProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // ── MOCK: simulated network delay ──────────────────────────
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Real call will look like:
-      // await _reportService.voteOnReport(
-      //   reportId: reportId,
-      //   isConfirmation: isConfirmation,
-      // );
-      // ── END MOCK ───────────────────────────────────────────────
+      await _reportService.voteOnReport(
+        reportId: reportId,
+        isConfirmation: isConfirmation,
+      );
 
       _setStatus(ReportProviderStatus.idle);
       return true;

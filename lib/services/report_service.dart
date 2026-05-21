@@ -18,6 +18,13 @@ abstract class ReportService {
   /// Persist a new [report]. Returns the server-confirmed copy
   /// (with an assigned id and final status).
   Future<ReportModel> createReport(ReportModel report);
+
+  /// Record a community credibility vote against [reportId].
+  /// [isConfirmation] = true → +1 confirmation, false → +1 rejection.
+  Future<void> voteOnReport({
+    required String reportId,
+    required bool isConfirmation,
+  });
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -41,6 +48,15 @@ class MockReportService implements ReportService {
       id: _generateMockId(),
       status: ReportStatus.pending,
     );
+  }
+
+  @override
+  Future<void> voteOnReport({
+    required String reportId,
+    required bool isConfirmation,
+  }) async {
+    // Simulated network round-trip.
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   // ── PRIVATE HELPERS ───────────────────────────────────────────────
