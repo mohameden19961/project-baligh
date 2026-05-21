@@ -569,13 +569,12 @@ class _LocationButton extends StatelessWidget {
       right: 16,
       child: Column(
         children: [
-          // ── Reset camera ─────────────────────────────────────────
+          // ── Native device location ───────────────────────────────
           _MapIconButton(
             icon: Icons.my_location_rounded,
             onTap: () {
               HapticFeedback.lightImpact();
-              // TODO: pass real device location from a location service.
-              mapProvider.resetCamera();
+              mapProvider.goToMyLocation();
             },
             theme: theme,
             isLoading: isLocating,

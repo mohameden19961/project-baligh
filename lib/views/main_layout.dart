@@ -67,23 +67,6 @@ class _MainLayoutState extends State<MainLayout>
     super.dispose();
   }
 
-  // ── FAB tap handler ───────────────────────────────────────────────
-  void _onFabTapped(BuildContext context) {
-    HapticFeedback.mediumImpact();
-    // TODO: Replace with Navigator.push to the real ReportView once built.
-    // Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportView()));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.reportTitle),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     // NavigationProvider is consumed only via Selector — the Scaffold shell

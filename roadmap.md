@@ -153,7 +153,7 @@ View (context.watch/Consumer/Selector)
 | ReportCard onTap | ❌ Not wired | Both HomeView and MapView have `// TODO: Navigator.push to ReportDetailView` |
 | Report Detail View | ❌ Not built | No detail screen exists |
 | Settings Screen | ❌ Not built | 22 localized keys exist, no UI |
-| Geolocation | ❌ Not built | `goToMyLocation` is a stub; location package not in pubspec |
+| Geolocation | ✅ | `goToMyLocation()` uses native `geolocator: ^13.0.1` with permission flow + try/catch. Manifest/plist platform entries pending. |
 | Camera / Photo | ❌ Not built | No `image_picker` dependency |
 | API / Backend | ❌ Mock only | All data in `_buildMockReports()`; http package unused |
 
@@ -191,7 +191,7 @@ View (context.watch/Consumer/Selector)
 - The `_buildMarkers()` method creates new Marker objects on every rebuild — no const or caching.
 
 **Known map issues:**
-- "My Location" button (`_LocationButton`) calls `mapProvider.resetCamera()` instead of actual device GPS — no geolocation package (geolocator, location) in pubspec
+- ~~"My Location" button (`_LocationButton`) calls `mapProvider.resetCamera()` instead of actual device GPS — no geolocation package (geolocator, location) in pubspec~~ ✅ Fixed — `_LocationButton` now invokes `context.read<MapProvider>().goToMyLocation()` which uses the native `geolocator` package.
 - Voting buttons in preview sheet are UI-only — `// TODO: wire to reportProvider.updateCredibility`
 - `_LocationPickerBody` does NOT have an `errorTileCallback` on its TileLayer
 
@@ -204,7 +204,7 @@ View (context.watch/Consumer/Selector)
 | 1 | ~~report_card.dart:314-326~~ | ~~Medium~~ ✅ **Fixed** | `_ElapsedTime._format()` now delegates to the generated `l10n.timeAgoMinutes/Hours/Days(count)` plural methods. ARB keys added with ICU plural syntax — Arabic uses 6-form (`=1`, `=2`, `few`, `many`, `other`), French uses 2-form. Hardcoded `isAr ? ... : ...` conditional is gone; adding a new locale only requires a new ARB file. |
 | 2 | ~~map_provider.dart:120 vs report_card.dart:511~~ | ~~Low~~ ✅ **Fixed** | Category colours unified in `lib/utils/report_category_meta.dart`. Lighting is now `0xFFF9A825` everywhere; both `MapProvider.markerColor/markerIcon` and `ReportCard._CategoryIcon` pull from `ReportCategoryMeta.of(category)`. |
 | 3 | add_report_view.dart:228-238 | Low | `Consumer<AddReportProvider>` wrapping AnimatedSize for error banner — the consumer scope is correct but the error banner only depends on `showCategoryError`; unrelated provider changes (step transitions) also rebuild the error banner. Minor issue. |
-| 4 | main_layout.dart:71-85 | Low | Dead code: `_onFabTapped` method exists but is never called — the actual FAB uses inline `Navigator.push(context, MaterialPageRoute(builder: (_) => const AddReportView()))` at line 112. Remove dead method. |
+| 4 | ~~main_layout.dart:71-85~~ | ~~Low~~ ✅ **Fixed** | Dead `_onFabTapped` method removed. The FAB onTap remains bound to its inline `Navigator.push(context, MaterialPageRoute(builder: (_) => const AddReportView()))`. |
 | 5 | ~~add_report_view.dart:884~~ | ~~Critical~~ ✅ **Fixed** | **mouse_tracker + Scaffold.geometryOf dual crash** — `_LocationPickerBodyState._onPositionChanged` called `setState(() => _pickedPoint = camera.center)` on every drag frame (60–120×/sec). `setState` during pointer dispatch caused `_debugDuringDeviceUpdate` assertion spam (`mouse_tracker.dart`). The same rebuild flood propagated to `MainLayout`'s Scaffold during layout phase, causing `_BottomAppBarClipper.getClip` to access `ScaffoldGeometry` while `debugDoingPaint` was false → `Scaffold.geometryOf() must only be accessed during the paint phase`. **Fix 1 (primary):** bare field assignment `_pickedPoint = camera.center` — zero rebuilds during drag. **Fix 2 (structural):** `_MainLayoutState.build()` replaced `context.watch<NavigationProvider>()` with two `Selector<NavigationProvider, int>` wrappers (one for IndexedStack, one for BottomNav). The Scaffold shell + BottomAppBar + notch clipper now NEVER rebuild from provider notifications — only the two interior widgets that consume `currentIndex` do. |
 | 7 | ~~add_report_provider.dart:149-160~~ | ~~Critical~~ ✅ **Fixed** | **`buildDraft()` release-mode crash risk** — `assert(hasCategory)` was stripped in release builds, leaving `_selectedCategory!` to throw an unguarded `Null check operator` runtime error if Step 1 validation was ever bypassed. Replaced with explicit null guard: logs via `debugPrint` and throws `StateError` so the caller (`_Step4ReviewBody._submit`) can surface a structured failure instead of a raw null-pointer crash. |
 | 6 | ~~add_report_view.dart:1149~~ | ~~Critical~~ ✅ **Fixed** | **Scaffold.geometryOf() crash + zombie UI on submission** — Confirmed by debugPrint instrumentation. `_submit()` itself ran to completion cleanly. The crash fired as a *scheduler callback* on the next frame, in `MouseTracker.updateAllDevices` → `_BottomAppBarClipper.getClip()` → `ScaffoldGeometryNotifier.value` → assertion `debugDoingPaint == true` fails. Root cause: `ReportProvider._setStatus(idle)` fires `notifyListeners()` (marks HomeView dirty) in the same microtask as `navigator.pop()` is called. Frame N therefore had two competing jobs: flush the pending HomeView rebuild AND start the route exit animation. `RendererBinding._scheduleMouseTrackerUpdate` fired during that frame's scheduler callbacks; the hit-test reached `_BottomAppBarClipper.getClip()` before the Scaffold had completed layout+paint, so `ScaffoldGeometry` was stale → assertion crash. The discard-path `navigator.pop()` never crashes because no `notifyListeners()` is pending when it fires. **Fix:** `WidgetsBinding.instance.addPostFrameCallback` defers SnackBar + pop to frame N+1. Frame N flushes all pending rebuilds and repaints the Scaffold (setting valid geometry). Frame N+1's pop fires into a fully-painted scaffold; mouse tracker hit-test finds a valid `ScaffoldGeometry` → no crash. SnackBar is shown before `navigator.pop()` inside the callback (standard Flutter ordering). |
@@ -213,7 +213,7 @@ View (context.watch/Consumer/Selector)
 
 | # | Item | Priority | Details |
 |---|------|----------|---------|
-| 1 | No API service layer | High | ReportProvider contains mock data + mock delays inline (`_buildMockReports()`, `Future.delayed`). Any real backend integration requires rewriting the entire provider. Must extract a ReportService interface. |
+| 1 | ~~No API service layer~~ | ~~High~~ ✅ **Fixed** | `lib/services/report_service.dart` now defines the abstract `ReportService` interface (`fetchReports()`, `createReport(report)`) and a concrete `MockReportService` housing the 6-record Nouakchott sample data + mock delays. `ReportProvider` constructor accepts `{ReportService? service}` (defaults to `MockReportService()`); `fetchReports()` and `addReport()` delegate via `_reportService`. Switching to a real HTTP backend is now a drop-in replacement of the implementation. |
 | 2 | ~~No error handling for FMTC init~~ ✅ **Fixed** | ~~Medium~~ | main.dart:54-66 now wraps `FMTCObjectBoxBackend().initialise()` + `FMTCStore('osm_cache').manage.create()` in `try/catch`. Failures are logged via `debugPrint` + `debugPrintStack` and boot proceeds; TileLayer falls back to network on cache miss. |
 | 3 | Unused localization keys | Low | `navMap`, `navReport`, `navSettings`, `homeQuickReport`, `homeViewMap`, `reportValidationDescription`, `reportPhoto`, `reportAddPhoto`, `reportChangePhoto`, `reportSubmit`, `reportSubmitSuccess`, `reportSubmitError`, `reportDetailTitle`, `reportDetailDate`, `reportDetailStatus`, `reportDetailCategory`, `reportDetailDescription`, `reportDetailLocation`, `settingsTitle`, `settingsLanguage`, `settingsNotifications`, `settingsNotificationsSubtitle`, `settingsAbout`, `settingsVersion`, `settingsPrivacy`, `settingsContact`, `settingsTheme`, `settingsThemeLight`, `settingsThemeDark`, `settingsThemeSystem`, `permissionLocationTitle`, `permissionLocationMessage`, `permissionLocationGrant`, `permissionLocationDeny`, `reportCount` — many keys defined but no UI uses them. |
 | 4 | Duplicate FMTC store config strings | Low | `'osm_cache'` hardcoded in 3 files (main.dart:54, map_view.dart:204, add_report_view.dart:989). Extract to a constant or singleton. |
@@ -243,13 +243,13 @@ View (context.watch/Consumer/Selector)
 
 4. ~~**Replace _ElapsedTime hardcoded strings** with proper localized plural messages via ARB (e.g., `timeAgoMinutes`, `timeAgoHours`, `timeAgoDays` with ICU plural rules).~~ ✅ Done — ARB keys added with strict ICU plural rules (Arabic 6-form, French 2-form). `_ElapsedTime._format()` now calls `l10n.timeAgoMinutes/Hours/Days(count)`.
 
-5. **Remove dead code** `_onFabTapped` in main_layout.dart:71-85.
+5. ~~**Remove dead code** `_onFabTapped` in main_layout.dart:71-85.~~ ✅ Done — method deleted; `main.dart`'s `_PlaceholderHome` + `_LanguageSwitcher` + `_LangButton` also purged in the same pass.
 
 ### Strongly Recommended
 
-6. **Add geolocation** — Add `geolocator` or `location` package. Wire `MapProvider.goToMyLocation()` to actual device location. Add platform permissions handling for Android/iOS.
+6. ~~**Add geolocation**~~ ✅ Done — `geolocator: ^13.0.1` added to pubspec. `MapProvider.goToMyLocation()` now takes no args; it runs `checkPermission` → `requestPermission` → `getCurrentPosition` with try/catch + `_isLocating` flag, then `mapController.move(LatLng(position.latitude, position.longitude), 15.5)`. Permission denials are logged and aborted gracefully without crashing the widget tree. **Pending platform plumbing:** Android `ACCESS_FINE_LOCATION`/`ACCESS_COARSE_LOCATION` manifest entries and iOS `NSLocationWhenInUseUsageDescription` plist key are still required for a real device runtime — out of scope for this milestone.
 
-7. **Extract ReportService** — Create `lib/services/report_service.dart` with an abstract interface and at minimum a `MockReportService` that replaces the inline mock data in `ReportProvider`. This makes the real API integration a drop-in replacement.
+7. ~~**Extract ReportService**~~ ✅ Done (see Tech Debt #1 above).
 
 8. **Build remaining tab views:** MyReportsView (report list filtered by submittedBy), AlertsView (push notifications or status updates), AccountView (profile, settings link, theme/locale controls).
 

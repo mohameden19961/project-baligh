@@ -1,12 +1,13 @@
 // lib/providers/report_provider.dart
 // ─────────────────────────────────────────────────────────────────
 // Controller layer — manages all report state for the Baligh app.
-// Consumes: ReportModel, ReportService (future).
+// Consumes: ReportModel, ReportService (injected at construction).
 // Consumed by: HomeView, MapView, MyReportsView, ReportView.
 // ─────────────────────────────────────────────────────────────────
 
 import 'package:flutter/foundation.dart';
 import '../models/report_model.dart';
+import '../services/report_service.dart';
 
 // ════════════════════════════════════════════════════════════════
 // ENUM: ReportProviderStatus
@@ -26,6 +27,12 @@ enum ReportProviderStatus {
 // CLASS: ReportProvider
 // ════════════════════════════════════════════════════════════════
 class ReportProvider extends ChangeNotifier {
+  ReportProvider({ReportService? service})
+      : _reportService = service ?? MockReportService();
+
+  // ── Injected service (defaults to MockReportService) ─────────────
+  final ReportService _reportService;
+
   // ── Internal state ───────────────────────────────────────────────
   List<ReportModel> _reports = [];
   ReportProviderStatus _status = ReportProviderStatus.idle;
@@ -80,15 +87,12 @@ class ReportProvider extends ChangeNotifier {
       _status == ReportProviderStatus.updating ||
       _status == ReportProviderStatus.refreshing;
 
-  // ── 1. FETCH (mocked) ─────────────────────────────────────────────
-  // The mock simulates a 1-second network round-trip.
-  // Replace the body of this method with a real ReportService call
-  // once the backend is ready: final data = await _service.fetchReports();
+  // ── 1. FETCH ──────────────────────────────────────────────────────
 
-  /// Fetches all reports. Uses [loading] status on first call,
-  /// [refreshing] on subsequent calls so the existing list stays visible.
+  /// Fetches all reports via [ReportService]. Uses [loading] status on
+  /// first call, [refreshing] on subsequent calls so the existing list
+  /// stays visible.
   Future<void> fetchReports({bool silent = false}) async {
-    // Decide which status to show based on whether we already have data.
     _setStatus(
       _reports.isEmpty && !silent
           ? ReportProviderStatus.loading
@@ -97,16 +101,8 @@ class ReportProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      // ── MOCK: simulated network delay ──────────────────────────
-      await Future.delayed(const Duration(milliseconds: 900));
-
-      final mockData = _buildMockReports();
-      // ── END MOCK ───────────────────────────────────────────────
-
-      // Real call will look like:
-      // final mockData = await _reportService.fetchReports();
-
-      _reports = mockData;
+      final data = await _reportService.fetchReports();
+      _reports = data;
       _setStatus(ReportProviderStatus.idle);
     } catch (e, stackTrace) {
       debugPrint('[ReportProvider] fetchReports error: $e\n$stackTrace');
@@ -131,18 +127,7 @@ class ReportProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // ── MOCK: simulated network delay ──────────────────────────
-      await Future.delayed(const Duration(milliseconds: 700));
-
-      // Simulate the server assigning a real ID and returning the report.
-      final synced = report.copyWith(
-        id: _generateMockId(),
-        status: ReportStatus.pending,
-      );
-      // ── END MOCK ───────────────────────────────────────────────
-
-      // Real call will look like:
-      // final synced = await _reportService.createReport(report);
+      final synced = await _reportService.createReport(report);
 
       // Replace the optimistic entry with the server-confirmed one.
       _replaceReport(report, synced);
@@ -280,110 +265,5 @@ class ReportProvider extends ChangeNotifier {
     if (index != -1) {
       _reports = List.from(_reports)..[index] = updated;
     }
-  }
-
-  String _generateMockId() =>
-      'RPT-${DateTime.now().millisecondsSinceEpoch}';
-
-  // ── MOCK DATA FACTORY ─────────────────────────────────────────────
-  // Realistic sample data for Nouakchott, Mauritania.
-  // Delete this method entirely when the real API is connected.
-
-  static List<ReportModel> _buildMockReports() {
-    final now = DateTime.now();
-
-    return [
-      ReportModel(
-        id: 'RPT-001',
-        category: ReportCategory.roads,
-        description:
-            'حفرة كبيرة في الطريق تسبب حوادث متكررة وتضر بالمركبات.',
-        location: const ReportLocation(
-          latitude: 18.0735,
-          longitude: -15.9582,
-          address: 'شارع جمال عبد الناصر، نواكشوط',
-        ),
-        createdAt: now.subtract(const Duration(hours: 2)),
-        status: ReportStatus.inProgress,
-        credibilityScore: const CredibilityScore(confirmations: 14, rejections: 1),
-        submittedBy: 'user-abc',
-      ),
-      ReportModel(
-        id: 'RPT-002',
-        category: ReportCategory.lighting,
-        description:
-            'عمود الإنارة معطل منذ أسبوعين مما يجعل الشارع مظلماً ليلاً.',
-        location: const ReportLocation(
-          latitude: 18.0791,
-          longitude: -15.9653,
-          address: 'حي تيارت، نواكشوط',
-        ),
-        createdAt: now.subtract(const Duration(days: 3)),
-        status: ReportStatus.pending,
-        credibilityScore: const CredibilityScore(confirmations: 7, rejections: 0),
-        submittedBy: 'user-def',
-      ),
-      ReportModel(
-        id: 'RPT-003',
-        category: ReportCategory.waste,
-        description:
-            'تراكم النفايات في الزاوية الشمالية للسوق يسبب رائحة كريهة.',
-        location: const ReportLocation(
-          latitude: 18.0862,
-          longitude: -15.9721,
-          address: 'السوق المركزي، نواكشوط',
-        ),
-        createdAt: now.subtract(const Duration(days: 1)),
-        status: ReportStatus.pending,
-        credibilityScore: const CredibilityScore(confirmations: 22, rejections: 3),
-        submittedBy: 'user-ghi',
-      ),
-      ReportModel(
-        id: 'RPT-004',
-        category: ReportCategory.water,
-        description:
-            'تسرب مائي من أنبوب رئيسي يهدر المياه ويتلف الرصيف.',
-        location: const ReportLocation(
-          latitude: 18.0678,
-          longitude: -15.9489,
-          address: 'حي كيبه، نواكشوط',
-        ),
-        createdAt: now.subtract(const Duration(days: 5)),
-        updatedAt: now.subtract(const Duration(days: 1)),
-        status: ReportStatus.resolved,
-        credibilityScore: const CredibilityScore(confirmations: 31, rejections: 2),
-        submittedBy: 'user-jkl',
-      ),
-      ReportModel(
-        id: 'RPT-005',
-        category: ReportCategory.parks,
-        description:
-            'الحديقة العامة بحاجة إلى صيانة عاجلة؛ الأعشاب طويلة ومقاعد الجلوس مكسورة.',
-        location: const ReportLocation(
-          latitude: 18.0920,
-          longitude: -15.9810,
-          address: 'حديقة الصداقة، نواكشوط',
-        ),
-        createdAt: now.subtract(const Duration(hours: 8)),
-        status: ReportStatus.pending,
-        credibilityScore: const CredibilityScore(confirmations: 5, rejections: 1),
-        submittedBy: 'user-mno',
-      ),
-      ReportModel(
-        id: 'RPT-006',
-        category: ReportCategory.roads,
-        description:
-            'الإشارة الضوئية لا تعمل في تقاطع مكتظ بالمركبات.',
-        location: const ReportLocation(
-          latitude: 18.0740,
-          longitude: -15.9600,
-          address: 'تقاطع شارع الاستقلال، نواكشوط',
-        ),
-        createdAt: now.subtract(const Duration(days: 7)),
-        status: ReportStatus.rejected,
-        credibilityScore: const CredibilityScore(confirmations: 2, rejections: 9),
-        submittedBy: 'user-pqr',
-      ),
-    ];
   }
 }

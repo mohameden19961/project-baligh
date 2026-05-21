@@ -7,6 +7,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show IconData, Color;
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/report_model.dart';
 import '../utils/report_category_meta.dart';
@@ -106,14 +107,40 @@ class MapProvider extends ChangeNotifier {
   }
 
   // ── Location button ──────────────────────────────────────────────
+  // Queries the native device GPS via `geolocator`. Permission flow:
+  //   1. checkPermission()  → existing grant status
+  //   2. requestPermission() if still denied
+  //   3. abort gracefully on denied / deniedForever (no crash)
+  //   4. mapController.move() to the resolved coordinates
+  // All async waits are wrapped between `_isLocating = true/false`
+  // so the FAB shows a spinner while resolution is in flight.
 
-  Future<void> goToMyLocation(LatLng? currentPosition) async {
-    if (currentPosition == null) return;
+  Future<void> goToMyLocation() async {
     _isLocating = true;
     notifyListeners();
-    mapController.move(currentPosition, 15.5);
-    _isLocating = false;
-    notifyListeners();
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        debugPrint(
+            '[MapProvider] location permission $permission — aborting goToMyLocation');
+        return;
+      }
+      final position = await Geolocator.getCurrentPosition();
+      mapController.move(
+        LatLng(position.latitude, position.longitude),
+        15.5,
+      );
+    } catch (e, stack) {
+      debugPrint('[MapProvider] goToMyLocation failed: $e');
+      debugPrintStack(stackTrace: stack);
+    } finally {
+      _isLocating = false;
+      notifyListeners();
+    }
   }
 
   // ── Marker visuals delegate to the shared ReportCategoryMeta ─────
