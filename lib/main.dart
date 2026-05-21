@@ -21,6 +21,9 @@ import 'l10n/app_localizations.dart';
 // ── Providers (Controllers) ───────────────────────────────────────
 import 'providers/locale_provider.dart';
 import 'providers/theme_provider.dart';
+
+// ── Shared constants ──────────────────────────────────────────────
+import 'utils/app_constants.dart';
 // Future providers are registered here as the project grows:
 // import 'providers/report_provider.dart';
 // import 'providers/map_provider.dart';
@@ -57,7 +60,7 @@ void main() async {
   if (!kIsWeb) {
     try {
       await FMTCObjectBoxBackend().initialise();
-      await const FMTCStore('osm_cache').manage.create();
+      await const FMTCStore(AppConstants.osmCacheStoreName).manage.create();
     } catch (e, stack) {
       debugPrint('FMTC init failed — continuing without tile cache: $e');
       debugPrintStack(stackTrace: stack);

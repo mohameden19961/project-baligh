@@ -22,6 +22,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
 import '../../providers/report_provider.dart';
 import '../../providers/map_provider.dart';
+import '../../utils/app_constants.dart';
 import '../../utils/report_category_meta.dart';
 import '../../widgets/report_card.dart';
 
@@ -281,7 +282,7 @@ class _BalighMap extends StatelessWidget {
           userAgentPackageName: 'com.baligh.app',
           tileProvider: kIsWeb
               ? NetworkTileProvider()
-              : const FMTCStore('osm_cache').getTileProvider(
+              : const FMTCStore(AppConstants.osmCacheStoreName).getTileProvider(
                   loadingStrategy: BrowseLoadingStrategy.cacheFirst,
                   cachedValidDuration: Duration(days: 30),
                 ),

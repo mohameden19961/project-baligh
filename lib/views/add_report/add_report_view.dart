@@ -22,6 +22,7 @@ import '../../models/report_model.dart';
 import '../../providers/add_report_provider.dart';
 import '../../providers/map_provider.dart' show kNouakchottLatLng;
 import '../../providers/report_provider.dart';
+import '../../utils/app_constants.dart';
 import '../../utils/report_category_meta.dart';
 
 // ════════════════════════════════════════════════════════════════
@@ -927,11 +928,15 @@ class _LocationPickerBodyState extends State<_LocationPickerBody> {
                     userAgentPackageName: 'com.baligh.app',
                     tileProvider: kIsWeb
                         ? NetworkTileProvider()
-                        : const FMTCStore('osm_cache').getTileProvider(
+                        : const FMTCStore(AppConstants.osmCacheStoreName)
+                            .getTileProvider(
                             loadingStrategy: BrowseLoadingStrategy.cacheFirst,
                             cachedValidDuration: Duration(days: 30),
                           ),
                     maxNativeZoom: 19,
+                    errorTileCallback: (tile, error, stackTrace) {
+                      debugPrint('[TileLayer] tile error: $error');
+                    },
                   ),
                 ],
               ),
