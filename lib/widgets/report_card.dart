@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import '../models/report_model.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/report_category_meta.dart';
 
 // ════════════════════════════════════════════════════════════════
 // PUBLIC: ReportCard
@@ -111,7 +112,8 @@ class _ReportCardBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final meta = _CategoryMeta.of(report.category, l10n);
+    final meta = ReportCategoryMeta.of(report.category);
+    final categoryLabel = ReportCategoryMeta.label(report.category, l10n);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -161,7 +163,7 @@ class _ReportCardBody extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    meta.label,
+                                    categoryLabel,
                                     style: theme.textTheme.titleMedium
                                         ?.copyWith(
                                       fontWeight: FontWeight.w700,
@@ -243,7 +245,7 @@ class _ReportCardBody extends StatelessWidget {
 // ════════════════════════════════════════════════════════════════
 class _CategoryIcon extends StatelessWidget {
   const _CategoryIcon({required this.meta});
-  final _CategoryMeta meta;
+  final ReportCategoryMeta meta;
 
   @override
   Widget build(BuildContext context) {
@@ -310,19 +312,15 @@ class _ElapsedTime extends StatelessWidget {
   final AppLocalizations l10n;
   final ThemeData theme;
 
-  String _format(BuildContext context) {
+  String _format() {
     final diff = DateTime.now().difference(createdAt);
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
-
     if (diff.inMinutes < 60) {
       final m = diff.inMinutes < 1 ? 1 : diff.inMinutes;
-      return isAr ? 'منذ $m دقيقة' : 'il y a $m min';
+      return l10n.timeAgoMinutes(m);
     } else if (diff.inHours < 24) {
-      final h = diff.inHours;
-      return isAr ? 'منذ $h ساعة' : 'il y a $h h';
+      return l10n.timeAgoHours(diff.inHours);
     } else {
-      final d = diff.inDays;
-      return isAr ? 'منذ $d يوم' : 'il y a $d j';
+      return l10n.timeAgoDays(diff.inDays);
     }
   }
 
@@ -337,7 +335,7 @@ class _ElapsedTime extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Text(
-          _format(context),
+          _format(),
           style: TextStyle(
             fontSize: 11,
             color: theme.colorScheme.onSurface.withOpacity(0.45),
@@ -491,29 +489,3 @@ class _CardDivider extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
-// _CategoryMeta — maps enum → icon, colour, label
-// Pure data, no widgets. Kept here because it only serves the card.
-// ════════════════════════════════════════════════════════════════
-class _CategoryMeta {
-  const _CategoryMeta({
-    required this.icon,
-    required this.color,
-    required this.label,
-  });
-
-  final IconData icon;
-  final Color color;
-  final String label;
-
-  factory _CategoryMeta.of(ReportCategory cat, AppLocalizations l10n) {
-    return switch (cat) {
-      ReportCategory.roads    => _CategoryMeta(icon: Icons.construction_rounded,        color: const Color(0xFFEF6C00), label: l10n.categoryRoads),
-      ReportCategory.lighting => _CategoryMeta(icon: Icons.lightbulb_outline_rounded,   color: const Color(0xFFFDD835), label: l10n.categoryLighting),
-      ReportCategory.waste    => _CategoryMeta(icon: Icons.delete_outline_rounded,       color: const Color(0xFF6D4C41), label: l10n.categoryWaste),
-      ReportCategory.water    => _CategoryMeta(icon: Icons.water_drop_outlined,          color: const Color(0xFF0277BD), label: l10n.categoryWater),
-      ReportCategory.parks    => _CategoryMeta(icon: Icons.park_outlined,                color: const Color(0xFF388E3C), label: l10n.categoryParks),
-      ReportCategory.other    => _CategoryMeta(icon: Icons.report_problem_outlined,      color: const Color(0xFF7B1FA2), label: l10n.categoryOther),
-    };
-  }
-}

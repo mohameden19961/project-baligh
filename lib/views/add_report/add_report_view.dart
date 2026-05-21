@@ -22,6 +22,7 @@ import '../../models/report_model.dart';
 import '../../providers/add_report_provider.dart';
 import '../../providers/map_provider.dart' show kNouakchottLatLng;
 import '../../providers/report_provider.dart';
+import '../../utils/report_category_meta.dart';
 
 // ════════════════════════════════════════════════════════════════
 // AddReportView  — the Navigator route pushed by the FAB
@@ -266,36 +267,10 @@ class _Step1CategoryBody extends StatelessWidget {
 }
 
 // ════════════════════════════════════════════════════════════════
-// _CategoryGrid — 3-column grid of 12 category tiles
+// _CategoryGrid — 3-column grid of 6 category tiles.
+// All icon/colour/label data is pulled from ReportCategoryMeta —
+// the single source of truth shared with MapView and ReportCard.
 // ════════════════════════════════════════════════════════════════
-
-/// All 12 category definitions used by the grid.
-/// Each entry: (category, icon, colourHex, arb-key accessor)
-class _CatDef {
-  const _CatDef(this.category, this.icon, this.color);
-  final ReportCategory category;
-  final IconData icon;
-  final Color color;
-}
-
-const List<_CatDef> _kCategories = [
-  _CatDef(ReportCategory.roads,    Icons.construction_rounded,       Color(0xFFEF6C00)),
-  _CatDef(ReportCategory.lighting, Icons.lightbulb_outline_rounded,  Color(0xFFF9A825)),
-  _CatDef(ReportCategory.waste,    Icons.delete_outline_rounded,     Color(0xFF6D4C41)),
-  _CatDef(ReportCategory.water,    Icons.water_drop_outlined,        Color(0xFF0277BD)),
-  _CatDef(ReportCategory.parks,    Icons.park_outlined,              Color(0xFF388E3C)),
-  _CatDef(ReportCategory.other,    Icons.report_problem_outlined,    Color(0xFF7B1FA2)),
-];
-
-String _catLabel(ReportCategory cat, AppLocalizations l10n) => switch (cat) {
-      ReportCategory.roads    => l10n.categoryRoads,
-      ReportCategory.lighting => l10n.categoryLighting,
-      ReportCategory.waste    => l10n.categoryWaste,
-      ReportCategory.water    => l10n.categoryWater,
-      ReportCategory.parks    => l10n.categoryParks,
-      ReportCategory.other    => l10n.categoryOther,
-    };
-
 class _CategoryGrid extends StatelessWidget {
   const _CategoryGrid();
 
@@ -313,19 +288,20 @@ class _CategoryGrid extends StatelessWidget {
         crossAxisSpacing: 12,
         childAspectRatio: 0.88,
       ),
-      itemCount: _kCategories.length,
+      itemCount: ReportCategory.values.length,
       itemBuilder: (context, i) {
-        final def = _kCategories[i];
-        final label = _catLabel(def.category, l10n);
-        final isSelected = provider.selectedCategory == def.category;
+        final category = ReportCategory.values[i];
+        final meta = ReportCategoryMeta.of(category);
+        final label = ReportCategoryMeta.label(category, l10n);
+        final isSelected = provider.selectedCategory == category;
 
         return _CategoryTile(
-          def: def,
+          meta: meta,
           label: label,
           isSelected: isSelected,
           onTap: () {
             HapticFeedback.selectionClick();
-            provider.selectCategory(def.category);
+            provider.selectCategory(category);
           },
         );
       },
@@ -338,13 +314,13 @@ class _CategoryGrid extends StatelessWidget {
 // ════════════════════════════════════════════════════════════════
 class _CategoryTile extends StatefulWidget {
   const _CategoryTile({
-    required this.def,
+    required this.meta,
     required this.label,
     required this.isSelected,
     required this.onTap,
   });
 
-  final _CatDef def;
+  final ReportCategoryMeta meta;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
@@ -388,7 +364,7 @@ class _CategoryTileState extends State<_CategoryTile>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = widget.def.color;
+    final color = widget.meta.color;
     final isSelected = widget.isSelected;
 
     return ScaleTransition(
@@ -443,7 +419,7 @@ class _CategoryTileState extends State<_CategoryTile>
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
-                  widget.def.icon,
+                  widget.meta.icon,
                   size: 26,
                   color: isSelected ? Colors.white : color,
                 ),
@@ -1188,10 +1164,9 @@ class _Step4ReviewBodyState extends State<_Step4ReviewBody> {
     final provider = context.watch<AddReportProvider>();
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    final catDef = _kCategories.firstWhere(
-      (d) => d.category == provider.selectedCategory,
-      orElse: () => _kCategories.last,
-    );
+    final reviewCategory =
+        provider.selectedCategory ?? ReportCategory.other;
+    final reviewMeta = ReportCategoryMeta.of(reviewCategory);
 
     return Column(
       children: [
@@ -1211,10 +1186,10 @@ class _Step4ReviewBodyState extends State<_Step4ReviewBody> {
                 const SizedBox(height: 20),
 
                 _ReviewRow(
-                  icon: catDef.icon,
-                  iconColor: catDef.color,
+                  icon: reviewMeta.icon,
+                  iconColor: reviewMeta.color,
                   label: l10n.reportCategory,
-                  value: _catLabel(catDef.category, l10n),
+                  value: ReportCategoryMeta.label(reviewCategory, l10n),
                   theme: theme,
                 ),
                 Divider(

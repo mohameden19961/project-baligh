@@ -266,5 +266,29 @@
     "placeholders": {
       "count": { "type": "int" }
     }
+  },
+
+  "timeAgoMinutes": "{count, plural, =1{il y a 1 min} other{il y a {count} min}}",
+  "@timeAgoMinutes": {
+    "description": "Elapsed time in minutes (e.g. 'il y a 5 min')",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "timeAgoHours": "{count, plural, =1{il y a 1 h} other{il y a {count} h}}",
+  "@timeAgoHours": {
+    "description": "Elapsed time in hours (e.g. 'il y a 3 h')",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "timeAgoDays": "{count, plural, =1{il y a 1 j} other{il y a {count} j}}",
+  "@timeAgoDays": {
+    "description": "Elapsed time in days (e.g. 'il y a 4 j')",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
   }
 }

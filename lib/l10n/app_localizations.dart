@@ -625,6 +625,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{count, plural, =0{لا توجد بلاغات} =1{بلاغ واحد} =2{بلاغان} few{{count} بلاغات} many{{count} بلاغاً} other{{count} بلاغ}}'**
   String reportCount(int count);
+
+  /// Elapsed time in minutes (e.g. 'منذ 5 دقائق')
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, =1{منذ دقيقة} =2{منذ دقيقتين} few{منذ {count} دقائق} many{منذ {count} دقيقة} other{منذ {count} دقيقة}}'**
+  String timeAgoMinutes(int count);
+
+  /// Elapsed time in hours (e.g. 'منذ 3 ساعات')
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, =1{منذ ساعة} =2{منذ ساعتين} few{منذ {count} ساعات} many{منذ {count} ساعة} other{منذ {count} ساعة}}'**
+  String timeAgoHours(int count);
+
+  /// Elapsed time in days (e.g. 'منذ 4 أيام')
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, =1{منذ يوم} =2{منذ يومين} few{منذ {count} أيام} many{منذ {count} يوماً} other{منذ {count} يوم}}'**
+  String timeAgoDays(int count);
 }
 
 class _AppLocalizationsDelegate

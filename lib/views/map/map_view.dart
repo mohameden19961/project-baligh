@@ -10,7 +10,7 @@
 //   [5] Sliding report preview sheet (appears on marker tap)
 // ─────────────────────────────────────────────────────────────────
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -22,6 +22,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
 import '../../providers/report_provider.dart';
 import '../../providers/map_provider.dart';
+import '../../utils/report_category_meta.dart';
 import '../../widgets/report_card.dart';
 
 // ════════════════════════════════════════════════════════════════
@@ -53,10 +54,11 @@ class _MapViewState extends State<MapView>
   // ── Build flutter_map Marker list from the current report list ───
   List<Marker> _buildMarkers({
     required List<ReportModel> reports,
+    required String? selectedId,
     required MapProvider mapProvider,
   }) {
     return reports.map((report) {
-      final isSelected = mapProvider.selectedReport?.id == report.id;
+      final isSelected = selectedId == report.id;
       final color = MapProvider.markerColor(report.category);
 
       return Marker(
@@ -109,15 +111,8 @@ class _MapViewState extends State<MapView>
     return ChangeNotifierProvider(
       // MapProvider is scoped to this tab — not global.
       create: (_) => MapProvider(),
-      child: Consumer2<ReportProvider, MapProvider>(
-        builder: (context, reportProvider, mapProvider, _) {
-          final visibleReports =
-              mapProvider.filteredReports(reportProvider.allReports);
-          final markers = _buildMarkers(
-            reports: visibleReports,
-            mapProvider: mapProvider,
-          );
-
+      child: Builder(
+        builder: (context) {
           return Scaffold(
             // No AppBar — the search bar floats over the map.
             extendBodyBehindAppBar: true,
@@ -126,45 +121,83 @@ class _MapViewState extends State<MapView>
               // Dismiss keyboard + sheet when tapping the map background.
               onTap: () {
                 _searchFocus.unfocus();
-                mapProvider.clearSelection();
+                context.read<MapProvider>().clearSelection();
               },
               child: Stack(
                 children: [
-                  // ── [1] Full-screen GoogleMap ─────────────────────
-                  _BalighMap(
-                    markers: markers,
-                    mapProvider: mapProvider,
+                  // ── [1] Map + markers ─────────────────────────────
+                  // Rebuilds only when the filtered collection or the
+                  // selected-report id changes.
+                  Selector2<ReportProvider, MapProvider, _MapMarkerSource>(
+                    selector: (_, rp, mp) => _MapMarkerSource(
+                      reports: mp.filteredReports(rp.allReports),
+                      selectedId: mp.selectedReport?.id,
+                    ),
+                    builder: (context, data, _) {
+                      final mp = context.read<MapProvider>();
+                      return _BalighMap(
+                        markers: _buildMarkers(
+                          reports: data.reports,
+                          selectedId: data.selectedId,
+                          mapProvider: mp,
+                        ),
+                        mapProvider: mp,
+                      );
+                    },
                   ),
 
                   // ── [2] Floating top search bar ───────────────────
-                  _FloatingSearchBar(
-                    controller: _searchController,
-                    focusNode: _searchFocus,
-                    mapProvider: mapProvider,
-                    reportProvider: reportProvider,
-                    l10n: l10n,
-                    theme: theme,
-                    visibleCount: visibleReports.length,
-                  ),
-
-                  // ── [3] Category filter chips ─────────────────────
-                  _FilterChipRow(
-                    mapProvider: mapProvider,
-                    l10n: l10n,
-                    theme: theme,
-                  ),
-
-                  // ── [4] My-location button ────────────────────────
-                  _LocationButton(mapProvider: mapProvider, l10n: l10n),
-
-                  // ── [5] Report preview bottom sheet ──────────────
-                  if (mapProvider.selectedReport != null)
-                    _ReportPreviewSheet(
-                      report: mapProvider.selectedReport!,
-                      onClose: mapProvider.clearSelection,
+                  // Rebuilds on searchQuery change only.
+                  Selector<MapProvider, String>(
+                    selector: (_, mp) => mp.searchQuery,
+                    builder: (context, searchQuery, _) => _FloatingSearchBar(
+                      controller: _searchController,
+                      focusNode: _searchFocus,
+                      searchQuery: searchQuery,
                       l10n: l10n,
                       theme: theme,
                     ),
+                  ),
+
+                  // ── [3] Category filter chips ─────────────────────
+                  // Rebuilds on activeCategory change only.
+                  Selector<MapProvider, ReportCategory?>(
+                    selector: (_, mp) => mp.activeCategory,
+                    builder: (context, activeCategory, _) => _FilterChipRow(
+                      activeCategory: activeCategory,
+                      l10n: l10n,
+                      theme: theme,
+                    ),
+                  ),
+
+                  // ── [4] My-location button ────────────────────────
+                  // Rebuilds on isLocating / hasActiveFilter change only.
+                  Selector<MapProvider, _LocationButtonState>(
+                    selector: (_, mp) => _LocationButtonState(
+                      isLocating: mp.isLocating,
+                      hasFilter: mp.hasActiveFilter,
+                    ),
+                    builder: (context, state, _) => _LocationButton(
+                      isLocating: state.isLocating,
+                      hasFilter: state.hasFilter,
+                      l10n: l10n,
+                    ),
+                  ),
+
+                  // ── [5] Report preview bottom sheet ───────────────
+                  // Rebuilds only when selectedReport changes.
+                  Selector<MapProvider, ReportModel?>(
+                    selector: (_, mp) => mp.selectedReport,
+                    builder: (context, selected, _) {
+                      if (selected == null) return const SizedBox.shrink();
+                      return _ReportPreviewSheet(
+                        report: selected,
+                        onClose: context.read<MapProvider>().clearSelection,
+                        l10n: l10n,
+                        theme: theme,
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -173,6 +206,50 @@ class _MapViewState extends State<MapView>
       ),
     );
   }
+}
+
+// ════════════════════════════════════════════════════════════════
+// _MapMarkerSource — value object feeding the marker layer Selector.
+// Equality is based on the selected report id + the ordered list of
+// report ids, so unrelated provider notifications don't rebuild the
+// marker list.
+// ════════════════════════════════════════════════════════════════
+class _MapMarkerSource {
+  const _MapMarkerSource({required this.reports, required this.selectedId});
+
+  final List<ReportModel> reports;
+  final String? selectedId;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _MapMarkerSource &&
+          other.selectedId == selectedId &&
+          listEquals(other.reports, reports);
+
+  @override
+  int get hashCode => Object.hash(selectedId, Object.hashAll(reports));
+}
+
+// ── Location button selector payload (records cannot override ==) ──
+class _LocationButtonState {
+  const _LocationButtonState({
+    required this.isLocating,
+    required this.hasFilter,
+  });
+
+  final bool isLocating;
+  final bool hasFilter;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _LocationButtonState &&
+          other.isLocating == isLocating &&
+          other.hasFilter == hasFilter;
+
+  @override
+  int get hashCode => Object.hash(isLocating, hasFilter);
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -230,25 +307,22 @@ class _FloatingSearchBar extends StatelessWidget {
   const _FloatingSearchBar({
     required this.controller,
     required this.focusNode,
-    required this.mapProvider,
-    required this.reportProvider,
+    required this.searchQuery,
     required this.l10n,
     required this.theme,
-    required this.visibleCount,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
-  final MapProvider mapProvider;
-  final ReportProvider reportProvider;
+  final String searchQuery;
   final AppLocalizations l10n;
   final ThemeData theme;
-  final int visibleCount;
 
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final hasQuery = mapProvider.searchQuery.isNotEmpty;
+    final hasQuery = searchQuery.isNotEmpty;
+    final mapProvider = context.read<MapProvider>();
 
     return Positioned(
       top: topPadding + 12,
@@ -320,21 +394,25 @@ class _FloatingSearchBar extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                 ],
-                // Result count pill
-                Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.10),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '$visibleCount',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.primary,
+                // Result count pill — bound to filtered list length.
+                Selector2<ReportProvider, MapProvider, int>(
+                  selector: (_, rp, mp) =>
+                      mp.filteredReports(rp.allReports).length,
+                  builder: (context, count, _) => Container(
+                    margin: const EdgeInsets.only(right: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 9, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.10),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '$count',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
                   ),
                 ),
@@ -352,49 +430,40 @@ class _FloatingSearchBar extends StatelessWidget {
 // ════════════════════════════════════════════════════════════════
 class _FilterChipRow extends StatelessWidget {
   const _FilterChipRow({
-    required this.mapProvider,
+    required this.activeCategory,
     required this.l10n,
     required this.theme,
   });
 
-  final MapProvider mapProvider;
+  final ReportCategory? activeCategory;
   final AppLocalizations l10n;
   final ThemeData theme;
 
-  // ── Category metadata for chips ────────────────────────────────
-  static const _chips = [
-    (null, Icons.layers_rounded),
-    (ReportCategory.roads, Icons.construction_rounded),
-    (ReportCategory.lighting, Icons.lightbulb_outline_rounded),
-    (ReportCategory.waste, Icons.delete_outline_rounded),
-    (ReportCategory.water, Icons.water_drop_outlined),
-    (ReportCategory.parks, Icons.park_outlined),
-    (ReportCategory.other, Icons.report_problem_outlined),
+  // Chip order — null sentinel = "All" pseudo-category.
+  static const List<ReportCategory?> _chipOrder = [
+    null,
+    ReportCategory.roads,
+    ReportCategory.lighting,
+    ReportCategory.waste,
+    ReportCategory.water,
+    ReportCategory.parks,
+    ReportCategory.other,
   ];
 
-  String _label(ReportCategory? cat) => switch (cat) {
-        null                    => l10n.mapFilterAll,
-        ReportCategory.roads    => l10n.categoryRoads,
-        ReportCategory.lighting => l10n.categoryLighting,
-        ReportCategory.waste    => l10n.categoryWaste,
-        ReportCategory.water    => l10n.categoryWater,
-        ReportCategory.parks    => l10n.categoryParks,
-        ReportCategory.other    => l10n.categoryOther,
-      };
+  String _label(ReportCategory? cat) =>
+      cat == null ? l10n.mapFilterAll : ReportCategoryMeta.label(cat, l10n);
 
-  Color _chipColor(ReportCategory? cat) => switch (cat) {
-        null                    => theme.colorScheme.primary,
-        ReportCategory.roads    => const Color(0xFFEF6C00),
-        ReportCategory.lighting => const Color(0xFFF9A825),
-        ReportCategory.waste    => const Color(0xFF6D4C41),
-        ReportCategory.water    => const Color(0xFF0277BD),
-        ReportCategory.parks    => const Color(0xFF388E3C),
-        ReportCategory.other    => const Color(0xFF7B1FA2),
-      };
+  Color _chipColor(ReportCategory? cat) => cat == null
+      ? theme.colorScheme.primary
+      : ReportCategoryMeta.of(cat).color;
+
+  IconData _chipIcon(ReportCategory? cat) =>
+      cat == null ? Icons.layers_rounded : ReportCategoryMeta.of(cat).icon;
 
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
+    final mapProvider = context.read<MapProvider>();
 
     return Positioned(
       top: topPadding + 76, // directly below the 52px search bar + 12 gap
@@ -405,11 +474,11 @@ class _FilterChipRow extends StatelessWidget {
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: _chips.length,
+          itemCount: _chipOrder.length,
           separatorBuilder: (_, __) => const SizedBox(width: 8),
           itemBuilder: (context, i) {
-            final (cat, icon) = _chips[i];
-            final isSelected = mapProvider.activeCategory == cat;
+            final cat = _chipOrder[i];
+            final isSelected = activeCategory == cat;
             final chipColor = _chipColor(cat);
 
             return GestureDetector(
@@ -445,7 +514,7 @@ class _FilterChipRow extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      icon,
+                      _chipIcon(cat),
                       size: 14,
                       color: isSelected
                           ? Colors.white
@@ -480,17 +549,20 @@ class _FilterChipRow extends StatelessWidget {
 // ════════════════════════════════════════════════════════════════
 class _LocationButton extends StatelessWidget {
   const _LocationButton({
-    required this.mapProvider,
+    required this.isLocating,
+    required this.hasFilter,
     required this.l10n,
   });
 
-  final MapProvider mapProvider;
+  final bool isLocating;
+  final bool hasFilter;
   final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final mapProvider = context.read<MapProvider>();
 
     return Positioned(
       bottom: bottomPadding + 180,
@@ -506,11 +578,11 @@ class _LocationButton extends StatelessWidget {
               mapProvider.resetCamera();
             },
             theme: theme,
-            isLoading: mapProvider.isLocating,
+            isLoading: isLocating,
           ),
           const SizedBox(height: 10),
           // ── Clear filters (only when active) ─────────────────────
-          if (mapProvider.hasActiveFilter)
+          if (hasFilter)
             _MapIconButton(
               icon: Icons.filter_alt_off_rounded,
               onTap: () {

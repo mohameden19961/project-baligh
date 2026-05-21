@@ -5,10 +5,11 @@
 // ─────────────────────────────────────────────────────────────────
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show Colors, IconData, Icons, Color;
+import 'package:flutter/material.dart' show IconData, Color;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/report_model.dart';
+import '../utils/report_category_meta.dart';
 
 // ════════════════════════════════════════════════════════════════
 // Default centre: Nouakchott, Mauritania
@@ -115,25 +116,13 @@ class MapProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Marker colour per category (Flutter Color — no Google hue) ───
+  // ── Marker visuals delegate to the shared ReportCategoryMeta ─────
 
-  static Color markerColor(ReportCategory cat) => switch (cat) {
-        ReportCategory.roads    => const Color(0xFFEF6C00),
-        ReportCategory.lighting => const Color(0xFFF9A825),
-        ReportCategory.waste    => const Color(0xFF6D4C41),
-        ReportCategory.water    => const Color(0xFF0277BD),
-        ReportCategory.parks    => const Color(0xFF388E3C),
-        ReportCategory.other    => const Color(0xFF7B1FA2),
-      };
+  static Color markerColor(ReportCategory cat) =>
+      ReportCategoryMeta.of(cat).color;
 
-  static IconData markerIcon(ReportCategory cat) => switch (cat) {
-        ReportCategory.roads    => Icons.construction_rounded,
-        ReportCategory.lighting => Icons.lightbulb_outline_rounded,
-        ReportCategory.waste    => Icons.delete_outline_rounded,
-        ReportCategory.water    => Icons.water_drop_outlined,
-        ReportCategory.parks    => Icons.park_outlined,
-        ReportCategory.other    => Icons.report_problem_outlined,
-      };
+  static IconData markerIcon(ReportCategory cat) =>
+      ReportCategoryMeta.of(cat).icon;
 
   @override
   void dispose() {
