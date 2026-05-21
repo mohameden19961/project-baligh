@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
+import '../../widgets/empty_state.dart';
 
 class AlertsView extends StatelessWidget {
   const AlertsView({super.key});
@@ -10,17 +11,10 @@ class AlertsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.notifications_rounded,
-              size: 64, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(height: 16),
-          Text(l10n.navAlerts,
-              style: Theme.of(context).textTheme.headlineSmall),
-        ],
-      ),
+    return EmptyState(
+      icon: Icons.notifications_none_outlined,
+      title: l10n.navAlerts,
+      message: l10n.homeNoReports,
     );
   }
 }

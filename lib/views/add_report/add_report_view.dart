@@ -919,6 +919,9 @@ class _LocationPickerBodyState extends State<_LocationPickerBody> {
                   minZoom: 5.0,
                   maxZoom: 19.0,
                   onPositionChanged: _onPositionChanged,
+                  onTap: (tapPosition, point) {
+                    _mapController.move(point, _mapController.camera.zoom);
+                  },
                 ),
                 children: [
                   // ── FMTC-cached OSM TileLayer (Audit Step 2) ──

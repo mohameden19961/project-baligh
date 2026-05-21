@@ -368,7 +368,7 @@ class _NavItem extends StatelessWidget {
                 curve: Curves.easeInOut,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
-                  vertical: 4,
+                  vertical: 2,
                 ),
                 decoration: BoxDecoration(
                   color: _isSelected

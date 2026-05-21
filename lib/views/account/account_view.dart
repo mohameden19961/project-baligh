@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
+import '../../widgets/empty_state.dart';
 
 class AccountView extends StatelessWidget {
   const AccountView({super.key});
@@ -10,17 +11,10 @@ class AccountView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.person_rounded,
-              size: 64, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(height: 16),
-          Text(l10n.navAccount,
-              style: Theme.of(context).textTheme.headlineSmall),
-        ],
-      ),
+    return EmptyState(
+      icon: Icons.person_outline,
+      title: l10n.navAccount,
+      message: l10n.homeSubtitle,
     );
   }
 }
