@@ -992,8 +992,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function changeStatus(id, newStatus) {
   try {
-    const { error } = await sb.from('reports').update({ status: newStatus }).eq('id', id);
+    const { data, error } = await sb.from('reports').update({ status: newStatus }).eq('id', id).select();
     if (error) throw error;
+    if (!data || data.length === 0) { showToast(t('noPermission') || 'عذراً، لا تملك الصلاحية (RLS)', 'error'); return; }
     showToast(t('statusChanged'), 'success');
     loadReports();
   } catch (e) { showToast(t('statusFailed') + ': ' + e.message, 'error'); }
@@ -1115,8 +1116,9 @@ async function loadUsers() {
 
 async function toggleAdmin(userId, makeAdmin) {
   try {
-    const { error } = await sb.from('users').update({ is_admin: makeAdmin }).eq('id', userId);
+    const { data, error } = await sb.from('users').update({ is_admin: makeAdmin }).eq('id', userId).select();
     if (error) throw error;
+    if (!data || data.length === 0) { showToast(t('noPermission') || 'عذراً، لا تملك الصلاحية (RLS)', 'error'); return; }
     showToast(t('adminUpdated'), 'success');
     loadUsers();
   } catch (e) { showToast(e.message, 'error'); }
@@ -1125,8 +1127,9 @@ async function toggleAdmin(userId, makeAdmin) {
 async function deleteUser(id) {
   if (!confirm(t('confirmDeleteUser'))) return;
   try {
-    const { error } = await sb.from('users').delete().eq('id', id);
+    const { data, error } = await sb.from('users').delete().eq('id', id).select();
     if (error) throw error;
+    if (!data || data.length === 0) { showToast(t('noPermission') || 'عذراً، لا تملك الصلاحية (RLS)', 'error'); return; }
     showToast(t('userDeleted'), 'success');
     loadUsers();
   } catch (e) { showToast(t('userDeleteFailed') + ': ' + e.message, 'error'); }
@@ -1167,8 +1170,12 @@ async function loadNotifications() {
 
 async function markAllNotificationsRead() {
   try {
-    const { error } = await sb.from('notifications').update({ is_read: true }).eq('is_read', false);
+    const { data, error } = await sb.from('notifications').update({ is_read: true }).eq('is_read', false).select();
     if (error) throw error;
+    if (!data || data.length === 0) {
+      showToast('لا توجد إشعارات غير مقروءة أو لا تملك الصلاحية', 'error'); 
+      return; 
+    }
     showToast('تم التحديث بنجاح', 'success');
     loadNotifications();
   } catch(e) {
