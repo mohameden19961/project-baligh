@@ -506,7 +506,7 @@ tr:nth-child(even) td { background: #f8fafc; }
     <div class="user-info" id="userInfo"></div>
     <a class="active" onclick="switchPage('reports', this)">📋 <span data-i18n="reports">البلاغات</span></a>
     <a onclick="switchPage('users', this)">👥 <span data-i18n="users">المستخدمون</span></a>
-    <a onclick="switchPage('notifications', this)">🔔 <span data-i18n="notifications">الإشعارات</span></a>
+    <a onclick="switchPage('notifications', this)">🔔 <span data-i18n="notifications">الإشعارات</span> <span id="unreadBadge" style="display:none;background:var(--danger);color:white;padding:2px 6px;border-radius:10px;font-size:10px;margin-right:auto">0</span></a>
     <div class="spacer"></div>
     <a class="logout-btn" onclick="logout()">🚪 <span data-i18n="logout">تسجيل الخروج</span></a>
   </div>
@@ -556,7 +556,10 @@ tr:nth-child(even) td { background: #f8fafc; }
     </div>
     <!-- Notifications Page -->
     <div id="page-notifications" class="page">
-      <div class="page-header"><h2 data-i18n="notificationsTitle">🔔 الإشعارات</h2></div>
+      <div class="page-header">
+        <h2 data-i18n="notificationsTitle">🔔 الإشعارات</h2>
+        <button onclick="markAllNotificationsRead()" style="background:var(--green);color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px">تحديد الكل كمقروء</button>
+      </div>
       <div class="table-wrapper"><table><thead><tr><th data-i18n="thUser">المستخدم</th><th data-i18n="thMessage">الرسالة</th><th data-i18n="thDate">التاريخ</th><th data-i18n="thStatus">مقروء</th></tr></thead><tbody id="notificationsBody"></tbody></table></div>
     </div>
   </div>
@@ -783,7 +786,7 @@ function applyLang() {
     `<option value="falseReport">${t('statusFalseReport')}</option>`;
 }
 
-function showToast(msg, type) {
+function showToast(msg, type = 'success') {
   const tEl = document.getElementById('toast');
   tEl.textContent = msg; tEl.className = `toast ${type}`; tEl.style.display = 'block';
   setTimeout(() => tEl.style.display = 'none', 3000);
@@ -866,20 +869,32 @@ async function loadReports() {
     if (status) query = query.eq('status', status);
     if (date) query = query.gte('created_at', date + 'T00:00:00Z').lte('created_at', date + 'T23:59:59Z');
 
-    const { data, error } = await query;
+    const [
+      { count: total },
+      { count: pending },
+      { count: validated },
+      { count: falseR },
+      { count: totalUsers },
+      { data, error }
+    ] = await Promise.all([
+      sb.from('reports').select('*', { count: 'exact', head: true }),
+      sb.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      sb.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'validated'),
+      sb.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'falseReport'),
+      sb.from('users').select('*', { count: 'exact', head: true }),
+      query
+    ]);
+
     if (error) throw error;
     _allReports = data;
 
     // Stats
-    const total = data.length;
-    const pending = data.filter(r => r.status === 'pending').length;
-    const validated = data.filter(r => r.status === 'validated').length;
-    const falseR = data.filter(r => r.status === 'falseReport').length;
     document.getElementById('reportsStats').innerHTML = `
-      <div class="stat-card"><div class="num">${total}</div><div class="label">${t('totalReports')}</div></div>
-      <div class="stat-card"><div class="num">${pending}</div><div class="label">${t('pending')}</div></div>
-      <div class="stat-card"><div class="num">${validated}</div><div class="label">${t('validated')}</div></div>
-      <div class="stat-card"><div class="num">${falseR}</div><div class="label">${t('falseReport')}</div></div>
+      <div class="stat-card"><div class="num">${total || 0}</div><div class="label">${t('totalReports')}</div></div>
+      <div class="stat-card"><div class="num">${pending || 0}</div><div class="label">${t('pending')}</div></div>
+      <div class="stat-card"><div class="num">${validated || 0}</div><div class="label">${t('validated')}</div></div>
+      <div class="stat-card"><div class="num">${falseR || 0}</div><div class="label">${t('falseReport')}</div></div>
+      <div class="stat-card"><div class="num">${totalUsers || 0}</div><div class="label">${t('usersTitle')}</div></div>
     `;
 
     renderCategoryChart(data);
@@ -977,10 +992,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function changeStatus(id, newStatus) {
   try {
-    const { data, error } = await sb.from('reports').update({ status: newStatus }).eq('id', id).select();
+    const { error } = await sb.from('reports').update({ status: newStatus }).eq('id', id);
     if (error) throw error;
-    if (!data || data.length === 0) { showToast(t('noPermission'), 'error'); return; }
-    showToast(t('statusChanged'));
+    showToast(t('statusChanged'), 'success');
     loadReports();
   } catch (e) { showToast(t('statusFailed') + ': ' + e.message, 'error'); }
 }
@@ -1103,7 +1117,7 @@ async function toggleAdmin(userId, makeAdmin) {
   try {
     const { error } = await sb.from('users').update({ is_admin: makeAdmin }).eq('id', userId);
     if (error) throw error;
-    showToast(t('adminUpdated'));
+    showToast(t('adminUpdated'), 'success');
     loadUsers();
   } catch (e) { showToast(e.message, 'error'); }
 }
@@ -1113,7 +1127,7 @@ async function deleteUser(id) {
   try {
     const { error } = await sb.from('users').delete().eq('id', id);
     if (error) throw error;
-    showToast(t('userDeleted'));
+    showToast(t('userDeleted'), 'success');
     loadUsers();
   } catch (e) { showToast(t('userDeleteFailed') + ': ' + e.message, 'error'); }
 }
@@ -1127,6 +1141,13 @@ async function loadNotifications() {
       .select('*, users!notifications_user_id_fkey(username, email)')
       .order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
+    const badge = document.getElementById('unreadBadge');
+    if (badge) {
+      const unreadCount = data.filter(n => !n.is_read).length;
+      badge.textContent = unreadCount;
+      badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+    }
+
     if (!data.length) {
       tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="text-align:center;padding:60px 20px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px;opacity:0.4">🔔</div>${t('noNotifications')}</div></td></tr>`;
       return;
@@ -1141,6 +1162,17 @@ async function loadNotifications() {
     `).join('');
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--danger)">${t('error')}: ${escapeHtml(e.message)}</td></tr>`;
+  }
+}
+
+async function markAllNotificationsRead() {
+  try {
+    const { error } = await sb.from('notifications').update({ is_read: true }).eq('is_read', false);
+    if (error) throw error;
+    showToast('تم التحديث بنجاح', 'success');
+    loadNotifications();
+  } catch(e) {
+    showToast(e.message, 'error');
   }
 }
 

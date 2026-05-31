@@ -15,7 +15,7 @@
 // ─────────────────────────────────────────────────────────────────
 
 import 'package:flutter/foundation.dart';
-import '../models/report_model.dart';
+import '../core/models/report_model.dart';
 
 // ════════════════════════════════════════════════════════════════
 // ENUM: FormStep  — tracks which step the wizard is on

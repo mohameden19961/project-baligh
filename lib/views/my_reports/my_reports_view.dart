@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../models/report_model.dart';
+import '../../core/models/report_model.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/report_controller.dart';
 import '../../utils/report_category_meta.dart';

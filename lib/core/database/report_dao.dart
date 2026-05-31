@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import '../../utils/supabase_config.dart';
-import '../../models/report_model.dart';
+import '../models/report_model.dart';
 
 class ReportDao {
   Future<int> insert(ReportModel report) async {

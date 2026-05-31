@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../models/report_model.dart';
+import '../../core/models/report_model.dart';
 import '../../controllers/report_controller.dart';
 import '../../widgets/report_card.dart';
 import '../report_detail/report_detail_view.dart';

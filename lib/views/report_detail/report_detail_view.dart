@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/models/vote_model.dart';
 import '../../l10n/app_localizations.dart';
-import '../../models/report_model.dart';
+import '../../core/models/report_model.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/report_controller.dart';
 import '../../utils/report_category_meta.dart';

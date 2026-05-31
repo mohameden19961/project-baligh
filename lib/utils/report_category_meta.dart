@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import '../models/report_model.dart';
+import '../core/models/report_model.dart';
 
 class ReportCategoryMeta {
   const ReportCategoryMeta({required this.icon, required this.color});

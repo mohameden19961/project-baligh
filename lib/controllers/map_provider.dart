@@ -9,7 +9,7 @@ import 'package:flutter/material.dart' show IconData, Color;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import '../models/report_model.dart';
+import '../core/models/report_model.dart';
 import '../utils/report_category_meta.dart';
 
 // ════════════════════════════════════════════════════════════════

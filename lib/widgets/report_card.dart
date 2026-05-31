@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
-import '../models/report_model.dart';
+import '../core/models/report_model.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/report_category_meta.dart';
 

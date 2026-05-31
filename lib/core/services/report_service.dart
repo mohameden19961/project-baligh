@@ -1,4 +1,4 @@
-import '../core/models/vote_model.dart';
+import '../models/vote_model.dart';
 import '../models/report_model.dart';
 
 abstract class ReportService {

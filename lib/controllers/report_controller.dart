@@ -2,8 +2,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/models/vote_model.dart';
-import '../models/report_model.dart';
-import '../services/report_service.dart';
+import '../core/models/report_model.dart';
+import '../core/services/report_service.dart';
 import '../core/services/report_service_db.dart';
 import '../utils/supabase_config.dart';
 

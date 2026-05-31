@@ -1,7 +1,7 @@
 import '../database/notification_dao.dart';
 import '../database/user_dao.dart';
 import '../models/notification_model.dart';
-import '../../models/report_model.dart';
+import '../models/report_model.dart';
 
 class NotificationService {
   final NotificationDao _notificationDao = NotificationDao();

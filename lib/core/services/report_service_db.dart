@@ -1,7 +1,7 @@
 import '../database/report_dao.dart';
 import '../database/vote_dao.dart';
-import '../../services/report_service.dart';
-import '../../models/report_model.dart';
+import 'report_service.dart';
+import '../models/report_model.dart';
 import '../models/vote_model.dart';
 import 'notification_service.dart';
 
