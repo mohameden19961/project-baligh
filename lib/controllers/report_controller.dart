@@ -1,9 +1,11 @@
 // MVC - Controller
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/models/vote_model.dart';
 import '../models/report_model.dart';
 import '../services/report_service.dart';
 import '../core/services/report_service_db.dart';
+import '../utils/supabase_config.dart';
 
 /// Représente les différents états possibles du [ReportProvider].
 enum ReportProviderStatus {
@@ -33,10 +35,15 @@ enum ReportProviderStatus {
 ///
 /// Gère le cycle de vie complet des [ReportModel] : chargement,
 /// ajout, modification, suppression et vote de crédibilité.
+/// S'abonne aux changements Supabase Realtime pour mettre à jour
+/// l'UI automatiquement quand l'admin modifie un statut.
 /// Notifie les widgets abonnés via [ChangeNotifier] à chaque
 /// changement d'état ou de données.
 class ReportProvider extends ChangeNotifier {
   final ReportService _reportService;
+
+  /// Abonnement Realtime Supabase sur la table `reports`.
+  RealtimeChannel? _realtimeChannel;
 
   /// Liste interne de tous les signalements chargés.
   List<ReportModel> _reports = [];
@@ -112,6 +119,137 @@ class ReportProvider extends ChangeNotifier {
       _status == ReportProviderStatus.submitting ||
       _status == ReportProviderStatus.updating ||
       _status == ReportProviderStatus.refreshing;
+
+  // ── Realtime ────────────────────────────────────────────────────────────────
+
+  /// Démarre l'abonnement Supabase Realtime sur la table `reports`.
+  ///
+  /// Réagit aux événements UPDATE (ex: changement de statut depuis le dashboard)
+  /// et INSERT (nouveau signalement) en mettant à jour la liste locale et
+  /// en notifiant les listeners sans recharger l'ensemble des données.
+  /// Idempotent : appeler plusieurs fois n'ouvre pas plusieurs canaux.
+  void subscribeToRealtimeUpdates() {
+    if (_realtimeChannel != null) return;
+
+    _realtimeChannel = SupabaseConfig.client
+        .channel('public:reports')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'reports',
+          callback: (payload) {
+            debugPrint('[ReportProvider] Realtime UPDATE: ${payload.newRecord}');
+            _applyRealtimeUpdate(payload.newRecord);
+          },
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'reports',
+          callback: (payload) {
+            debugPrint('[ReportProvider] Realtime INSERT: ${payload.newRecord}');
+            _applyRealtimeInsert(payload.newRecord);
+          },
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.delete,
+          schema: 'public',
+          table: 'reports',
+          callback: (payload) {
+            final deletedId = payload.oldRecord['id'] as int?;
+            debugPrint('[ReportProvider] Realtime DELETE: id=$deletedId');
+            if (deletedId != null) _applyRealtimeDelete(deletedId);
+          },
+        )
+        .subscribe();
+
+    debugPrint('[ReportProvider] Subscribed to Supabase Realtime on reports');
+  }
+
+  /// Applique un événement UPDATE reçu en temps réel.
+  ///
+  /// Met à jour uniquement le signalement concerné dans [_reports]
+  /// en appliquant le nouveau statut et les compteurs de votes.
+  void _applyRealtimeUpdate(Map<String, dynamic> record) {
+    final id = record['id'] as int?;
+    if (id == null) return;
+
+    final index = _reports.indexWhere((r) => r.id == id);
+    if (index == -1) {
+      // Signalement inconnu — rafraîchir silencieusement
+      fetchReports(silent: true);
+      return;
+    }
+
+    final existing = _reports[index];
+    final newStatus = ReportStatus.fromJson(
+      record['status'] as String? ?? 'pending',
+    );
+    final confirmCount = (record['confirm_count'] as num?)?.toInt() ?? existing.credibilityScore.confirmations;
+    final denyCount = (record['deny_count'] as num?)?.toInt() ?? existing.credibilityScore.rejections;
+
+    final updated = existing.copyWith(
+      status: newStatus,
+      credibilityScore: CredibilityScore(
+        confirmations: confirmCount,
+        rejections: denyCount,
+      ),
+    );
+
+    _reports = List.from(_reports)..[index] = updated;
+    notifyListeners();
+  }
+
+  /// Applique un événement INSERT reçu en temps réel.
+  ///
+  /// Ajoute le nouveau signalement en tête de liste uniquement s'il
+  /// n'est pas déjà présent (évite les doublons avec l'ajout optimiste).
+  void _applyRealtimeInsert(Map<String, dynamic> record) {
+    final id = record['id'] as int?;
+    if (id == null) return;
+
+    // Ne pas ajouter si déjà présent (ajout optimiste)
+    if (_reports.any((r) => r.id == id)) return;
+
+    try {
+      final report = ReportModel.fromDbMap({
+        ...record,
+        'photo_url': record['photo_url'],
+        'created_at': record['created_at'],
+      });
+      _reports = [report, ..._reports];
+      notifyListeners();
+    } catch (e) {
+      debugPrint('[ReportProvider] _applyRealtimeInsert parse error: $e');
+      fetchReports(silent: true);
+    }
+  }
+
+  /// Applique un événement DELETE reçu en temps réel.
+  void _applyRealtimeDelete(int id) {
+    final before = _reports.length;
+    _reports = _reports.where((r) => r.id != id).toList();
+    if (_reports.length != before) notifyListeners();
+  }
+
+  /// Annule l'abonnement Realtime et libère les ressources.
+  ///
+  /// Doit être appelé dans [dispose] ou quand le contrôleur n'est plus utilisé.
+  Future<void> unsubscribeRealtime() async {
+    if (_realtimeChannel != null) {
+      await SupabaseConfig.client.removeChannel(_realtimeChannel!);
+      _realtimeChannel = null;
+      debugPrint('[ReportProvider] Unsubscribed from Supabase Realtime');
+    }
+  }
+
+  @override
+  void dispose() {
+    unsubscribeRealtime();
+    super.dispose();
+  }
+
+  // ── CRUD ────────────────────────────────────────────────────────────────────
 
   /// Charge ou rafraîchit la liste des signalements depuis le service.
   ///

@@ -1,10 +1,10 @@
 // MVC - View
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../controllers/auth_controller.dart';
-import '../../controllers/report_controller.dart';
 import '../auth/login_view.dart';
 import '../settings/settings_view.dart';
 import '../emergency/emergency_numbers_view.dart';
@@ -106,59 +106,112 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-class _StatsCard extends StatelessWidget {
+class _StatsCard extends StatefulWidget {
   const _StatsCard({required this.l10n, required this.theme});
   final AppLocalizations l10n;
   final ThemeData theme;
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<ReportProvider>(
-      builder: (context, provider, _) {
-        final total = provider.allReports.length;
-        final resolved = provider.validatedReports.length;
+  State<_StatsCard> createState() => _StatsCardState();
+}
 
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(20),
-            border:
-                Border.all(color: theme.colorScheme.outline.withOpacity(0.08)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+class _StatsCardState extends State<_StatsCard> {
+  int? _reportsCount;
+  int? _confirmedCount;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserStats();
+  }
+
+  /// Fetches stats specific to the current user from Supabase:
+  /// - COUNT(*) FROM reports WHERE user_id = currentUserId
+  /// - SUM(confirm_count) FROM reports WHERE user_id = currentUserId
+  Future<void> _fetchUserStats() async {
+    final userId = context.read<AuthProvider>().currentUserId;
+    if (userId == null) {
+      setState(() => _loading = false);
+      return;
+    }
+
+    try {
+      final client = Supabase.instance.client;
+
+      // Fetch all user reports and compute both stats in one query
+      final response = await client
+          .from('reports')
+          .select('confirm_count')
+          .eq('user_id', userId);
+
+      final rows = response as List<dynamic>;
+      final reportsCount = rows.length;
+      final confirmedCount = rows.fold<int>(
+        0,
+        (sum, row) => sum + ((row['confirm_count'] as num?)?.toInt() ?? 0),
+      );
+
+      if (mounted) {
+        setState(() {
+          _reportsCount = reportsCount;
+          _confirmedCount = confirmedCount;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('[_StatsCard] fetchUserStats error: $e');
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      decoration: BoxDecoration(
+        color: widget.theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+            color: widget.theme.colorScheme.outline.withOpacity(0.08)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: _loading
+          ? const SizedBox(
+              height: 72,
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          : IntrinsicHeight(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _StatItem(
+                    value: '${_reportsCount ?? 0}',
+                    label: widget.l10n.accountReportsSubmitted,
+                    color: widget.theme.colorScheme.primary,
+                  ),
+                  VerticalDivider(
+                    color: widget.theme.colorScheme.outline.withOpacity(0.15),
+                    thickness: 1,
+                  ),
+                  _StatItem(
+                    value: '${_confirmedCount ?? 0}',
+                    label: widget.l10n.statusValidated,
+                    color: const Color(0xFF2E7D32),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: IntrinsicHeight(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _StatItem(
-                  value: '$total',
-                  label: l10n.accountReportsSubmitted,
-                  color: theme.colorScheme.primary,
-                ),
-                VerticalDivider(
-                  color: theme.colorScheme.outline.withOpacity(0.15),
-                  thickness: 1,
-                ),
-                _StatItem(
-                  value: '$resolved',
-                  label: l10n.statusValidated,
-                  color: const Color(0xFF2E7D32),
-                ),
-              ],
             ),
-          ),
-        );
-      },
     );
   }
 }
+
 
 class _StatItem extends StatelessWidget {
   const _StatItem({

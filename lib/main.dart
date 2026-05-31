@@ -69,8 +69,23 @@ void main() async {
   );
 }
 
-class BalighApp extends StatelessWidget {
+class BalighApp extends StatefulWidget {
   const BalighApp({super.key});
+
+  @override
+  State<BalighApp> createState() => _BalighAppState();
+}
+
+class _BalighAppState extends State<BalighApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Start Supabase Realtime subscription after the first frame so the
+    // Provider tree is fully initialised before we access it.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ReportProvider>().subscribeToRealtimeUpdates();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

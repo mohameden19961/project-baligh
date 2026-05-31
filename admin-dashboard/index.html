@@ -197,32 +197,43 @@ body {
 .table-wrapper {
   background: var(--card);
   border-radius: 16px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
 }
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-thead { background: #f8f9fb; }
+table { width: 100%; min-width: 1100px; border-collapse: collapse; font-size: 13px; table-layout: auto; }
+thead { background: #f4f6f9; position: sticky; top: 0; z-index: 2; }
 th {
   text-align: right;
-  padding: 14px 16px;
+  padding: 13px 14px;
   font-weight: 700;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
-  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border);
   white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s, color .15s;
 }
+th:hover { background: #ebeef3; color: var(--green); }
+th.sort-asc::after { content: ' ↑'; font-size: 10px; }
+th.sort-desc::after { content: ' ↓'; font-size: 10px; }
+th.no-sort { cursor: default; }
+th.no-sort:hover { background: #f4f6f9; color: var(--text-secondary); }
 td {
-  padding: 12px 16px;
+  padding: 11px 14px;
   border-bottom: 1px solid #f0f1f3;
   vertical-align: middle;
+  max-width: 200px;
 }
 tr:last-child td { border-bottom: none; }
-tr:hover td { background: #f8f9fb; }
-tr:nth-child(even) td { background: #fafbfc; }
-tr:nth-child(even):hover td { background: #f0f2f5; }
+tr:hover td { background: #f0f4f8 !important; }
+tr:nth-child(odd) td { background: #ffffff; }
+tr:nth-child(even) td { background: #f8fafc; }
 
 /* Status Badges */
 .badge {
@@ -513,18 +524,19 @@ tr:nth-child(even):hover td { background: #f0f2f5; }
           <button onclick="loadReports()"><span data-i18n="filter">تصفية</span></button>
         </div>
       </div>
-      <div class="table-wrapper"><table><thead><tr>
-        <th>#</th>
-        <th data-i18n="thPhoto">صورة</th>
-        <th data-i18n="thUser">المستخدم</th>
-        <th data-i18n="thCategory">التصنيف</th>
-        <th data-i18n="thDescription">الوصف</th>
-        <th data-i18n="thVotes">✅ ❌</th>
-        <th data-i18n="thCredibility">المصداقية</th>
-        <th data-i18n="thLocation">الموقع</th>
-        <th data-i18n="thDate">التاريخ</th>
-        <th data-i18n="thStatus">الحالة</th>
-        <th data-i18n="thActions">الإجراءات</th>
+      <div class="table-wrapper"><table id="reportsTable"><thead><tr>
+        <th class="sort-col" data-col="id" style="width:52px">#</th>
+        <th class="no-sort" style="width:60px" data-i18n="thPhoto">صورة</th>
+        <th class="sort-col" data-col="user" data-i18n="thUser">المستخدم</th>
+        <th class="sort-col" data-col="category" data-i18n="thCategory">الفئة</th>
+        <th class="no-sort" data-i18n="thDescription">الوصف</th>
+        <th class="sort-col" data-col="date" data-i18n="thDate">التاريخ</th>
+        <th class="no-sort" data-i18n="thLocation">الموقع</th>
+        <th class="sort-col" data-col="confirm" style="width:48px">✅</th>
+        <th class="sort-col" data-col="deny" style="width:48px">❌</th>
+        <th class="sort-col" data-col="cred" data-i18n="thCredibility">المصداقية</th>
+        <th class="sort-col" data-col="status" data-i18n="thStatus">الحالة</th>
+        <th class="no-sort" data-i18n="thActions" style="width:110px">الإجراءات</th>
       </tr></thead><tbody id="reportsBody"></tbody></table></div>
     </div>
     <!-- Users Page -->
@@ -837,12 +849,16 @@ function initCategoryFilter() {
 }
 
 // ── Reports ──
+let _allReports = [];
+let _sortCol = 'date';
+let _sortDir = 'desc';
+
 async function loadReports() {
   const category = document.getElementById('filterCategory').value;
   const status = document.getElementById('filterStatus').value;
   const date = document.getElementById('filterDate').value;
   const tbody = document.getElementById('reportsBody');
-  tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px">${t('loading')}</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:40px">${t('loading')}</td></tr>`;
 
   try {
     let query = sb.from('reports').select('*, users!reports_user_id_fkey(username, email)').order('created_at', { ascending: false });
@@ -852,6 +868,7 @@ async function loadReports() {
 
     const { data, error } = await query;
     if (error) throw error;
+    _allReports = data;
 
     // Stats
     const total = data.length;
@@ -866,46 +883,97 @@ async function loadReports() {
     `;
 
     renderCategoryChart(data);
+    renderReportsTable(data);
 
-    if (!data.length) {
-      tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state" style="text-align:center;padding:60px 20px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px;opacity:0.4">📭</div>${t('noReports')}</div></td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = data.map(r => {
-      const totalVotes = (r.confirm_count || 0) + (r.deny_count || 0);
-      const credPct = totalVotes > 0 ? Math.round((r.confirm_count || 0) / totalVotes * 100) : 0;
-      const credColor = credPct >= 70 ? '#16A34A' : credPct >= 40 ? '#F59E0B' : '#DC2626';
-      const photoHtml = r.photo_url
-        ? `<img src="${escapeHtml(r.photo_url)}" class="thumb" onerror="this.style.display='none'" loading="lazy">`
-        : `<div class="thumb">📷</div>`;
-      return `<tr style="cursor:pointer" onclick="showReportDetail(${r.id})">
-        <td style="font-weight:600;color:var(--muted)">${r.id}</td>
-        <td>${photoHtml}</td>
-        <td><div class="user-cell">${r.users?.username ? `<div class="avatar" style="background:${avatarColor(r.users.username)}">${(r.users.username || '?')[0].toUpperCase()}</div>` : ''}<span>${escapeHtml(r.users?.username || r.users?.email || r.user_id?.substring(0,8) || '—')}</span></div></td>
-        <td><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:${CATEGORY_COLORS[r.category] || '#888'};display:inline-block"></span>${catLabel(r.category)}</span></td>
-        <td class="truncate">${escapeHtml(r.description?.substring(0, 50) || '')}</td>
-        <td style="white-space:nowrap;font-size:13px">✅ ${r.confirm_count||0} &nbsp; ❌ ${r.deny_count||0}</td>
-        <td><div class="cred-bar"><span style="font-size:12px;font-weight:700;color:${credColor};min-width:36px">${credPct}%</span><div class="bar"><div class="bar-fill" style="width:${credPct}%;background:${credColor}"></div></div></div></td>
-        <td style="font-size:11px;color:var(--muted)">${r.latitude?.toFixed(3)||'—'}, ${r.longitude?.toFixed(3)||'—'}</td>
-        <td style="font-size:12px;color:var(--muted);white-space:nowrap">${formatDate(r.created_at)}</td>
-        <td>
-          <select class="status-select" data-id="${r.id}" onclick="event.stopPropagation()" onchange="changeStatus(${r.id}, this.value)" style="background:${statusBg(r.status)};color:${statusFg(r.status)}">
-            <option value="pending" ${r.status==='pending'?'selected':''}>${t('statusPending')}</option>
-            <option value="validated" ${r.status==='validated'?'selected':''}>${t('statusValidated')}</option>
-            <option value="falseReport" ${r.status==='falseReport'?'selected':''}>${t('statusFalseReport')}</option>
-          </select>
-        </td>
-        <td><div class="actions" onclick="event.stopPropagation()">
-          <button class="btn-view btn-icon-only" onclick="showReportDetail(${r.id})" title="${t('view')}">👁️</button>
-          <button class="btn-delete" onclick="deleteReport(${r.id})">🗑️ ${t('delete')}</button>
-        </div></td>
-      </tr>`;
-    }).join('');
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--danger)">${t('error')}: ${escapeHtml(e.message)}</td></tr>`;
+    document.getElementById('reportsBody').innerHTML = `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--danger)">${t('error')}: ${escapeHtml(e.message)}</td></tr>`;
   }
 }
+
+function renderReportsTable(data) {
+  const tbody = document.getElementById('reportsBody');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty-state" style="text-align:center;padding:60px 20px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px;opacity:0.4">📭</div>${t('noReports')}</div></td></tr>`;
+    return;
+  }
+
+  // Sort
+  const sorted = [...data].sort((a, b) => {
+    let va, vb;
+    switch (_sortCol) {
+      case 'id':       va = a.id; vb = b.id; break;
+      case 'user':     va = (a.users?.username || ''); vb = (b.users?.username || ''); break;
+      case 'category': va = catLabel(a.category); vb = catLabel(b.category); break;
+      case 'date':     va = a.created_at; vb = b.created_at; break;
+      case 'confirm':  va = a.confirm_count || 0; vb = b.confirm_count || 0; break;
+      case 'deny':     va = a.deny_count || 0; vb = b.deny_count || 0; break;
+      case 'cred': {
+        const tv = (a.confirm_count||0)+(a.deny_count||0);
+        const tw = (b.confirm_count||0)+(b.deny_count||0);
+        va = tv > 0 ? (a.confirm_count||0)/tv : 0;
+        vb = tw > 0 ? (b.confirm_count||0)/tw : 0;
+        break;
+      }
+      case 'status':   va = a.status; vb = b.status; break;
+      default:         va = a.id; vb = b.id;
+    }
+    if (va < vb) return _sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return _sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  tbody.innerHTML = sorted.map((r, idx) => {
+    const totalVotes = (r.confirm_count || 0) + (r.deny_count || 0);
+    const credPct = totalVotes > 0 ? Math.round((r.confirm_count || 0) / totalVotes * 100) : 0;
+    const credColor = credPct >= 70 ? '#16A34A' : credPct >= 40 ? '#F59E0B' : '#DC2626';
+    const photoHtml = r.photo_url
+      ? `<img src="${escapeHtml(r.photo_url)}" class="thumb" onerror="this.style.display='none'" loading="lazy">`
+      : `<div class="thumb">📷</div>`;
+    const userLabel = r.users?.username || r.users?.email || r.user_id?.substring(0,8) || '—';
+    const rowBg = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
+    return `<tr style="cursor:pointer;background:${rowBg}" onclick="showReportDetail(${r.id})">
+      <td style="font-weight:700;color:var(--muted);font-size:12px;width:52px">${r.id}</td>
+      <td style="width:60px">${photoHtml}</td>
+      <td style="min-width:120px"><div class="user-cell">${r.users?.username ? `<div class="avatar" style="background:${avatarColor(r.users.username)};width:28px;height:28px;font-size:11px">${(r.users.username||'?')[0].toUpperCase()}</div>` : ''}<span style="font-size:13px">${escapeHtml(userLabel)}</span></div></td>
+      <td style="min-width:100px"><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:${CATEGORY_COLORS[r.category]||'#888'};display:inline-block;flex-shrink:0"></span><span style="font-size:12px">${catLabel(r.category)}</span></span></td>
+      <td style="max-width:180px"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px" title="${escapeHtml(r.description||'')}">${escapeHtml((r.description||'').substring(0,60))}${(r.description||'').length>60?'…':''}</div></td>
+      <td style="white-space:nowrap;font-size:12px;color:var(--muted)">${formatDate(r.created_at)}</td>
+      <td style="font-size:11px;color:var(--muted);white-space:nowrap;min-width:90px">${r.latitude?.toFixed(3)||'—'},<br>${r.longitude?.toFixed(3)||'—'}</td>
+      <td style="text-align:center;font-weight:700;color:var(--success)">${r.confirm_count||0}</td>
+      <td style="text-align:center;font-weight:700;color:var(--danger)">${r.deny_count||0}</td>
+      <td style="min-width:90px"><div class="cred-bar"><span style="font-size:12px;font-weight:700;color:${credColor};min-width:34px">${credPct}%</span><div class="bar"><div class="bar-fill" style="width:${credPct}%;background:${credColor}"></div></div></div></td>
+      <td style="min-width:110px">
+        <select class="status-select" data-id="${r.id}" onclick="event.stopPropagation()" onchange="changeStatus(${r.id}, this.value)" style="background:${statusBg(r.status)};color:${statusFg(r.status)};border-color:${statusFg(r.status)}40">
+          <option value="pending" ${r.status==='pending'?'selected':''}>${t('statusPending')}</option>
+          <option value="validated" ${r.status==='validated'?'selected':''}>${t('statusValidated')}</option>
+          <option value="falseReport" ${r.status==='falseReport'?'selected':''}>${t('statusFalseReport')}</option>
+        </select>
+      </td>
+      <td style="width:110px"><div class="actions" onclick="event.stopPropagation()">
+        <button class="btn-view btn-icon-only" onclick="showReportDetail(${r.id})" title="${t('view')}">👁️</button>
+        <button class="btn-delete btn-icon-only" onclick="deleteReport(${r.id})" title="${t('delete')}">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// Sortable column headers
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('#reportsTable th.sort-col').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (_sortCol === col) {
+        _sortDir = _sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        _sortCol = col;
+        _sortDir = col === 'date' ? 'desc' : 'asc';
+      }
+      document.querySelectorAll('#reportsTable th').forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+      th.classList.add(_sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+      renderReportsTable(_allReports);
+    });
+  });
+});
 
 async function changeStatus(id, newStatus) {
   try {
