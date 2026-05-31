@@ -1003,9 +1003,10 @@ async function changeStatus(id, newStatus) {
 async function deleteReport(id) {
   if (!confirm(t('confirmDelete'))) return;
   try {
-    const { error } = await sb.from('reports').delete().eq('id', id);
+    const { data, error } = await sb.from('reports').delete().eq('id', id).select();
     if (error) throw error;
-    showToast(t('deleted'));
+    if (!data || data.length === 0) { showToast(t('noPermission') || 'عذراً، لا تملك الصلاحية (RLS)', 'error'); return; }
+    showToast(t('deleted'), 'success');
     loadReports();
   } catch (e) { showToast(t('deleteFailed') + ': ' + e.message, 'error'); }
 }
