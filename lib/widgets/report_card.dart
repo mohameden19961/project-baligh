@@ -19,11 +19,13 @@ class ReportCard extends StatelessWidget {
     super.key,
     required this.report,
     this.onTap,
+    this.trailing,
     this.animationDelay = Duration.zero,
   });
 
   final ReportModel report;
   final VoidCallback? onTap;
+  final Widget? trailing;
 
   /// Stagger delay for the entrance animation driven by the list builder.
   final Duration animationDelay;
@@ -33,6 +35,7 @@ class ReportCard extends StatelessWidget {
     return _AnimatedReportCard(
       report: report,
       onTap: onTap,
+      trailing: trailing,
       animationDelay: animationDelay,
     );
   }
@@ -43,11 +46,13 @@ class _AnimatedReportCard extends StatefulWidget {
   const _AnimatedReportCard({
     required this.report,
     required this.onTap,
+    this.trailing,
     required this.animationDelay,
   });
 
   final ReportModel report;
   final VoidCallback? onTap;
+  final Widget? trailing;
   final Duration animationDelay;
 
   @override
@@ -93,6 +98,7 @@ class _AnimatedReportCardState extends State<_AnimatedReportCard>
         child: _ReportCardBody(
           report: widget.report,
           onTap: widget.onTap,
+          trailing: widget.trailing,
         ),
       ),
     );
@@ -103,10 +109,11 @@ class _AnimatedReportCardState extends State<_AnimatedReportCard>
 // _ReportCardBody — the actual card UI
 // ════════════════════════════════════════════════════════════════
 class _ReportCardBody extends StatelessWidget {
-  const _ReportCardBody({required this.report, this.onTap});
+  const _ReportCardBody({required this.report, this.onTap, this.trailing});
 
   final ReportModel report;
   final VoidCallback? onTap;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +185,10 @@ class _ReportCardBody extends StatelessWidget {
                                   status: report.status,
                                   l10n: l10n,
                                 ),
+                                if (trailing != null) ...[
+                                  const SizedBox(width: 6),
+                                  trailing!,
+                                ],
                               ],
                             ),
                             const SizedBox(height: 4),
@@ -273,10 +284,9 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, bg, fg) = switch (status) {
-      ReportStatus.pending    => (l10n.statusPending,    const Color(0xFFFFF8E1), const Color(0xFFF9A825)),
-      ReportStatus.inProgress => (l10n.statusInProgress, const Color(0xFFE3F2FD), const Color(0xFF1565C0)),
-      ReportStatus.resolved   => (l10n.statusResolved,   const Color(0xFFE8F5E9), const Color(0xFF2E7D32)),
-      ReportStatus.rejected   => (l10n.statusRejected,   const Color(0xFFFFEBEE), const Color(0xFFC62828)),
+      ReportStatus.pending     => (l10n.statusPending,     const Color(0xFFFFF8E1), const Color(0xFFF9A825)),
+      ReportStatus.validated   => (l10n.statusValidated,   const Color(0xFFE8F5E9), const Color(0xFF2E7D32)),
+      ReportStatus.falseReport => (l10n.statusFalseReport, const Color(0xFFFFEBEE), const Color(0xFFC62828)),
     };
 
     return Container(

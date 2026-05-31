@@ -128,35 +128,50 @@
   "reportValidationLocation": "الرجاء تحديد موقع المشكلة",
   "@reportValidationLocation": { "description": "Validation message for location field" },
 
-  "categoryRoads": "طرق وأرصفة",
-  "@categoryRoads": { "description": "Report category: Roads" },
+  "categoryElectricity": "كهرباء",
+  "@categoryElectricity": { "description": "Report category: Electricity" },
 
-  "categoryLighting": "إنارة عامة",
-  "@categoryLighting": { "description": "Report category: Public Lighting" },
+  "categoryRoad": "طرق",
+  "@categoryRoad": { "description": "Report category: Road" },
 
-  "categoryWaste": "نفايات وصرف صحي",
-  "@categoryWaste": { "description": "Report category: Waste & Sanitation" },
+  "categoryFlood": "فيضانات",
+  "@categoryFlood": { "description": "Report category: Flood" },
 
-  "categoryWater": "ماء وكهرباء",
-  "@categoryWater": { "description": "Report category: Water & Electricity" },
+  "categorySecurity": "أمن",
+  "@categorySecurity": { "description": "Report category: Security" },
 
-  "categoryParks": "حدائق ومساحات خضراء",
-  "@categoryParks": { "description": "Report category: Parks & Green Spaces" },
+  "categoryWater": "ماء",
+  "@categoryWater": { "description": "Report category: Water" },
 
-  "categoryOther": "أخرى",
-  "@categoryOther": { "description": "Report category: Other" },
+  "categoryHealth": "صحة",
+  "@categoryHealth": { "description": "Report category: Health" },
+
+  "categoryInternet": "إنترنت",
+  "@categoryInternet": { "description": "Report category: Internet" },
+
+  "categoryMarket": "أسواق",
+  "@categoryMarket": { "description": "Report category: Market" },
+
+  "categoryGovernment": "حكومة",
+  "@categoryGovernment": { "description": "Report category: Government" },
+
+  "categoryFire": "حرائق",
+  "@categoryFire": { "description": "Report category: Fire" },
+
+  "categoryInfrastructure": "بنية تحتية",
+  "@categoryInfrastructure": { "description": "Report category: Infrastructure" },
+
+  "categoryFraud": "احتيال",
+  "@categoryFraud": { "description": "Report category: Fraud" },
 
   "statusPending": "قيد الانتظار",
   "@statusPending": { "description": "Report status: Pending" },
 
-  "statusInProgress": "قيد المعالجة",
-  "@statusInProgress": { "description": "Report status: In Progress" },
+  "statusValidated": "موثّق",
+  "@statusValidated": { "description": "Report status: Validated" },
 
-  "statusResolved": "تم الحل",
-  "@statusResolved": { "description": "Report status: Resolved" },
-
-  "statusRejected": "مرفوض",
-  "@statusRejected": { "description": "Report status: Rejected" },
+  "statusFalseReport": "بلاغ كاذب",
+  "@statusFalseReport": { "description": "Report status: False Report" },
 
   "myReportsTitle": "تقاريري",
   "@myReportsTitle": { "description": "My Reports screen title" },
@@ -254,11 +269,110 @@
   "navAlerts": "تنبيهات",
   "navAccount": "حسابي",
 
+  "alertsTitle": "التنبيهات",
+  "@alertsTitle": { "description": "Alerts/Notifications screen title" },
+
+  "alertsEmpty": "لا توجد تنبيهات",
+  "@alertsEmpty": { "description": "Empty state for alerts screen" },
+
+  "alertStatusUpdate": "تحديث حالة البلاغ",
+  "@alertStatusUpdate": { "description": "Alert type: report status updated" },
+
+  "alertNewReport": "بلاغ جديد في منطقتك",
+  "@alertNewReport": { "description": "Alert type: new report nearby" },
+
+  "alertMarkAllRead": "تحديد الكل كمقروء",
+  "@alertMarkAllRead": { "description": "Tooltip: mark all alerts as read" },
+
+  "alertTileTitle": "تنبيه",
+  "@alertTileTitle": { "description": "Generic alert/notification tile title" },
+
+  "accountJoinDate": "تاريخ الانضمام",
+  "@accountJoinDate": { "description": "Account: join date label" },
+
+  "accountReportsSubmitted": "البلاغات المقدمة",
+  "@accountReportsSubmitted": { "description": "Account: reports count label" },
+
+  "accountSettings": "الإعدادات",
+  "@accountSettings": { "description": "Account: settings button" },
+
+  "accountEmergencyNumbers": "أرقام الطوارئ",
+  "@accountEmergencyNumbers": { "description": "Account: emergency numbers button" },
+
+  "accountLogout": "تسجيل الخروج",
+  "@accountLogout": { "description": "Account: logout button" },
+
+  "reportDetailVoteConfirm": "صحيح",
+  "@reportDetailVoteConfirm": { "description": "Report detail: confirm vote button" },
+
+  "reportDetailVoteReject": "خطأ",
+  "@reportDetailVoteReject": { "description": "Report detail: reject vote button" },
+
+  "reportDetailVoteSuccess": "تم تسجيل صوتك!",
+  "@reportDetailVoteSuccess": { "description": "Report detail: vote success message" },
+
+  "reportDetailVoteError": "فشل تسجيل الصوت. حاول مجدداً.",
+  "@reportDetailVoteError": { "description": "Report detail: vote error message" },
+
+  "reportDetailCredibility": "المصداقية",
+  "@reportDetailCredibility": { "description": "Report detail: credibility section label" },
+
+  "reportDetailOpenMap": "فتح على الخريطة",
+  "@reportDetailOpenMap": { "description": "Report detail: open map button" },
+
+  "emergencyTitle": "أرقام الطوارئ",
+  "@emergencyTitle": { "description": "Emergency numbers screen title" },
+
+  "emergencyPolice": "الشرطة",
+  "@emergencyPolice": { "description": "Emergency: police" },
+
+  "emergencyAmbulance": "الإسعاف",
+  "@emergencyAmbulance": { "description": "Emergency: ambulance" },
+
+  "emergencyFire": "الدفاع المدني",
+  "@emergencyFire": { "description": "Emergency: fire department" },
+
+  "emergencyCivilProtection": "الحماية المدنية",
+  "@emergencyCivilProtection": { "description": "Emergency: civil protection" },
+
+  "emergencyCall": "اتصال",
+  "@emergencyCall": { "description": "Emergency: call button" },
+
+  "splashTitle": "بلّغ لايت",
+  "@splashTitle": { "description": "Splash screen title" },
+
+  "splashSubtitle": "صوتك يصنع الفرق",
+  "@splashSubtitle": { "description": "Splash screen subtitle" },
+
+  "splashStart": "ابدأ الآن",
+  "@splashStart": { "description": "Splash: start button" },
+
+  "splashSkip": "تخطي",
+  "@splashSkip": { "description": "Splash: skip button" },
+
   "networkError": "تعذّر الاتصال بالشبكة. تحقق من اتصالك بالإنترنت.",
   "@networkError": { "description": "Generic network error message" },
 
   "unknownError": "حدث خطأ غير متوقع. حاول مجدداً.",
   "@unknownError": { "description": "Generic unknown error message" },
+
+  "login": "تسجيل الدخول",
+  "@login": { "description": "Login button label" },
+
+  "register": "إنشاء حساب",
+  "@register": { "description": "Register button label" },
+
+  "email": "البريد الإلكتروني",
+  "@email": { "description": "Email field label" },
+
+  "password": "كلمة المرور",
+  "@password": { "description": "Password field label" },
+
+  "username": "اسم المستخدم",
+  "@username": { "description": "Username field label" },
+
+  "confirmPassword": "تأكيد كلمة المرور",
+  "@confirmPassword": { "description": "Confirm password field label" },
 
   "reportCount": "{count, plural, =0{لا توجد بلاغات} =1{بلاغ واحد} =2{بلاغان} few{{count} بلاغات} many{{count} بلاغاً} other{{count} بلاغ}}",
   "@reportCount": {

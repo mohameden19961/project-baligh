@@ -29,7 +29,8 @@ class AddReportProvider extends ChangeNotifier {
   ReportCategory? _selectedCategory;
   String _description = '';
   ReportLocation? _selectedLocation;
-  String? _localPhotoPath;
+  String? _photoUrl;
+  bool _photoUploading = false;
   FormStep _currentStep = FormStep.category;
 
   // ── Validation flags ─────────────────────────────────────────────
@@ -40,7 +41,8 @@ class AddReportProvider extends ChangeNotifier {
   ReportCategory? get selectedCategory => _selectedCategory;
   String get description => _description;
   ReportLocation? get selectedLocation => _selectedLocation;
-  String? get localPhotoPath => _localPhotoPath;
+  String? get photoUrl => _photoUrl;
+  bool get photoUploading => _photoUploading;
   FormStep get currentStep => _currentStep;
   int get currentStepIndex => _currentStep.index;
   bool get showCategoryError => _showCategoryError;
@@ -49,7 +51,7 @@ class AddReportProvider extends ChangeNotifier {
   bool get hasCategory => _selectedCategory != null;
   bool get hasDescription => _description.trim().isNotEmpty;
   bool get hasLocation => _selectedLocation != null;
-  bool get hasPhoto => _localPhotoPath != null;
+  bool get hasPhoto => _photoUrl != null;
 
   /// Step 1 is complete when a category is selected.
   bool get isStep1Valid => hasCategory;
@@ -106,13 +108,20 @@ class AddReportProvider extends ChangeNotifier {
 
   // ── Step 3: Photo ─────────────────────────────────────────────────
 
-  void setPhoto(String path) {
-    _localPhotoPath = path;
+  void setPhotoUrl(String url) {
+    _photoUrl = url;
+    _photoUploading = false;
+    notifyListeners();
+  }
+
+  void setPhotoUploading(bool value) {
+    _photoUploading = value;
     notifyListeners();
   }
 
   void removePhoto() {
-    _localPhotoPath = null;
+    _photoUrl = null;
+    _photoUploading = false;
     notifyListeners();
   }
 
@@ -164,7 +173,7 @@ class AddReportProvider extends ChangeNotifier {
           // Fallback to Nouakchott city centre if location step skipped.
           const ReportLocation(latitude: 18.0735, longitude: -15.9582),
       createdAt: DateTime.now().toUtc(),
-      localPhotoPath: _localPhotoPath,
+      photoUrl: _photoUrl,
     );
   }
 
@@ -175,7 +184,8 @@ class AddReportProvider extends ChangeNotifier {
     _selectedCategory = null;
     _description = '';
     _selectedLocation = null;
-    _localPhotoPath = null;
+    _photoUrl = null;
+    _photoUploading = false;
     _currentStep = FormStep.category;
     _showCategoryError = false;
     _showLocationError = false;

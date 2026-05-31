@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بلّغ — لوحة التحكم</title>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --green: #1B6B2F;
+  --green-light: #2E8B3D;
+  --green-dark: #0D4720;
+  --yellow: #F5C518;
+  --yellow-light: #FFF3B0;
+  --bg: #f0f2f5;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --text-secondary: #5a6170;
+  --muted: #8a94a6;
+  --border: #e2e5ea;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+}
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* Login */
+.login-page {
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  padding: 20px;
+}
+.login-box {
+  background: var(--card); border-radius: 24px; padding: 48px 40px 40px;
+  width: 400px; max-width: 100%; box-shadow: var(--shadow-lg);
+}
+.login-box h1 { color: var(--green); text-align: center; margin-bottom: 6px; font-size: 26px; font-weight: 800; }
+.login-box p { color: var(--text-secondary); text-align: center; margin-bottom: 32px; font-size: 14px; }
+.login-box input {
+  width: 100%; padding: 14px 16px; border: 2px solid var(--border);
+  border-radius: var(--radius); font-size: 15px; margin-bottom: 14px; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  background: #fafbfc;
+}
+.login-box input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(27,107,47,0.12);
+  background: white;
+}
+.login-box button {
+  width: 100%; padding: 14px; background: var(--green); color: white;
+  border: none; border-radius: var(--radius); font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: background .2s, transform .1s;
+  margin-top: 8px;
+}
+.login-box button:hover { background: var(--green-light); }
+.login-box button:active { transform: scale(0.98); }
+.login-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+
+/* Dashboard */
+.dashboard { display: none; }
+
+/* Sidebar */
+.sidebar {
+  position: fixed; right: 0; top: 0; width: 250px; height: 100vh;
+  background: var(--green); color: white; padding: 0;
+  display: flex; flex-direction: column;
+  z-index: 100;
+}
+.sidebar-header {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sidebar-header h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+.sidebar-header .lang-btn {
+  background: rgba(255,255,255,0.12); color: white;
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+  padding: 5px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: background .2s;
+}
+.sidebar-header .lang-btn:hover { background: rgba(255,255,255,0.2); }
+.sidebar .user-info {
+  padding: 16px 20px; font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px; color: rgba(255,255,255,0.75); text-decoration: none;
+  font-size: 14px; cursor: pointer; transition: all .2s;
+  border-right: 3px solid transparent;
+}
+.sidebar a:hover { background: rgba(255,255,255,0.08); color: white; }
+.sidebar a.active {
+  background: rgba(255,255,255,0.12); color: white;
+  border-right-color: var(--yellow);
+}
+.sidebar .spacer { flex: 1; }
+.sidebar .logout-btn { border-top: 1px solid rgba(255,255,255,0.08); }
+
+/* Main Content */
+.main-content {
+  margin-right: 250px;
+  padding: 32px;
+  min-height: 100vh;
+}
+.page { display: none; }
+.page.active { display: block; }
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+}
+.page-header h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+
+/* Stats Cards */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: box-shadow .2s, transform .2s;
+}
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+.stat-card .num { font-size: 30px; font-weight: 800; color: var(--green); line-height: 1.2; }
+.stat-card .label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; font-weight: 500; }
+
+/* Filters */
+.filters-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filters select, .filters input {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  outline: none;
+  background: #fafbfc;
+  color: var(--text);
+  min-width: 150px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.filters select:focus, .filters input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(27,107,47,0.10);
+  background: white;
+}
+.filters button {
+  padding: 10px 22px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+.filters button:hover { background: var(--green-light); }
+.filters button:active { transform: scale(0.97); }
+
+/* Table Wrapper */
+.table-wrapper {
+  background: var(--card);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead { background: #f8f9fb; }
+th {
+  text-align: right;
+  padding: 14px 16px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f1f3;
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8f9fb; }
+tr:nth-child(even) td { background: #fafbfc; }
+tr:nth-child(even):hover td { background: #f0f2f5; }
+
+/* Status Badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+}
+.badge-pending { background: #FFF8E1; color: #B8860B; }
+.badge-validated { background: #E6F7EC; color: #1B6B2F; }
+.badge-false { background: #FDE8E8; color: #B91C1C; }
+
+/* Thumbnail */
+.thumb {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+/* Actions */
+.actions { display: flex; gap: 6px; flex-wrap: nowrap; }
+.actions button, .actions .btn-icon {
+  padding: 7px 12px; border: none; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s;
+  display: inline-flex; align-items: center; gap: 4px;
+  white-space: nowrap;
+}
+.btn-edit { background: #E6F7EC; color: #1B6B2F; }
+.btn-edit:hover { background: #1B6B2F; color: white; }
+.btn-delete { background: #FDE8E8; color: #B91C1C; }
+.btn-delete:hover { background: #B91C1C; color: white; }
+.btn-view { background: #E3F2FD; color: #1565C0; }
+.btn-view:hover { background: #1565C0; color: white; }
+.btn-icon-only { padding: 7px 9px; }
+
+/* Status Select */
+.status-select {
+  padding: 6px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.status-select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(27,107,47,0.10);
+}
+
+/* Credibility Bar */
+.cred-bar {
+  display: flex; align-items: center; gap: 6px;
+}
+.cred-bar .bar {
+  width: 60px; height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.cred-bar .bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .3s;
+}
+
+/* Avatar */
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 28px;
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  display: none;
+  animation: fadeIn .3s ease-out;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.toast.success { background: var(--green); }
+.toast.error { background: var(--danger); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1000;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn .25s ease-out;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-size: 18px; font-weight: 700; }
+.modal-close {
+  width: 36px; height: 36px; border: none; border-radius: 50%;
+  background: var(--bg); cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary); transition: background .2s;
+}
+.modal-close:hover { background: #e0e0e0; }
+.modal-body { padding: 24px; }
+.modal-body .field { margin-bottom: 16px; }
+.modal-body .field-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+.modal-body .field-value { font-size: 15px; color: var(--text); }
+.modal-body .field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.modal-photo {
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+.modal .cred-bar .bar { width: 100%; }
+
+/* Toggle Switch */
+.toggle {
+  width: 44px; height: 24px;
+  background: var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: background .2s;
+  border: none;
+}
+.toggle.on { background: var(--green); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px; width: 20px; height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: right .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle.on::after { right: 22px; }
+.toggle::after { right: 2px; }
+
+/* Chart */
+.chart-container {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.chart-container canvas { max-height: 260px; }
+
+/* Mobile */
+.mobile-menu-btn {
+  display: none;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 200;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  align-items: center;
+  justify-content: center;
+}
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 99;
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+/* Truncate */
+.truncate { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-cell { display: flex; align-items: center; gap: 8px; }
+
+@media (max-width: 768px) {
+  .mobile-menu-btn { display: flex; }
+  .sidebar {
+    right: -280px;
+    transition: right .3s ease;
+    box-shadow: none;
+  }
+  .sidebar.open { right: 0; }
+  .sidebar-overlay.open { display: block; opacity: 1; }
+  .main-content { margin-right: 0; padding: 16px; padding-top: 72px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .filters-card { padding: 16px; }
+  .filters { flex-direction: column; }
+  .filters select, .filters input, .filters button { width: 100%; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .table-wrapper { overflow-x: auto; }
+  table { min-width: 900px; }
+  .modal-body .field-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="loginPage" class="login-page">
+  <div class="login-box">
+    <div class="logo" style="text-align:center;margin-bottom:12px"><span style="font-size:48px">📢</span></div>
+    <h1 data-i18n="loginTitle">لوحة تحكم بلّغ</h1>
+    <p data-i18n="loginSubtitle">تسجيل الدخول لحساب المشرف</p>
+    <input type="email" id="emailInput" placeholder="" autocomplete="email">
+    <input type="password" id="passwordInput" placeholder="" autocomplete="current-password">
+    <button onclick="login()"><span data-i18n="login">تسجيل الدخول</span></button>
+    <div class="login-error" id="loginError" data-i18n="loginError">البريد الإلكتروني أو كلمة المرور غير صحيحة</div>
+  </div>
+</div>
+
+<div id="dashboard" class="dashboard">
+  <div class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>📢 بلّغ</h2>
+      <button class="lang-btn" id="langToggle" onclick="toggleLang()">FR</button>
+    </div>
+    <div class="user-info" id="userInfo"></div>
+    <a class="active" onclick="switchPage('reports', this)">📋 <span data-i18n="reports">البلاغات</span></a>
+    <a onclick="switchPage('users', this)">👥 <span data-i18n="users">المستخدمون</span></a>
+    <a onclick="switchPage('notifications', this)">🔔 <span data-i18n="notifications">الإشعارات</span></a>
+    <div class="spacer"></div>
+    <a class="logout-btn" onclick="logout()">🚪 <span data-i18n="logout">تسجيل الخروج</span></a>
+  </div>
+  <div class="main-content">
+    <!-- Reports Page -->
+    <div id="page-reports" class="page active">
+      <div class="page-header"><h2 data-i18n="reports">📋 البلاغات</h2></div>
+      <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+      <div class="stats" id="reportsStats"></div>
+      <div class="filters-card">
+        <div class="filters">
+          <select id="filterCategory"></select>
+          <select id="filterStatus"></select>
+          <input type="date" id="filterDate">
+          <button onclick="loadReports()"><span data-i18n="filter">تصفية</span></button>
+        </div>
+      </div>
+      <div class="table-wrapper"><table><thead><tr>
+        <th>#</th>
+        <th data-i18n="thPhoto">صورة</th>
+        <th data-i18n="thUser">المستخدم</th>
+        <th data-i18n="thCategory">التصنيف</th>
+        <th data-i18n="thDescription">الوصف</th>
+        <th data-i18n="thVotes">✅ ❌</th>
+        <th data-i18n="thCredibility">المصداقية</th>
+        <th data-i18n="thLocation">الموقع</th>
+        <th data-i18n="thDate">التاريخ</th>
+        <th data-i18n="thStatus">الحالة</th>
+        <th data-i18n="thActions">الإجراءات</th>
+      </tr></thead><tbody id="reportsBody"></tbody></table></div>
+    </div>
+    <!-- Users Page -->
+    <div id="page-users" class="page">
+      <div class="page-header"><h2 data-i18n="usersTitle">👥 المستخدمون</h2></div>
+      <div class="table-wrapper"><table><thead><tr>
+        <th></th>
+        <th data-i18n="thUsername">المستخدم</th>
+        <th data-i18n="thEmail">البريد</th>
+        <th data-i18n="thRegistered">تاريخ التسجيل</th>
+        <th data-i18n="thReports">البلاغات</th>
+        <th data-i18n="thConfirmed">موثقة</th>
+        <th data-i18n="thReputation">السمعة</th>
+        <th data-i18n="thAdmin">مسؤول</th>
+        <th data-i18n="thActions">الإجراءات</th>
+      </tr></thead><tbody id="usersBody"></tbody></table></div>
+    </div>
+    <!-- Notifications Page -->
+    <div id="page-notifications" class="page">
+      <div class="page-header"><h2 data-i18n="notificationsTitle">🔔 الإشعارات</h2></div>
+      <div class="table-wrapper"><table><thead><tr><th data-i18n="thUser">المستخدم</th><th data-i18n="thMessage">الرسالة</th><th data-i18n="thDate">التاريخ</th><th data-i18n="thStatus">مقروء</th></tr></thead><tbody id="notificationsBody"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Detail Modal -->
+<div class="modal-overlay" id="reportModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle" data-i18n="reportDetail">تفاصيل البلاغ</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://fghccefhxorhnpgvxjvb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnaGNjZWZoeG9yaG5wZ3Z4anZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMjEwMTMsImV4cCI6MjA5NTc5NzAxM30.wK7KvMbvYax4u9jTCDRIVwX4NC00EMxgvEk1awWptKQ';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let currentLang = localStorage.getItem('admin_lang') || 'ar';
+let categoryChart = null;
+
+const LANG = {
+  ar: {
+    loginTitle: 'لوحة تحكم بلّغ',
+    loginSubtitle: 'تسجيل الدخول لحساب المشرف',
+    email: 'البريد الإلكتروني',
+    password: 'كلمة المرور',
+    login: 'تسجيل الدخول',
+    loginError: 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+    noAccess: 'ليس لديك صلاحية الوصول إلى لوحة التحكم',
+    reports: 'البلاغات',
+    users: 'المستخدمون',
+    notifications: 'الإشعارات',
+    logout: 'تسجيل الخروج',
+    totalReports: 'إجمالي البلاغات',
+    pending: 'قيد الانتظار',
+    validated: 'موثقة',
+    falseReport: 'كاذبة',
+    allCategories: 'كل التصنيفات',
+    allStatuses: 'كل الحالات',
+    statusPending: 'قيد الانتظار',
+    statusValidated: 'موثق',
+    statusFalseReport: 'بلاغ كاذب',
+    filter: 'تصفية',
+    thPhoto: 'صورة',
+    thUser: 'المستخدم',
+    thCategory: 'التصنيف',
+    thDescription: 'الوصف',
+    thVotes: '✅ ❌',
+    thCredibility: 'المصداقية',
+    thLocation: 'الموقع',
+    thDate: 'التاريخ',
+    thStatus: 'الحالة',
+    thActions: 'الإجراءات',
+    loading: 'جارٍ التحميل...',
+    noReports: 'لا توجد بلاغات',
+    delete: 'حذف',
+    view: 'عرض',
+    statusChanged: 'تم تغيير حالة البلاغ بنجاح',
+    statusFailed: 'فشل تغيير الحالة',
+    noPermission: 'ليس لديك صلاحية',
+    confirmDelete: 'هل أنت متأكد من حذف هذا البلاغ؟',
+    deleted: 'تم حذف البلاغ بنجاح',
+    deleteFailed: 'فشل حذف البلاغ',
+    error: 'خطأ',
+    usersTitle: 'المستخدمون',
+    thUsername: 'المستخدم',
+    thEmail: 'البريد',
+    thRegistered: 'تاريخ التسجيل',
+    thReports: 'البلاغات',
+    thConfirmed: 'موثقة',
+    thReputation: 'السمعة',
+    thAdmin: 'مسؤول',
+    noUsers: 'لا يوجد مستخدمون',
+    notificationsTitle: 'الإشعارات',
+    thMessage: 'الرسالة',
+    read: 'مقروء',
+    unread: 'غير مقروء',
+    noNotifications: 'لا توجد إشعارات',
+    clearFilter: 'إزالة الفلتر',
+    langToggle: 'FR',
+    reportDetail: 'تفاصيل البلاغ',
+    detailCategory: 'التصنيف',
+    detailDescription: 'الوصف',
+    detailLocation: 'الموقع',
+    detailDate: 'التاريخ',
+    detailStatus: 'الحالة',
+    detailVotes: 'التصويتات',
+    detailConfirm: 'موثق',
+    detailDeny: 'مرفوض',
+    detailCredibility: 'المصداقية',
+    detailUser: 'المستخدم',
+    detailPhoto: 'الصورة',
+    toggleAdmin: 'تعيين كمسؤول',
+    removeAdmin: 'إزالة الصلاحية',
+    userDeleted: 'تم حذف المستخدم',
+    userDeleteFailed: 'فشل حذف المستخدم',
+    confirmDeleteUser: 'هل أنت متأكد من حذف هذا المستخدم؟',
+    adminUpdated: 'تم تحديث صلاحية المسؤول',
+  },
+  fr: {
+    loginTitle: 'Tableau de bord بلّغ',
+    loginSubtitle: 'Connexion administrateur',
+    email: 'Email',
+    password: 'Mot de passe',
+    login: 'Se connecter',
+    loginError: 'Email ou mot de passe incorrect',
+    noAccess: "Vous n'avez pas les droits d'accès",
+    reports: 'Signalements',
+    users: 'Utilisateurs',
+    notifications: 'Notifications',
+    logout: 'Déconnexion',
+    totalReports: 'Total signalements',
+    pending: 'En attente',
+    validated: 'Validés',
+    falseReport: 'Faux',
+    allCategories: 'Toutes catégories',
+    allStatuses: 'Tous statuts',
+    statusPending: 'En attente',
+    statusValidated: 'Validé',
+    statusFalseReport: 'Faux signalement',
+    filter: 'Filtrer',
+    thPhoto: 'Photo',
+    thUser: 'Utilisateur',
+    thCategory: 'Catégorie',
+    thDescription: 'Description',
+    thVotes: '✅ ❌',
+    thCredibility: 'Crédibilité',
+    thLocation: 'Localisation',
+    thDate: 'Date',
+    thStatus: 'Statut',
+    thActions: 'Actions',
+    loading: 'Chargement...',
+    noReports: 'Aucun signalement',
+    delete: 'Supprimer',
+    view: 'Voir',
+    statusChanged: 'Statut modifié avec succès',
+    statusFailed: 'Échec de modification',
+    noPermission: 'Action non autorisée',
+    confirmDelete: 'Confirmer la suppression ?',
+    deleted: 'Signalement supprimé',
+    deleteFailed: 'Échec de suppression',
+    error: 'Erreur',
+    usersTitle: 'Utilisateurs',
+    thUsername: 'Utilisateur',
+    thEmail: 'Email',
+    thRegistered: "Date d'inscription",
+    thReports: 'Signalements',
+    thConfirmed: 'Validés',
+    thReputation: 'Réputation',
+    thAdmin: 'Admin',
+    noUsers: 'Aucun utilisateur',
+    notificationsTitle: 'Notifications',
+    thMessage: 'Message',
+    read: 'Lu',
+    unread: 'Non lu',
+    noNotifications: 'Aucune notification',
+    clearFilter: 'Voir tout',
+    langToggle: 'AR',
+    reportDetail: 'Détails du signalement',
+    detailCategory: 'Catégorie',
+    detailDescription: 'Description',
+    detailLocation: 'Localisation',
+    detailDate: 'Date',
+    detailStatus: 'Statut',
+    detailVotes: 'Votes',
+    detailConfirm: 'Validé',
+    detailDeny: 'Rejeté',
+    detailCredibility: 'Crédibilité',
+    detailUser: 'Utilisateur',
+    detailPhoto: 'Photo',
+    toggleAdmin: 'Promouvoir admin',
+    removeAdmin: 'Rétrograder',
+    userDeleted: 'Utilisateur supprimé',
+    userDeleteFailed: 'Échec de suppression',
+    confirmDeleteUser: 'Confirmer la suppression ?',
+    adminUpdated: 'Statut admin mis à jour',
+  },
+};
+
+const CATEGORY_LABELS = {
+  ar: { electricity: 'الكهرباء', road: 'الطرق', flood: 'الفيضانات', security: 'الأمن', water: 'المياه', health: 'الصحة', internet: 'الإنترنت', market: 'السوق', government: 'الحكومة', fire: 'الحرائق', infrastructure: 'البنية التحتية', fraud: 'الاحتيال' },
+  fr: { electricity: 'Électricité', road: 'Routes', flood: 'Inondations', security: 'Sécurité', water: 'Eau', health: 'Santé', internet: 'Internet', market: 'Marché', government: 'Gouvernement', fire: 'Incendies', infrastructure: 'Infrastructure', fraud: 'Fraude' },
+};
+const CATEGORY_COLORS = {
+  electricity: '#F59E0B', road: '#6366F1', flood: '#06B6D4', security: '#DC2626', water: '#2563EB',
+  health: '#16A34A', internet: '#8B5CF6', market: '#EC4899', government: '#0D9488', fire: '#EB6424',
+  infrastructure: '#6B7280', fraud: '#9333EA',
+};
+
+function t(key) { return LANG[currentLang][key] || key; }
+function catLabel(key) { return CATEGORY_LABELS[currentLang][key] || key; }
+
+function toggleLang() {
+  currentLang = currentLang === 'ar' ? 'fr' : 'ar';
+  localStorage.setItem('admin_lang', currentLang);
+  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  applyLang();
+  document.getElementById('langToggle').textContent = t('langToggle');
+  initCategoryFilter();
+  if (document.getElementById('dashboard').style.display !== 'none') {
+    loadReports(); loadUsers(); loadNotifications();
+  }
+}
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    el.textContent = t(key);
+  });
+  document.getElementById('emailInput').placeholder = t('email');
+  document.getElementById('passwordInput').placeholder = t('password');
+  const fs = document.getElementById('filterStatus');
+  fs.innerHTML =
+    `<option value="">${t('allStatuses')}</option>` +
+    `<option value="pending">${t('statusPending')}</option>` +
+    `<option value="validated">${t('statusValidated')}</option>` +
+    `<option value="falseReport">${t('statusFalseReport')}</option>`;
+}
+
+function showToast(msg, type) {
+  const tEl = document.getElementById('toast');
+  tEl.textContent = msg; tEl.className = `toast ${type}`; tEl.style.display = 'block';
+  setTimeout(() => tEl.style.display = 'none', 3000);
+}
+
+async function login() {
+  const email = document.getElementById('emailInput').value;
+  const password = document.getElementById('passwordInput').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    const { data: profile } = await sb.from('users').select('*').eq('id', data.user.id).single();
+    if (!profile || !profile.is_admin) {
+      await sb.auth.signOut();
+      errEl.textContent = t('noAccess');
+      errEl.style.display = 'block';
+      return;
+    }
+    currentUser = profile;
+    applyLang();
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('userInfo').textContent = `👤 ${profile.username || profile.email}`;
+    document.getElementById('langToggle').textContent = t('langToggle');
+    initCategoryFilter();
+    loadReports(); loadUsers(); loadNotifications();
+  } catch (e) {
+    errEl.textContent = e.message.includes('Invalid login credentials') ? t('loginError') : e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  currentUser = null;
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('emailInput').value = '';
+  document.getElementById('passwordInput').value = '';
+}
+
+function toggleMobileMenu() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+function switchPage(page, el) {
+  toggleMobileMenu();
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  if (page === 'reports') setTimeout(() => renderCategoryChart(), 100);
+}
+
+function initCategoryFilter() {
+  const sel = document.getElementById('filterCategory');
+  const labels = CATEGORY_LABELS[currentLang];
+  sel.innerHTML = `<option value="">${t('allCategories')}</option>`;
+  Object.entries(labels).forEach(([k, v]) => { sel.innerHTML += `<option value="${k}">${v}</option>`; });
+}
+
+// ── Reports ──
+async function loadReports() {
+  const category = document.getElementById('filterCategory').value;
+  const status = document.getElementById('filterStatus').value;
+  const date = document.getElementById('filterDate').value;
+  const tbody = document.getElementById('reportsBody');
+  tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px">${t('loading')}</td></tr>`;
+
+  try {
+    let query = sb.from('reports').select('*, users!reports_user_id_fkey(username, email)').order('created_at', { ascending: false });
+    if (category) query = query.eq('category', category);
+    if (status) query = query.eq('status', status);
+    if (date) query = query.gte('created_at', date + 'T00:00:00Z').lte('created_at', date + 'T23:59:59Z');
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    // Stats
+    const total = data.length;
+    const pending = data.filter(r => r.status === 'pending').length;
+    const validated = data.filter(r => r.status === 'validated').length;
+    const falseR = data.filter(r => r.status === 'falseReport').length;
+    document.getElementById('reportsStats').innerHTML = `
+      <div class="stat-card"><div class="num">${total}</div><div class="label">${t('totalReports')}</div></div>
+      <div class="stat-card"><div class="num">${pending}</div><div class="label">${t('pending')}</div></div>
+      <div class="stat-card"><div class="num">${validated}</div><div class="label">${t('validated')}</div></div>
+      <div class="stat-card"><div class="num">${falseR}</div><div class="label">${t('falseReport')}</div></div>
+    `;
+
+    renderCategoryChart(data);
+
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state" style="text-align:center;padding:60px 20px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px;opacity:0.4">📭</div>${t('noReports')}</div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(r => {
+      const totalVotes = (r.confirm_count || 0) + (r.deny_count || 0);
+      const credPct = totalVotes > 0 ? Math.round((r.confirm_count || 0) / totalVotes * 100) : 0;
+      const credColor = credPct >= 70 ? '#16A34A' : credPct >= 40 ? '#F59E0B' : '#DC2626';
+      const photoHtml = r.photo_url
+        ? `<img src="${escapeHtml(r.photo_url)}" class="thumb" onerror="this.style.display='none'" loading="lazy">`
+        : `<div class="thumb">📷</div>`;
+      return `<tr style="cursor:pointer" onclick="showReportDetail(${r.id})">
+        <td style="font-weight:600;color:var(--muted)">${r.id}</td>
+        <td>${photoHtml}</td>
+        <td><div class="user-cell">${r.users?.username ? `<div class="avatar" style="background:${avatarColor(r.users.username)}">${(r.users.username || '?')[0].toUpperCase()}</div>` : ''}<span>${escapeHtml(r.users?.username || r.users?.email || r.user_id?.substring(0,8) || '—')}</span></div></td>
+        <td><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:${CATEGORY_COLORS[r.category] || '#888'};display:inline-block"></span>${catLabel(r.category)}</span></td>
+        <td class="truncate">${escapeHtml(r.description?.substring(0, 50) || '')}</td>
+        <td style="white-space:nowrap;font-size:13px">✅ ${r.confirm_count||0} &nbsp; ❌ ${r.deny_count||0}</td>
+        <td><div class="cred-bar"><span style="font-size:12px;font-weight:700;color:${credColor};min-width:36px">${credPct}%</span><div class="bar"><div class="bar-fill" style="width:${credPct}%;background:${credColor}"></div></div></div></td>
+        <td style="font-size:11px;color:var(--muted)">${r.latitude?.toFixed(3)||'—'}, ${r.longitude?.toFixed(3)||'—'}</td>
+        <td style="font-size:12px;color:var(--muted);white-space:nowrap">${formatDate(r.created_at)}</td>
+        <td>
+          <select class="status-select" data-id="${r.id}" onclick="event.stopPropagation()" onchange="changeStatus(${r.id}, this.value)" style="background:${statusBg(r.status)};color:${statusFg(r.status)}">
+            <option value="pending" ${r.status==='pending'?'selected':''}>${t('statusPending')}</option>
+            <option value="validated" ${r.status==='validated'?'selected':''}>${t('statusValidated')}</option>
+            <option value="falseReport" ${r.status==='falseReport'?'selected':''}>${t('statusFalseReport')}</option>
+          </select>
+        </td>
+        <td><div class="actions" onclick="event.stopPropagation()">
+          <button class="btn-view btn-icon-only" onclick="showReportDetail(${r.id})" title="${t('view')}">👁️</button>
+          <button class="btn-delete" onclick="deleteReport(${r.id})">🗑️ ${t('delete')}</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--danger)">${t('error')}: ${escapeHtml(e.message)}</td></tr>`;
+  }
+}
+
+async function changeStatus(id, newStatus) {
+  try {
+    const { data, error } = await sb.from('reports').update({ status: newStatus }).eq('id', id).select();
+    if (error) throw error;
+    if (!data || data.length === 0) { showToast(t('noPermission'), 'error'); return; }
+    showToast(t('statusChanged'));
+    loadReports();
+  } catch (e) { showToast(t('statusFailed') + ': ' + e.message, 'error'); }
+}
+
+async function deleteReport(id) {
+  if (!confirm(t('confirmDelete'))) return;
+  try {
+    const { error } = await sb.from('reports').delete().eq('id', id);
+    if (error) throw error;
+    showToast(t('deleted'));
+    loadReports();
+  } catch (e) { showToast(t('deleteFailed') + ': ' + e.message, 'error'); }
+}
+
+// ── Report Detail Modal ──
+function showReportDetail(r) {
+  if (typeof r === 'number') {
+    // Called with ID from button — fetch full data
+    fetchReportDetail(r);
+    return;
+  }
+  openModal(r);
+}
+
+async function fetchReportDetail(id) {
+  try {
+    const { data, error } = await sb.from('reports').select('*, users!reports_user_id_fkey(username, email)').eq('id', id).single();
+    if (error) throw error;
+    openModal(data);
+  } catch (e) { showToast(t('error') + ': ' + e.message, 'error'); }
+}
+
+function openModal(r) {
+  const totalVotes = (r.confirm_count || 0) + (r.deny_count || 0);
+  const credPct = totalVotes > 0 ? Math.round((r.confirm_count || 0) / totalVotes * 100) : 0;
+  const credColor = credPct >= 70 ? '#16A34A' : credPct >= 40 ? '#F59E0B' : '#DC2626';
+  const modalBody = document.getElementById('modalBody');
+  modalBody.innerHTML = `
+    ${r.photo_url ? `<img src="${escapeHtml(r.photo_url)}" class="modal-photo" onerror="this.style.display='none'" loading="lazy">` : ''}
+    <div class="field-row">
+      <div class="field">
+        <div class="field-label">${t('detailCategory')}</div>
+        <div class="field-value"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:50%;background:${CATEGORY_COLORS[r.category]||'#888'};display:inline-block"></span>${catLabel(r.category)}</span></div>
+      </div>
+      <div class="field">
+        <div class="field-label">${t('detailStatus')}</div>
+        <div class="field-value"><span class="badge badge-${r.status}">${t('status' + r.status.charAt(0).toUpperCase() + r.status.slice(1)) || r.status}</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">${t('detailUser')}</div>
+      <div class="field-value">${escapeHtml(r.users?.username || r.users?.email || '—')}</div>
+    </div>
+    <div class="field">
+      <div class="field-label">${t('detailDescription')}</div>
+      <div class="field-value">${escapeHtml(r.description || '')}</div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <div class="field-label">${t('detailLocation')}</div>
+        <div class="field-value" style="font-size:13px;color:var(--text-secondary)">${r.latitude?.toFixed(4) || '—'}, ${r.longitude?.toFixed(4) || '—'}${r.address ? '<br>' + escapeHtml(r.address) : ''}</div>
+      </div>
+      <div class="field">
+        <div class="field-label">${t('detailDate')}</div>
+        <div class="field-value" style="font-size:13px">${formatDate(r.created_at)}</div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">${t('detailVotes')} (${totalVotes})</div>
+      <div style="display:flex;gap:24px;align-items:center">
+        <span style="font-size:15px;font-weight:600;color:var(--success)">✅ ${r.confirm_count||0} ${t('detailConfirm')}</span>
+        <span style="font-size:15px;font-weight:600;color:var(--danger)">❌ ${r.deny_count||0} ${t('detailDeny')}</span>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">${t('detailCredibility')}</div>
+      <div class="cred-bar"><span style="font-size:18px;font-weight:800;color:${credColor};min-width:48px">${credPct}%</span><div class="bar" style="width:100%"><div class="bar-fill" style="width:${credPct}%;background:${credColor}"></div></div></div>
+    </div>
+  `;
+  document.getElementById('reportModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('reportModal').classList.remove('open');
+}
+document.getElementById('reportModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── Users ──
+async function loadUsers() {
+  const tbody = document.getElementById('usersBody');
+  tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px">${t('loading')}</td></tr>`;
+  try {
+    const { data, error } = await sb.from('users').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state" style="text-align:center;padding:60px 20px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px;opacity:0.4">👥</div>${t('noUsers')}</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.map(u => `
+      <tr>
+        <td><div class="avatar" style="background:${avatarColor(u.username)}">${(u.username || u.email || '?')[0].toUpperCase()}</div></td>
+        <td><strong>${escapeHtml(u.username || '—')}</strong></td>
+        <td style="font-size:13px;color:var(--muted)">${escapeHtml(u.email || '—')}</td>
+        <td style="font-size:13px;color:var(--muted);white-space:nowrap">${formatDate(u.created_at)}</td>
+        <td style="text-align:center">${u.reports_count ?? 0}</td>
+        <td style="text-align:center">${u.confirmed_count ?? 0}</td>
+        <td style="text-align:center"><span style="font-weight:700;color:${(u.reputation_score||0) >= 50 ? 'var(--success)' : (u.reputation_score||0) >= 20 ? 'var(--warning)' : 'var(--muted)'}">${u.reputation_score ?? 0}</span></td>
+        <td><button class="toggle ${u.is_admin ? 'on' : ''}" onclick="toggleAdmin('${u.id}', ${!u.is_admin})"></button></td>
+        <td><div class="actions"><button class="btn-delete" onclick="deleteUser('${u.id}')">🗑️</button></div></td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--danger)">${t('error')}: ${escapeHtml(e.message)}</td></tr>`;
+  }
+}
+
+async function toggleAdmin(userId, makeAdmin) {
+  try {
+    const { error } = await sb.from('users').update({ is_admin: makeAdmin }).eq('id', userId);
+    if (error) throw error;
+    showToast(t('adminUpdated'));
+    loadUsers();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function deleteUser(id) {
+  if (!confirm(t('confirmDeleteUser'))) return;
+  try {
+    const { error } = await sb.from('users').delete().eq('id', id);
+    if (error) throw error;
+    showToast(t('userDeleted'));
+    loadUsers();
+  } catch (e) { showToast(t('userDeleteFailed') + ': ' + e.message, 'error'); }
+}
+
+// ── Notifications ──
+async function loadNotifications() {
+  const tbody = document.getElementById('notificationsBody');
+  tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px">${t('loading')}</td></tr>`;
+  try {
+    const { data, error } = await sb.from('notifications')
+      .select('*, users!notifications_user_id_fkey(username, email)')
+      .order('created_at', { ascending: false }).limit(100);
+    if (error) throw error;
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="text-align:center;padding:60px 20px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px;opacity:0.4">🔔</div>${t('noNotifications')}</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.map(n => `
+      <tr>
+        <td><div class="user-cell">${n.users?.username ? `<div class="avatar" style="background:${avatarColor(n.users.username)};width:28px;height:28px;font-size:11px">${n.users.username[0].toUpperCase()}</div>` : ''}<span>${escapeHtml(n.users?.username || n.users?.email || n.user_id?.substring(0,8) || '—')}</span></div></td>
+        <td class="truncate" style="max-width:300px">${escapeHtml(n.message || '')}</td>
+        <td style="font-size:12px;color:var(--muted);white-space:nowrap">${formatDate(n.created_at)}</td>
+        <td>${n.is_read ? '✅ ' + t('read') : '🔴 ' + t('unread')}</td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--danger)">${t('error')}: ${escapeHtml(e.message)}</td></tr>`;
+  }
+}
+
+// ── Chart ──
+function renderCategoryChart(reports) {
+  const ctx = document.getElementById('categoryChart').getContext('2d');
+  if (categoryChart) categoryChart.destroy();
+
+  if (!reports || reports.length === 0) return;
+
+  const counts = {};
+  reports.forEach(r => { counts[r.category] = (counts[r.category] || 0) + 1; });
+  const labels = Object.keys(counts).map(k => catLabel(k));
+  const values = Object.values(counts);
+  const colors = Object.keys(counts).map(k => CATEGORY_COLORS[k] || '#888');
+
+  categoryChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#f0f0f0' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ── Helpers ──
+function formatDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d);
+  const locale = currentLang === 'fr' ? 'fr-FR' : 'ar-SA';
+  return dt.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function statusBg(s) { return s === 'pending' ? '#FFF8E1' : s === 'validated' ? '#E8F5E9' : '#FFEBEE'; }
+function statusFg(s) { return s === 'pending' ? '#F9A825' : s === 'validated' ? '#2E7D32' : '#C62828'; }
+function escapeHtml(str) { if (typeof str !== 'string') return str || ''; const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function avatarColor(name) {
+  const colors = ['#1B6B2F','#1565C0','#6A1B9A','#C62828','#2E7D32','#E65100','#00838F','#4A148C','#01579B','#F57F17','#283593','#AD1457'];
+  let hash = 0; const s = name || '?';
+  for (let i = 0; i < s.length; i++) hash = s.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+// ── Auto-login ──
+(async () => {
+  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  applyLang();
+  document.getElementById('langToggle').textContent = t('langToggle');
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    const { data: profile } = await sb.from('users').select('*').eq('id', session.user.id).single();
+    if (profile && profile.is_admin) {
+      currentUser = profile;
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('userInfo').textContent = `👤 ${profile.username || profile.email}`;
+      initCategoryFilter();
+      loadReports(); loadUsers(); loadNotifications();
+    }
+  }
+})();
+</script>
+</body>
+</html>

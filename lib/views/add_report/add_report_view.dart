@@ -9,21 +9,28 @@
 // progress bar at the top gives the user a sense of forward motion.
 // ─────────────────────────────────────────────────────────────────
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
 import '../../providers/add_report_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/map_provider.dart' show kNouakchottLatLng;
 import '../../providers/report_provider.dart';
 import '../../utils/app_constants.dart';
 import '../../utils/report_category_meta.dart';
+import '../../utils/supabase_config.dart';
 
 // ════════════════════════════════════════════════════════════════
 // AddReportView  — the Navigator route pushed by the FAB
@@ -106,7 +113,7 @@ class _AddReportScaffold extends StatelessWidget {
             child: switch (provider.currentStep) {
               FormStep.category => const _Step1CategoryBody(),
               FormStep.location => const _LocationPickerBody(),
-              FormStep.photo    => const _Step3PhotoBody(),
+              FormStep.photo    => _Step3PhotoBody(),
               FormStep.review   => const _Step4ReviewBody(),
             },
           ),
@@ -846,11 +853,33 @@ class _LocationPickerBody extends StatefulWidget {
 class _LocationPickerBodyState extends State<_LocationPickerBody> {
   late final MapController _mapController;
   LatLng _pickedPoint = kNouakchottLatLng;
+  String? _detectedAddress;
+  bool _isResolving = false;
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _autoLocate());
+  }
+
+  Future<void> _autoLocate() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      return;
+    }
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      _pickedPoint = LatLng(position.latitude, position.longitude);
+      _mapController.move(_pickedPoint, 15.5);
+      _resolveAddress();
+    } catch (e) {
+      debugPrint('[LocationPicker] autoLocate failed: $e');
+    }
   }
 
   @override
@@ -859,9 +888,69 @@ class _LocationPickerBodyState extends State<_LocationPickerBody> {
     super.dispose();
   }
 
+  bool _isLocating = false;
+
+  Future<void> _goToMyLocation() async {
+    setState(() => _isLocating = true);
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return;
+      }
+      final position = await Geolocator.getCurrentPosition();
+      _pickedPoint = LatLng(position.latitude, position.longitude);
+      _mapController.move(_pickedPoint, 15.5);
+      _resolveAddress();
+    } catch (e) {
+      debugPrint('[LocationPicker] goToMyLocation failed: $e');
+    } finally {
+      if (mounted) setState(() => _isLocating = false);
+    }
+  }
+
   void _onPositionChanged(MapCamera camera, bool hasGesture) {
     if (hasGesture) {
       _pickedPoint = camera.center;
+      _resolveAddress();
+    }
+  }
+
+  Future<String?> _reverseGeocode(double lat, double lng) async {
+    final uri = Uri.parse(
+      'https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lng&format=json&accept-language=ar',
+    );
+    final client = HttpClient();
+    client.userAgent = 'BalighApp/1.0';
+    try {
+      final request = await client.getUrl(uri);
+      final response = await request.close();
+      final body = await response.transform(utf8.decoder).join();
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      return data['display_name'] as String?;
+    } catch (e) {
+      debugPrint('[Nominatim] reverse geocode failed: $e');
+      return null;
+    } finally {
+      client.close();
+    }
+  }
+
+  Future<void> _resolveAddress() async {
+    if (_isResolving) return;
+    setState(() => _isResolving = true);
+    final address = await _reverseGeocode(
+      _pickedPoint.latitude,
+      _pickedPoint.longitude,
+    );
+    if (mounted) {
+      setState(() {
+        _detectedAddress = address;
+        _isResolving = false;
+      });
     }
   }
 
@@ -870,6 +959,7 @@ class _LocationPickerBodyState extends State<_LocationPickerBody> {
           ReportLocation(
             latitude: _pickedPoint.latitude,
             longitude: _pickedPoint.longitude,
+            address: _detectedAddress,
           ),
         );
     context.read<AddReportProvider>().nextStep();
@@ -981,9 +1071,79 @@ class _LocationPickerBodyState extends State<_LocationPickerBody> {
                   ],
                 ),
               ),
+              // ── My location button ────────────────────────────
+              Positioned(
+                right: 16,
+                bottom: 24,
+                child: GestureDetector(
+                  onTap: _goToMyLocation,
+                  child: Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withOpacity(0.10),
+                      ),
+                    ),
+                    child: _isLocating
+                        ? Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                theme.colorScheme.primary,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            Icons.my_location_rounded,
+                            size: 22,
+                            color: theme.colorScheme.primary,
+                          ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
+
+        // ── Detected address ───────────────────────────────────
+        if (_detectedAddress != null || _isResolving)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            color: theme.colorScheme.primary.withOpacity(0.04),
+            child: Row(
+              children: [
+                Icon(
+                  _isResolving ? Icons.hourglass_top_rounded : Icons.location_on_rounded,
+                  size: 16,
+                  color: theme.colorScheme.primary.withOpacity(0.60),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _isResolving ? 'جاري تحديد العنوان…' : _detectedAddress!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withOpacity(0.65),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
 
         // ── Confirm button ──────────────────────────────────────
         Container(
@@ -1022,15 +1182,88 @@ class _LocationPickerBodyState extends State<_LocationPickerBody> {
 
 // ════════════════════════════════════════════════════════════════
 // _Step3PhotoBody — Step 3: Photo (optional, skippable)
-// No camera logic yet — "Continue" advances to the review step.
+// Pick from gallery → upload to Supabase Storage → store URL.
 // ════════════════════════════════════════════════════════════════
-class _Step3PhotoBody extends StatelessWidget {
-  const _Step3PhotoBody();
+class _Step3PhotoBody extends StatefulWidget {
+  @override
+  State<_Step3PhotoBody> createState() => _Step3PhotoBodyState();
+}
+
+class _Step3PhotoBodyState extends State<_Step3PhotoBody> {
+  Future<void> _pickFromSource(AddReportProvider provider, ImageSource source) async {
+    final picker = ImagePicker();
+    try {
+      final picked = await picker.pickImage(
+        source: source,
+        imageQuality: 80,
+        maxWidth: 1200,
+      );
+      if (picked == null) return;
+
+      provider.setPhotoUploading(true);
+
+      final path = picked.path;
+      if (path.isEmpty) {
+        provider.setPhotoUploading(false);
+        return;
+      }
+
+      final url = await SupabaseConfig.uploadReportPhoto(path);
+      if (url != null) {
+        provider.setPhotoUrl(url);
+      } else {
+        provider.setPhotoUploading(false);
+      }
+    } catch (e) {
+      provider.setPhotoUploading(false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل التقاط الصورة. حاول مرة أخرى.')),
+        );
+      }
+    }
+  }
+
+  void _showSourceSheet(AddReportProvider provider) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt_rounded, size: 28),
+                title: const Text('📷 Caméra', style: TextStyle(fontSize: 16)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickFromSource(provider, ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library_rounded, size: 28),
+                title: const Text('🖼️ Galerie', style: TextStyle(fontSize: 16)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickFromSource(provider, ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final provider = context.watch<AddReportProvider>();
 
     return Column(
       children: [
@@ -1039,63 +1272,136 @@ class _Step3PhotoBody extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 40, 20, 16),
             child: Column(
               children: [
-                // ── Camera icon ─────────────────────────────────
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.07),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.camera_alt_rounded,
-                    size: 46,
-                    color: theme.colorScheme.primary.withOpacity(0.35),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  l10n.reportPhoto,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                // ── Disabled "Add Photo" placeholder ────────────
-                Opacity(
-                  opacity: 0.38,
-                  child: Container(
-                    height: 52,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: theme.colorScheme.primary,
-                        width: 1.5,
+                if (provider.hasPhoto) ...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      provider.photoUrl!,
+                      height: 220,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.broken_image_rounded,
+                        size: 64,
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.camera_alt_rounded,
-                            size: 20, color: theme.colorScheme.primary),
-                        const SizedBox(width: 8),
-                        Text(
-                          l10n.reportAddPhoto,
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
+                  ),
+                  const SizedBox(height: 16),
+                  // ── Change photo button ───────────────────────
+                  GestureDetector(
+                    onTap: provider.photoUploading
+                        ? null
+                        : () => _showSourceSheet(provider),
+                    child: Container(
+                      height: 52,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: theme.colorScheme.primary,
+                          width: 1.5,
                         ),
-                      ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.camera_alt_rounded,
+                              size: 20, color: theme.colorScheme.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.reportChangePhoto,
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  // ── Remove photo ──────────────────────────────
+                  TextButton(
+                    onPressed: () => provider.removePhoto(),
+                    child: const Text(
+                      'إزالة الصورة',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ] else ...[
+                  // ── Camera icon ───────────────────────────────
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.07),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.camera_alt_rounded,
+                      size: 46,
+                      color: theme.colorScheme.primary.withOpacity(0.35),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    l10n.reportPhoto,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  // ── Add Photo button ──────────────────────────
+                  GestureDetector(
+                    onTap: provider.photoUploading
+                        ? null
+                        : () => _showSourceSheet(provider),
+                    child: Container(
+                      height: 52,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: provider.photoUploading
+                              ? theme.colorScheme.outline
+                              : theme.colorScheme.primary,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (provider.photoUploading)
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: theme.colorScheme.primary,
+                              ),
+                            )
+                          else ...[
+                            Icon(Icons.camera_alt_rounded,
+                                size: 20,
+                                color: theme.colorScheme.primary),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.reportAddPhoto,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
         ),
-        // ── Standard bottom bar: "Continue" = Skip photo ────────
         const _BottomActionBar(),
       ],
     );
@@ -1124,11 +1430,14 @@ class _Step4ReviewBodyState extends State<_Step4ReviewBody> {
     // Capture context-dependent refs before the async gap.
     final addProvider = context.read<AddReportProvider>();
     final reportProvider = context.read<ReportProvider>();
+    final authProvider = context.read<AuthProvider>();
     final l10n = AppLocalizations.of(context)!;
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
 
-    final draft = addProvider.buildDraft();
+    final draft = addProvider.buildDraft().copyWith(
+      userId: authProvider.currentUserId,
+    );
     final success = await reportProvider.addReport(draft);
 
     if (!mounted) return;
@@ -1173,7 +1482,7 @@ class _Step4ReviewBodyState extends State<_Step4ReviewBody> {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     final reviewCategory =
-        provider.selectedCategory ?? ReportCategory.other;
+        provider.selectedCategory ?? ReportCategory.infrastructure;
     final reviewMeta = ReportCategoryMeta.of(reviewCategory);
 
     return Column(

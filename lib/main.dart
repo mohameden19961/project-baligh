@@ -1,8 +1,3 @@
-// lib/main.dart
-// ─────────────────────────────────────────────────────────────
-// Entry point for the Baligh (بلّغ) application.
-// Architecture : MVC  |  State : Provider  |  i18n : AppLocalizations
-// ─────────────────────────────────────────────────────────────
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,40 +5,29 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'providers/navigation_provider.dart';
 import 'providers/report_provider.dart';
-import 'views/main_layout.dart';
+import 'providers/alert_provider.dart';
+import 'providers/auth_provider.dart';
+import 'views/splash/splash_view.dart';
 
-
-// ── Generated localization class (manual path — no flutter_gen phantom) ──
 import 'l10n/app_localizations.dart';
 
-// ── Providers (Controllers) ───────────────────────────────────────
 import 'providers/locale_provider.dart';
 import 'providers/theme_provider.dart';
 
-// ── Shared constants ──────────────────────────────────────────────
 import 'utils/app_constants.dart';
-// Future providers are registered here as the project grows:
-// import 'providers/report_provider.dart';
-// import 'providers/map_provider.dart';
+import 'utils/supabase_config.dart';
 
-// ── Views (Screens) ───────────────────────────────────────────────
-// import 'views/home/home_view.dart'; // ← uncomment when created
-// import 'views/splash/splash_view.dart';
-
-// ─────────────────────────────────────────────────────────────────
 void main() async {
-  // Ensure Flutter engine is initialized before any platform calls.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Lock the app to portrait mode for a consistent UX.
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // Make the status bar transparent so our green AppBar bleeds through.
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -51,12 +35,6 @@ void main() async {
     ),
   );
 
-  // ── FMTC tile-cache initialization (native platforms only) ──────
-  // FMTCObjectBoxBackend uses FFI and is not available on web.
-  // On web, TileLayers fall back to NetworkTileProvider directly.
-  // Wrapped in try/catch: a corrupted ObjectBox DB or unavailable store
-  // must NOT crash the boot sequence — TileLayer will fall back to
-  // NetworkTileProvider transparently if FMTC isn't ready.
   if (!kIsWeb) {
     try {
       await FMTCObjectBoxBackend().initialise();
@@ -66,47 +44,46 @@ void main() async {
       debugPrintStack(stackTrace: stack);
     }
   }
-  // ───────────────────────────────────────────────────────────────
+
+  // Debug prints for release APK testing
+  print('Supabase URL: ${SupabaseConfig.url}');
+  print('Anon key length: ${SupabaseConfig.anonKey.length}');
+
+  await Supabase.initialize(
+    url: SupabaseConfig.url,
+    anonKey: SupabaseConfig.anonKey,
+  );
 
   runApp(
-    // ── Register all Providers at the root ───────────────────────
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider()),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
+        ChangeNotifierProvider(create: (_) => AlertProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: const BalighApp(),
     ),
   );
 }
 
-// ─────────────────────────────────────────────────────────────────
-/// Root widget of the Baligh application.
-/// Listens to [LocaleProvider] and [ThemeProvider] to rebuild
-/// [MaterialApp] whenever the user changes language or theme.
-// ─────────────────────────────────────────────────────────────────
 class BalighApp extends StatelessWidget {
   const BalighApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Watch providers — any change triggers a full MaterialApp rebuild.
     final localeProvider = context.watch<LocaleProvider>();
     final themeProvider = context.watch<ThemeProvider>();
 
     return MaterialApp(
-      // ── App identity ────────────────────────────────────────────
+      key: ValueKey(localeProvider.locale.languageCode),
       title: 'Baligh',
       debugShowCheckedModeBanner: false,
-
-      // ── Theming ─────────────────────────────────────────────────
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.themeMode,
-
-      // ── Internationalization ─────────────────────────────────────
       locale: localeProvider.locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
@@ -115,45 +92,22 @@ class BalighApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      // Resolve RTL/LTR automatically from the active locale.
       localeResolutionCallback: (locale, supportedLocales) {
         for (final supported in supportedLocales) {
           if (supported.languageCode == locale?.languageCode) {
             return supported;
           }
         }
-        // Default to Arabic if no match.
         return const Locale('ar');
       },
-
-      // ── Navigation ───────────────────────────────────────────────
-      home: const MainLayout(),
-
-      // Named routes will be added here as screens are built:
-      // routes: {
-      //   '/':          (_) => const SplashView(),
-      //   '/home':      (_) => const HomeView(),
-      //   '/report':    (_) => const ReportView(),
-      //   '/map':       (_) => const MapView(),
-      //   '/myReports': (_) => const MyReportsView(),
-      //   '/settings':  (_) => const SettingsView(),
-      // },
+      home: const SplashView(),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────
-/// Centralized theme definitions for the Baligh design system.
-///
-/// Palette:
-///   Primary Green  → #2E7D32
-///   Accent Yellow  → #FDD835
-///   Background     → #FFFFFF (light) / #121212 (dark)
-/// ─────────────────────────────────────────────────────────────────
 class AppTheme {
   AppTheme._();
 
-  // ── Brand Colors ────────────────────────────────────────────────
   static const Color primaryGreen = Color(0xFF2E7D32);
   static const Color lightGreen = Color(0xFF4CAF50);
   static const Color accentYellow = Color(0xFFFDD835);
@@ -162,7 +116,6 @@ class AppTheme {
   static const Color nearBlack = Color(0xFF121212);
   static const Color surfaceGrey = Color(0xFFF5F5F5);
 
-  // ── Light Theme ─────────────────────────────────────────────────
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -175,8 +128,6 @@ class AppTheme {
         surface: white,
         error: const Color(0xFFB00020),
       ),
-
-      // ── AppBar ───────────────────────────────────────────────────
       appBarTheme: const AppBarTheme(
         backgroundColor: primaryGreen,
         foregroundColor: white,
@@ -188,11 +139,7 @@ class AppTheme {
           fontWeight: FontWeight.bold,
         ),
       ),
-
-      // ── Scaffold ─────────────────────────────────────────────────
       scaffoldBackgroundColor: surfaceGrey,
-
-      // ── Bottom Navigation ─────────────────────────────────────────
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: white,
         selectedItemColor: primaryGreen,
@@ -200,8 +147,6 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
-
-      // ── ElevatedButton ────────────────────────────────────────────
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryGreen,
@@ -213,8 +158,6 @@ class AppTheme {
           elevation: 2,
         ),
       ),
-
-      // ── OutlinedButton ────────────────────────────────────────────
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: primaryGreen,
@@ -225,8 +168,6 @@ class AppTheme {
           ),
         ),
       ),
-
-      // ── InputDecoration ───────────────────────────────────────────
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: white,
@@ -253,8 +194,6 @@ class AppTheme {
         labelStyle: const TextStyle(color: Color(0xFF757575)),
         hintStyle: const TextStyle(color: Color(0xFFBDBDBD)),
       ),
-
-      // ── Card ──────────────────────────────────────────────────────
       cardTheme: CardThemeData(
         color: white,
         elevation: 2,
@@ -263,8 +202,6 @@ class AppTheme {
           borderRadius: BorderRadius.circular(16),
         ),
       ),
-
-      // ── Chip ──────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: surfaceGrey,
         selectedColor: lightGreen.withOpacity(0.2),
@@ -273,21 +210,15 @@ class AppTheme {
           borderRadius: BorderRadius.circular(20),
         ),
       ),
-
-      // ── FloatingActionButton ──────────────────────────────────────
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: primaryGreen,
         foregroundColor: white,
         elevation: 4,
       ),
-
-      // ── Divider ───────────────────────────────────────────────────
       dividerTheme: const DividerThemeData(
         color: Color(0xFFEEEEEE),
         thickness: 1,
       ),
-
-      // ── Typography ────────────────────────────────────────────────
       textTheme: GoogleFonts.cairoTextTheme().copyWith(
         headlineLarge: TextStyle(
           fontSize: 32,
@@ -325,7 +256,6 @@ class AppTheme {
     );
   }
 
-  // ── Dark Theme ──────────────────────────────────────────────────
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,

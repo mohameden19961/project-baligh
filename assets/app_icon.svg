@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1B6B2F"/>
+      <stop offset="100%" stop-color="#2E8B3D"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+
+  <!-- Location pin (the pin body) -->
+  <path d="M256 380c-44 0-80-36-80-80 0-60 80-160 80-160s80 100 80 160c0 44-36 80-80 80z"
+        fill="#F5C518" stroke="#E0B010" stroke-width="3"/>
+
+  <!-- Pin inner circle -->
+  <circle cx="256" cy="300" r="28" fill="#1B6B2F"/>
+
+  <!-- Megaphone body -->
+  <path d="M200 200 L200 280 L280 320 L320 320 L320 200 Z"
+        fill="#F5C518" stroke="#E0B010" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Megaphone handle/base -->
+  <rect x="190" y="226" width="16" height="28" rx="4" fill="#F5C518" stroke="#E0B010" stroke-width="2"/>
+
+  <!-- Megaphone sound waves -->
+  <path d="M330 220 Q360 240 330 260" fill="none" stroke="#F5C518" stroke-width="5" stroke-linecap="round"/>
+  <path d="M345 210 Q385 240 345 270" fill="none" stroke="#F5C518" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <path d="M358 200 Q408 240 358 280" fill="none" stroke="#F5C518" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- White inner detail on megaphone -->
+  <path d="M210 210 L210 270 L280 305 L300 305 L300 210 Z"
+        fill="none" stroke="white" stroke-width="2" stroke-linejoin="round" opacity="0.3"/>
+</svg>

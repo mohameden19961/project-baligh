@@ -135,34 +135,49 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reportValidationLocation => 'الرجاء تحديد موقع المشكلة';
 
   @override
-  String get categoryRoads => 'طرق وأرصفة';
+  String get categoryElectricity => 'كهرباء';
 
   @override
-  String get categoryLighting => 'إنارة عامة';
+  String get categoryRoad => 'طرق';
 
   @override
-  String get categoryWaste => 'نفايات وصرف صحي';
+  String get categoryFlood => 'فيضانات';
 
   @override
-  String get categoryWater => 'ماء وكهرباء';
+  String get categorySecurity => 'أمن';
 
   @override
-  String get categoryParks => 'حدائق ومساحات خضراء';
+  String get categoryWater => 'ماء';
 
   @override
-  String get categoryOther => 'أخرى';
+  String get categoryHealth => 'صحة';
+
+  @override
+  String get categoryInternet => 'إنترنت';
+
+  @override
+  String get categoryMarket => 'أسواق';
+
+  @override
+  String get categoryGovernment => 'حكومة';
+
+  @override
+  String get categoryFire => 'حرائق';
+
+  @override
+  String get categoryInfrastructure => 'بنية تحتية';
+
+  @override
+  String get categoryFraud => 'احتيال';
 
   @override
   String get statusPending => 'قيد الانتظار';
 
   @override
-  String get statusInProgress => 'قيد المعالجة';
+  String get statusValidated => 'موثّق';
 
   @override
-  String get statusResolved => 'تم الحل';
-
-  @override
-  String get statusRejected => 'مرفوض';
+  String get statusFalseReport => 'بلاغ كاذب';
 
   @override
   String get myReportsTitle => 'تقاريري';
@@ -266,10 +281,109 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navAccount => 'حسابي';
 
   @override
+  String get alertsTitle => 'التنبيهات';
+
+  @override
+  String get alertsEmpty => 'لا توجد تنبيهات';
+
+  @override
+  String get alertStatusUpdate => 'تحديث حالة البلاغ';
+
+  @override
+  String get alertNewReport => 'بلاغ جديد في منطقتك';
+
+  @override
+  String get alertMarkAllRead => 'تحديد الكل كمقروء';
+
+  @override
+  String get alertTileTitle => 'تنبيه';
+
+  @override
+  String get accountJoinDate => 'تاريخ الانضمام';
+
+  @override
+  String get accountReportsSubmitted => 'البلاغات المقدمة';
+
+  @override
+  String get accountSettings => 'الإعدادات';
+
+  @override
+  String get accountEmergencyNumbers => 'أرقام الطوارئ';
+
+  @override
+  String get accountLogout => 'تسجيل الخروج';
+
+  @override
+  String get reportDetailVoteConfirm => 'صحيح';
+
+  @override
+  String get reportDetailVoteReject => 'خطأ';
+
+  @override
+  String get reportDetailVoteSuccess => 'تم تسجيل صوتك!';
+
+  @override
+  String get reportDetailVoteError => 'فشل تسجيل الصوت. حاول مجدداً.';
+
+  @override
+  String get reportDetailCredibility => 'المصداقية';
+
+  @override
+  String get reportDetailOpenMap => 'فتح على الخريطة';
+
+  @override
+  String get emergencyTitle => 'أرقام الطوارئ';
+
+  @override
+  String get emergencyPolice => 'الشرطة';
+
+  @override
+  String get emergencyAmbulance => 'الإسعاف';
+
+  @override
+  String get emergencyFire => 'الدفاع المدني';
+
+  @override
+  String get emergencyCivilProtection => 'الحماية المدنية';
+
+  @override
+  String get emergencyCall => 'اتصال';
+
+  @override
+  String get splashTitle => 'بلّغ لايت';
+
+  @override
+  String get splashSubtitle => 'صوتك يصنع الفرق';
+
+  @override
+  String get splashStart => 'ابدأ الآن';
+
+  @override
+  String get splashSkip => 'تخطي';
+
+  @override
   String get networkError => 'تعذّر الاتصال بالشبكة. تحقق من اتصالك بالإنترنت.';
 
   @override
   String get unknownError => 'حدث خطأ غير متوقع. حاول مجدداً.';
+
+  @override
+  String get login => 'تسجيل الدخول';
+
+  @override
+  String get register => 'إنشاء حساب';
+
+  @override
+  String get email => 'البريد الإلكتروني';
+
+  @override
+  String get password => 'كلمة المرور';
+
+  @override
+  String get username => 'اسم المستخدم';
+
+  @override
+  String get confirmPassword => 'تأكيد كلمة المرور';
 
   @override
   String reportCount(int count) {

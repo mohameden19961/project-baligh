@@ -350,41 +350,77 @@ abstract class AppLocalizations {
   /// **'الرجاء تحديد موقع المشكلة'**
   String get reportValidationLocation;
 
-  /// Report category: Roads
+  /// Report category: Electricity
   ///
   /// In ar, this message translates to:
-  /// **'طرق وأرصفة'**
-  String get categoryRoads;
+  /// **'كهرباء'**
+  String get categoryElectricity;
 
-  /// Report category: Public Lighting
+  /// Report category: Road
   ///
   /// In ar, this message translates to:
-  /// **'إنارة عامة'**
-  String get categoryLighting;
+  /// **'طرق'**
+  String get categoryRoad;
 
-  /// Report category: Waste & Sanitation
+  /// Report category: Flood
   ///
   /// In ar, this message translates to:
-  /// **'نفايات وصرف صحي'**
-  String get categoryWaste;
+  /// **'فيضانات'**
+  String get categoryFlood;
 
-  /// Report category: Water & Electricity
+  /// Report category: Security
   ///
   /// In ar, this message translates to:
-  /// **'ماء وكهرباء'**
+  /// **'أمن'**
+  String get categorySecurity;
+
+  /// Report category: Water
+  ///
+  /// In ar, this message translates to:
+  /// **'ماء'**
   String get categoryWater;
 
-  /// Report category: Parks & Green Spaces
+  /// Report category: Health
   ///
   /// In ar, this message translates to:
-  /// **'حدائق ومساحات خضراء'**
-  String get categoryParks;
+  /// **'صحة'**
+  String get categoryHealth;
 
-  /// Report category: Other
+  /// Report category: Internet
   ///
   /// In ar, this message translates to:
-  /// **'أخرى'**
-  String get categoryOther;
+  /// **'إنترنت'**
+  String get categoryInternet;
+
+  /// Report category: Market
+  ///
+  /// In ar, this message translates to:
+  /// **'أسواق'**
+  String get categoryMarket;
+
+  /// Report category: Government
+  ///
+  /// In ar, this message translates to:
+  /// **'حكومة'**
+  String get categoryGovernment;
+
+  /// Report category: Fire
+  ///
+  /// In ar, this message translates to:
+  /// **'حرائق'**
+  String get categoryFire;
+
+  /// Report category: Infrastructure
+  ///
+  /// In ar, this message translates to:
+  /// **'بنية تحتية'**
+  String get categoryInfrastructure;
+
+  /// Report category: Fraud
+  ///
+  /// In ar, this message translates to:
+  /// **'احتيال'**
+  String get categoryFraud;
 
   /// Report status: Pending
   ///
@@ -392,23 +428,17 @@ abstract class AppLocalizations {
   /// **'قيد الانتظار'**
   String get statusPending;
 
-  /// Report status: In Progress
+  /// Report status: Validated
   ///
   /// In ar, this message translates to:
-  /// **'قيد المعالجة'**
-  String get statusInProgress;
+  /// **'موثّق'**
+  String get statusValidated;
 
-  /// Report status: Resolved
+  /// Report status: False Report
   ///
   /// In ar, this message translates to:
-  /// **'تم الحل'**
-  String get statusResolved;
-
-  /// Report status: Rejected
-  ///
-  /// In ar, this message translates to:
-  /// **'مرفوض'**
-  String get statusRejected;
+  /// **'بلاغ كاذب'**
+  String get statusFalseReport;
 
   /// My Reports screen title
   ///
@@ -608,6 +638,168 @@ abstract class AppLocalizations {
   /// **'حسابي'**
   String get navAccount;
 
+  /// Alerts/Notifications screen title
+  ///
+  /// In ar, this message translates to:
+  /// **'التنبيهات'**
+  String get alertsTitle;
+
+  /// Empty state for alerts screen
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد تنبيهات'**
+  String get alertsEmpty;
+
+  /// Alert type: report status updated
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديث حالة البلاغ'**
+  String get alertStatusUpdate;
+
+  /// Alert type: new report nearby
+  ///
+  /// In ar, this message translates to:
+  /// **'بلاغ جديد في منطقتك'**
+  String get alertNewReport;
+
+  /// Tooltip: mark all alerts as read
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد الكل كمقروء'**
+  String get alertMarkAllRead;
+
+  /// Generic alert/notification tile title
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيه'**
+  String get alertTileTitle;
+
+  /// Account: join date label
+  ///
+  /// In ar, this message translates to:
+  /// **'تاريخ الانضمام'**
+  String get accountJoinDate;
+
+  /// Account: reports count label
+  ///
+  /// In ar, this message translates to:
+  /// **'البلاغات المقدمة'**
+  String get accountReportsSubmitted;
+
+  /// Account: settings button
+  ///
+  /// In ar, this message translates to:
+  /// **'الإعدادات'**
+  String get accountSettings;
+
+  /// Account: emergency numbers button
+  ///
+  /// In ar, this message translates to:
+  /// **'أرقام الطوارئ'**
+  String get accountEmergencyNumbers;
+
+  /// Account: logout button
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
+  String get accountLogout;
+
+  /// Report detail: confirm vote button
+  ///
+  /// In ar, this message translates to:
+  /// **'صحيح'**
+  String get reportDetailVoteConfirm;
+
+  /// Report detail: reject vote button
+  ///
+  /// In ar, this message translates to:
+  /// **'خطأ'**
+  String get reportDetailVoteReject;
+
+  /// Report detail: vote success message
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تسجيل صوتك!'**
+  String get reportDetailVoteSuccess;
+
+  /// Report detail: vote error message
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل تسجيل الصوت. حاول مجدداً.'**
+  String get reportDetailVoteError;
+
+  /// Report detail: credibility section label
+  ///
+  /// In ar, this message translates to:
+  /// **'المصداقية'**
+  String get reportDetailCredibility;
+
+  /// Report detail: open map button
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح على الخريطة'**
+  String get reportDetailOpenMap;
+
+  /// Emergency numbers screen title
+  ///
+  /// In ar, this message translates to:
+  /// **'أرقام الطوارئ'**
+  String get emergencyTitle;
+
+  /// Emergency: police
+  ///
+  /// In ar, this message translates to:
+  /// **'الشرطة'**
+  String get emergencyPolice;
+
+  /// Emergency: ambulance
+  ///
+  /// In ar, this message translates to:
+  /// **'الإسعاف'**
+  String get emergencyAmbulance;
+
+  /// Emergency: fire department
+  ///
+  /// In ar, this message translates to:
+  /// **'الدفاع المدني'**
+  String get emergencyFire;
+
+  /// Emergency: civil protection
+  ///
+  /// In ar, this message translates to:
+  /// **'الحماية المدنية'**
+  String get emergencyCivilProtection;
+
+  /// Emergency: call button
+  ///
+  /// In ar, this message translates to:
+  /// **'اتصال'**
+  String get emergencyCall;
+
+  /// Splash screen title
+  ///
+  /// In ar, this message translates to:
+  /// **'بلّغ لايت'**
+  String get splashTitle;
+
+  /// Splash screen subtitle
+  ///
+  /// In ar, this message translates to:
+  /// **'صوتك يصنع الفرق'**
+  String get splashSubtitle;
+
+  /// Splash: start button
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ الآن'**
+  String get splashStart;
+
+  /// Splash: skip button
+  ///
+  /// In ar, this message translates to:
+  /// **'تخطي'**
+  String get splashSkip;
+
   /// Generic network error message
   ///
   /// In ar, this message translates to:
@@ -619,6 +811,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حدث خطأ غير متوقع. حاول مجدداً.'**
   String get unknownError;
+
+  /// Login button label
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الدخول'**
+  String get login;
+
+  /// Register button label
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء حساب'**
+  String get register;
+
+  /// Email field label
+  ///
+  /// In ar, this message translates to:
+  /// **'البريد الإلكتروني'**
+  String get email;
+
+  /// Password field label
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور'**
+  String get password;
+
+  /// Username field label
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم المستخدم'**
+  String get username;
+
+  /// Confirm password field label
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد كلمة المرور'**
+  String get confirmPassword;
 
   /// Pluralized report count
   ///

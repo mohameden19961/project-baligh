@@ -25,10 +25,19 @@ dependencies:
   # Native device geolocation (used by MapProvider.goToMyLocation)
   geolocator: ^13.0.1
 
-  # ── AUDIT ADDITIONS (Step 1) ──────────────────────────────────
-  # Tile caching for flutter_map
   flutter_map_tile_caching: ^10.0.0
-  # ─────────────────────────────────────────────────────────────
+
+  # Image picker (gallery + camera for report photos)
+  image_picker: ^1.1.2
+
+  # Supabase backend (replaces sqflite + local auth)
+  supabase_flutter: ^2.8.3
+
+  # Share (report details sharing)
+  share_plus: ^10.1.4
+
+  # Launch URL (tel: for emergency calls)
+  url_launcher: ^6.3.1
 
   # Localisation codegen
   intl: ^0.20.2
@@ -37,10 +46,19 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.2
 
 flutter:
   generate: true        # enables flutter gen-l10n → AppLocalizations
   uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
+  adaptive_icon_background: "#1B6B2F"
+  adaptive_icon_foreground: "assets/app_icon.png"
+  min_sdk_android: 23
 
 intl:
   arb-dir: lib/l10n

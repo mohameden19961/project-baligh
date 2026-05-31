@@ -1,44 +1,35 @@
-// lib/models/report_model.dart
-// ─────────────────────────────────────────────────────────────────
-// Model layer — pure Dart, zero Flutter/UI dependencies.
-// Represents a single citizen report submitted through Baligh.
-// ─────────────────────────────────────────────────────────────────
-
-// ════════════════════════════════════════════════════════════════
-// ENUM: ReportCategory
-// Mirrors the localization keys: categoryRoads, categoryLighting…
-// ════════════════════════════════════════════════════════════════
 enum ReportCategory {
-  roads,
-  lighting,
-  waste,
+  electricity,
+  road,
+  flood,
+  security,
   water,
-  parks,
-  other;
+  health,
+  internet,
+  market,
+  government,
+  fire,
+  infrastructure,
+  fraud;
 
-  /// Serialize to a stable JSON string (safe for API + SharedPrefs).
-  String toJson() => name; // e.g. "roads"
+  String toJson() => name;
 
-  /// Deserialize from a JSON string. Falls back to [other] on unknown values.
   static ReportCategory fromJson(String value) {
     return ReportCategory.values.firstWhere(
       (e) => e.name == value,
       orElse: () => ReportCategory.other,
     );
   }
+
+  static ReportCategory get other => ReportCategory.infrastructure;
 }
 
-// ════════════════════════════════════════════════════════════════
-// ENUM: ReportStatus
-// Mirrors the localization keys: statusPending, statusInProgress…
-// ════════════════════════════════════════════════════════════════
 enum ReportStatus {
   pending,
-  inProgress,
-  resolved,
-  rejected;
+  validated,
+  falseReport;
 
-  String toJson() => name; // e.g. "inProgress"
+  String toJson() => name;
 
   static ReportStatus fromJson(String value) {
     return ReportStatus.values.firstWhere(
@@ -48,16 +39,9 @@ enum ReportStatus {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
-// CLASS: ReportLocation
-// A lightweight value object that pairs latitude and longitude.
-// Kept separate so the Map feature can consume it directly.
-// ════════════════════════════════════════════════════════════════
 class ReportLocation {
   final double latitude;
   final double longitude;
-
-  /// Optional human-readable address resolved by the geocoding service.
   final String? address;
 
   const ReportLocation({
@@ -66,7 +50,6 @@ class ReportLocation {
     this.address,
   });
 
-  // ── Serialization ──────────────────────────────────────────────
   factory ReportLocation.fromJson(Map<String, dynamic> json) {
     return ReportLocation(
       latitude: (json['latitude'] as num).toDouble(),
@@ -81,7 +64,6 @@ class ReportLocation {
         if (address != null) 'address': address,
       };
 
-  // ── Equality & Debug ───────────────────────────────────────────
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -97,16 +79,8 @@ class ReportLocation {
       'ReportLocation(lat: $latitude, lng: $longitude, address: $address)';
 }
 
-// ════════════════════════════════════════════════════════════════
-// CLASS: CredibilityScore
-// Tracks community confirmations and rejections of a report.
-// The net score drives the report's trustworthiness indicator in the UI.
-// ════════════════════════════════════════════════════════════════
 class CredibilityScore {
-  /// Number of users who confirmed they see the same problem.
   final int confirmations;
-
-  /// Number of users who flagged the report as inaccurate or resolved.
   final int rejections;
 
   const CredibilityScore({
@@ -114,28 +88,27 @@ class CredibilityScore {
     this.rejections = 0,
   });
 
-  // ── Computed properties ────────────────────────────────────────
-
-  /// Net score: positive means the community trusts this report.
   int get netScore => confirmations - rejections;
 
-  /// Total votes cast on this report.
   int get totalVotes => confirmations + rejections;
 
-  /// Confidence ratio from 0.0 → 1.0 (NaN-safe).
-  /// Returns 0.0 when no votes exist yet.
   double get confidenceRatio =>
       totalVotes == 0 ? 0.0 : confirmations / totalVotes;
 
-  /// A quick qualitative label for the UI badge.
   CredibilityLevel get level {
     if (totalVotes == 0) return CredibilityLevel.unverified;
-    if (confidenceRatio >= 0.75) return CredibilityLevel.high;
-    if (confidenceRatio >= 0.40) return CredibilityLevel.medium;
+    if (totalVotes >= 3 && confidenceRatio >= 0.8) return CredibilityLevel.high;
+    if (totalVotes >= 3) return CredibilityLevel.medium;
     return CredibilityLevel.low;
   }
 
-  // ── Serialization ──────────────────────────────────────────────
+  String get label {
+    if (totalVotes == 0) return 'غير مؤكد';
+    if (totalVotes >= 3 && confidenceRatio >= 0.8) return 'موثوق جداً';
+    if (totalVotes >= 3) return 'مؤكد';
+    return 'قيد المراجعة';
+  }
+
   factory CredibilityScore.fromJson(Map<String, dynamic> json) {
     return CredibilityScore(
       confirmations: (json['confirmations'] as num?)?.toInt() ?? 0,
@@ -148,15 +121,12 @@ class CredibilityScore {
         'rejections': rejections,
       };
 
-  /// Returns a copy with one more confirmation.
   CredibilityScore copyWithConfirmation() =>
       CredibilityScore(confirmations: confirmations + 1, rejections: rejections);
 
-  /// Returns a copy with one more rejection.
   CredibilityScore copyWithRejection() =>
       CredibilityScore(confirmations: confirmations, rejections: rejections + 1);
 
-  // ── Equality & Debug ───────────────────────────────────────────
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -172,54 +142,25 @@ class CredibilityScore {
       'CredibilityScore(+$confirmations / -$rejections | net: $netScore)';
 }
 
-// ════════════════════════════════════════════════════════════════
-// ENUM: CredibilityLevel
-// Used by the UI to choose badge colors without embedding logic there.
-// ════════════════════════════════════════════════════════════════
 enum CredibilityLevel {
-  unverified, // No votes yet
-  low,        // Community doubts this report
-  medium,     // Mixed signals
-  high,       // Community strongly confirms this report
+  unverified,
+  low,
+  medium,
+  high;
 }
 
-// ════════════════════════════════════════════════════════════════
-// CLASS: ReportModel  ←  The main model
-// ════════════════════════════════════════════════════════════════
 class ReportModel {
-  /// Unique identifier assigned by the backend (null until synced).
-  final String? id;
-
-  /// Category of the civic problem being reported.
+  final int? id;
   final ReportCategory category;
-
-  /// Free-text description provided by the citizen.
   final String description;
-
-  /// Geographic coordinates and optional address of the problem.
   final ReportLocation location;
-
-  /// UTC timestamp of when the report was first submitted.
   final DateTime createdAt;
-
-  /// UTC timestamp of the last status update (null if never updated).
   final DateTime? updatedAt;
-
-  /// Current processing status assigned by the municipality.
   final ReportStatus status;
-
-  /// Community-driven credibility tracking (confirmations / rejections).
   final CredibilityScore credibilityScore;
-
-  /// URL of the photo attached to the report (null if no photo was added).
   final String? photoUrl;
-
-  /// Device-local path to the photo before it has been uploaded.
-  /// Only present on freshly created, not-yet-synced reports.
   final String? localPhotoPath;
-
-  /// Identifier of the submitting user (anonymous UUID or authenticated ID).
-  final String? submittedBy;
+  final String? userId;
 
   const ReportModel({
     this.id,
@@ -232,30 +173,24 @@ class ReportModel {
     this.credibilityScore = const CredibilityScore(),
     this.photoUrl,
     this.localPhotoPath,
-    this.submittedBy,
+    this.userId,
   });
 
-  // ── Computed helpers ────────────────────────────────────────────
-
-  /// Whether this report exists on the server yet.
   bool get isSynced => id != null;
 
-  /// Whether the report is still open (not resolved or rejected).
   bool get isOpen =>
-      status == ReportStatus.pending || status == ReportStatus.inProgress;
+      status == ReportStatus.pending || status == ReportStatus.validated;
 
-  /// Whether a photo is available (either uploaded or local).
   bool get hasPhoto => photoUrl != null || localPhotoPath != null;
 
-  /// The best available photo source for display.
   String? get displayPhotoSource => photoUrl ?? localPhotoPath;
 
-  // ── Serialization ───────────────────────────────────────────────
+  int get confirmCount => credibilityScore.confirmations;
+  int get denyCount => credibilityScore.rejections;
 
-  /// Construct a [ReportModel] from a raw JSON map (API response).
   factory ReportModel.fromJson(Map<String, dynamic> json) {
     return ReportModel(
-      id: json['id'] as String?,
+      id: json['id'] as int?,
       category: ReportCategory.fromJson(json['category'] as String),
       description: json['description'] as String,
       location: ReportLocation.fromJson(
@@ -270,14 +205,16 @@ class ReportModel {
           ? CredibilityScore.fromJson(
               json['credibilityScore'] as Map<String, dynamic>,
             )
-          : const CredibilityScore(),
+          : CredibilityScore(
+              confirmations: (json['confirm_count'] as num?)?.toInt() ?? 0,
+              rejections: (json['deny_count'] as num?)?.toInt() ?? 0,
+            ),
       photoUrl: json['photoUrl'] as String?,
       localPhotoPath: json['localPhotoPath'] as String?,
-      submittedBy: json['submittedBy'] as String?,
+      userId: json['user_id'] as String?,
     );
   }
 
-  /// Convert this model to a JSON map for API submission.
   Map<String, dynamic> toJson() => {
         if (id != null) 'id': id,
         'category': category.toJson(),
@@ -289,14 +226,49 @@ class ReportModel {
         'credibilityScore': credibilityScore.toJson(),
         if (photoUrl != null) 'photoUrl': photoUrl,
         if (localPhotoPath != null) 'localPhotoPath': localPhotoPath,
-        if (submittedBy != null) 'submittedBy': submittedBy,
+        if (userId != null) 'user_id': userId,
       };
 
-  // ── Immutable update pattern (copyWith) ─────────────────────────
-  // Allows providers to produce new state without mutating existing objects.
+  Map<String, dynamic> toDbMap() => {
+        if (id != null) 'id': id,
+        'user_id': userId ?? '',
+        'category': category.toJson(),
+        'description': description,
+        'latitude': location.latitude,
+        'longitude': location.longitude,
+        'address': location.address,
+        'photo_url': photoUrl,
+        'created_at': createdAt.toIso8601String(),
+        'status': status.toJson(),
+        'confirm_count': credibilityScore.confirmations,
+        'deny_count': credibilityScore.rejections,
+      };
+
+  factory ReportModel.fromDbMap(Map<String, dynamic> map) {
+    final confirmCount = (map['confirm_count'] as num?)?.toInt() ?? 0;
+    final denyCount = (map['deny_count'] as num?)?.toInt() ?? 0;
+    return ReportModel(
+      id: map['id'] as int?,
+      userId: map['user_id'] as String?,
+      category: ReportCategory.fromJson(map['category'] as String? ?? 'infrastructure'),
+      description: (map['description'] as String?) ?? '',
+      location: ReportLocation(
+        latitude: (map['latitude'] as num?)?.toDouble() ?? 0.0,
+        longitude: (map['longitude'] as num?)?.toDouble() ?? 0.0,
+        address: map['address'] as String?,
+      ),
+      photoUrl: map['photo_url'] as String?,
+      createdAt: DateTime.parse(map['created_at'] as String),
+      status: ReportStatus.fromJson(map['status'] as String? ?? 'pending'),
+      credibilityScore: CredibilityScore(
+        confirmations: confirmCount,
+        rejections: denyCount,
+      ),
+    );
+  }
 
   ReportModel copyWith({
-    String? id,
+    int? id,
     ReportCategory? category,
     String? description,
     ReportLocation? location,
@@ -306,7 +278,7 @@ class ReportModel {
     CredibilityScore? credibilityScore,
     String? photoUrl,
     String? localPhotoPath,
-    String? submittedBy,
+    String? userId,
   }) {
     return ReportModel(
       id: id ?? this.id,
@@ -319,11 +291,10 @@ class ReportModel {
       credibilityScore: credibilityScore ?? this.credibilityScore,
       photoUrl: photoUrl ?? this.photoUrl,
       localPhotoPath: localPhotoPath ?? this.localPhotoPath,
-      submittedBy: submittedBy ?? this.submittedBy,
+      userId: userId ?? this.userId,
     );
   }
 
-  // ── Equality & Debug ────────────────────────────────────────────
   @override
   bool operator ==(Object other) =>
       identical(this, other) || (other is ReportModel && other.id == id);
@@ -337,7 +308,6 @@ class ReportModel {
         'id: $id, '
         'category: ${category.name}, '
         'status: ${status.name}, '
-        'location: $location, '
         'credibility: $credibilityScore'
         ')';
   }

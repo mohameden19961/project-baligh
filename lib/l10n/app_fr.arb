@@ -23,6 +23,87 @@
   "navAlerts": "Alertes",
   "navAccount": "Profil",
 
+  "alertsTitle": "Alertes",
+  "@alertsTitle": { "description": "Alerts/Notifications screen title" },
+
+  "alertsEmpty": "Aucune alerte",
+  "@alertsEmpty": { "description": "Empty state for alerts screen" },
+
+  "alertStatusUpdate": "Mise à jour de statut",
+  "@alertStatusUpdate": { "description": "Alert type: report status updated" },
+
+  "alertNewReport": "Nouveau signalement près de chez vous",
+  "@alertNewReport": { "description": "Alert type: new report nearby" },
+
+  "alertMarkAllRead": "Tout marquer comme lu",
+  "@alertMarkAllRead": { "description": "Tooltip: mark all alerts as read" },
+
+  "alertTileTitle": "Alerte",
+  "@alertTileTitle": { "description": "Generic alert/notification tile title" },
+
+  "accountJoinDate": "Membre depuis",
+  "@accountJoinDate": { "description": "Account: join date label" },
+
+  "accountReportsSubmitted": "Signalements soumis",
+  "@accountReportsSubmitted": { "description": "Account: reports count label" },
+
+  "accountSettings": "Paramètres",
+  "@accountSettings": { "description": "Account: settings button" },
+
+  "accountEmergencyNumbers": "Numéros d'urgence",
+  "@accountEmergencyNumbers": { "description": "Account: emergency numbers button" },
+
+  "accountLogout": "Déconnexion",
+  "@accountLogout": { "description": "Account: logout button" },
+
+  "reportDetailVoteConfirm": "Confirmer",
+  "@reportDetailVoteConfirm": { "description": "Report detail: confirm vote button" },
+
+  "reportDetailVoteReject": "Rejeter",
+  "@reportDetailVoteReject": { "description": "Report detail: reject vote button" },
+
+  "reportDetailVoteSuccess": "Votre vote a été enregistré !",
+  "@reportDetailVoteSuccess": { "description": "Report detail: vote success message" },
+
+  "reportDetailVoteError": "Échec du vote. Veuillez réessayer.",
+  "@reportDetailVoteError": { "description": "Report detail: vote error message" },
+
+  "reportDetailCredibility": "Crédibilité",
+  "@reportDetailCredibility": { "description": "Report detail: credibility section label" },
+
+  "reportDetailOpenMap": "Ouvrir sur la carte",
+  "@reportDetailOpenMap": { "description": "Report detail: open map button" },
+
+  "emergencyTitle": "Numéros d'urgence",
+  "@emergencyTitle": { "description": "Emergency numbers screen title" },
+
+  "emergencyPolice": "Police",
+  "@emergencyPolice": { "description": "Emergency: police" },
+
+  "emergencyAmbulance": "Ambulance",
+  "@emergencyAmbulance": { "description": "Emergency: ambulance" },
+
+  "emergencyFire": "Pompiers",
+  "@emergencyFire": { "description": "Emergency: fire department" },
+
+  "emergencyCivilProtection": "Protection civile",
+  "@emergencyCivilProtection": { "description": "Emergency: civil protection" },
+
+  "emergencyCall": "Appeler",
+  "@emergencyCall": { "description": "Emergency: call button" },
+
+  "splashTitle": "Baligh Lite",
+  "@splashTitle": { "description": "Splash screen title" },
+
+  "splashSubtitle": "Votre voix fait la différence",
+  "@splashSubtitle": { "description": "Splash screen subtitle" },
+
+  "splashStart": "Commencer",
+  "@splashStart": { "description": "Splash: start button" },
+
+  "splashSkip": "Passer",
+  "@splashSkip": { "description": "Splash: skip button" },
+
   "saveButton": "Enregistrer",
   "@saveButton": { "description": "Generic save button" },
 
@@ -131,35 +212,50 @@
   "reportValidationLocation": "Veuillez indiquer la localisation",
   "@reportValidationLocation": { "description": "Validation message for location field" },
 
-  "categoryRoads": "Routes et trottoirs",
-  "@categoryRoads": { "description": "Report category: Roads" },
+  "categoryElectricity": "Électricité",
+  "@categoryElectricity": { "description": "Report category: Electricity" },
 
-  "categoryLighting": "Éclairage public",
-  "@categoryLighting": { "description": "Report category: Public Lighting" },
+  "categoryRoad": "Routes",
+  "@categoryRoad": { "description": "Report category: Road" },
 
-  "categoryWaste": "Déchets et assainissement",
-  "@categoryWaste": { "description": "Report category: Waste & Sanitation" },
+  "categoryFlood": "Inondation",
+  "@categoryFlood": { "description": "Report category: Flood" },
 
-  "categoryWater": "Eau et électricité",
-  "@categoryWater": { "description": "Report category: Water & Electricity" },
+  "categorySecurity": "Sécurité",
+  "@categorySecurity": { "description": "Report category: Security" },
 
-  "categoryParks": "Parcs et espaces verts",
-  "@categoryParks": { "description": "Report category: Parks & Green Spaces" },
+  "categoryWater": "Eau",
+  "@categoryWater": { "description": "Report category: Water" },
 
-  "categoryOther": "Autre",
-  "@categoryOther": { "description": "Report category: Other" },
+  "categoryHealth": "Santé",
+  "@categoryHealth": { "description": "Report category: Health" },
+
+  "categoryInternet": "Internet",
+  "@categoryInternet": { "description": "Report category: Internet" },
+
+  "categoryMarket": "Marché",
+  "@categoryMarket": { "description": "Report category: Market" },
+
+  "categoryGovernment": "Gouvernement",
+  "@categoryGovernment": { "description": "Report category: Government" },
+
+  "categoryFire": "Incendie",
+  "@categoryFire": { "description": "Report category: Fire" },
+
+  "categoryInfrastructure": "Infrastructure",
+  "@categoryInfrastructure": { "description": "Report category: Infrastructure" },
+
+  "categoryFraud": "Fraude",
+  "@categoryFraud": { "description": "Report category: Fraud" },
 
   "statusPending": "En attente",
   "@statusPending": { "description": "Report status: Pending" },
 
-  "statusInProgress": "En cours",
-  "@statusInProgress": { "description": "Report status: In Progress" },
+  "statusValidated": "Validé",
+  "@statusValidated": { "description": "Report status: Validated" },
 
-  "statusResolved": "Résolu",
-  "@statusResolved": { "description": "Report status: Resolved" },
-
-  "statusRejected": "Rejeté",
-  "@statusRejected": { "description": "Report status: Rejected" },
+  "statusFalseReport": "Faux signalement",
+  "@statusFalseReport": { "description": "Report status: False Report" },
 
   "myReportsTitle": "Mes signalements",
   "@myReportsTitle": { "description": "My Reports screen title" },
@@ -259,6 +355,24 @@
 
   "unknownError": "Une erreur inattendue s'est produite. Veuillez réessayer.",
   "@unknownError": { "description": "Generic unknown error message" },
+
+  "login": "Connexion",
+  "@login": { "description": "Login button label" },
+
+  "register": "S'inscrire",
+  "@register": { "description": "Register button label" },
+
+  "email": "E-mail",
+  "@email": { "description": "Email field label" },
+
+  "password": "Mot de passe",
+  "@password": { "description": "Password field label" },
+
+  "username": "Nom d'utilisateur",
+  "@username": { "description": "Username field label" },
+
+  "confirmPassword": "Confirmer le mot de passe",
+  "@confirmPassword": { "description": "Confirm password field label" },
 
   "reportCount": "{count, plural, =0{Aucun signalement} =1{1 signalement} other{{count} signalements}}",
   "@reportCount": {

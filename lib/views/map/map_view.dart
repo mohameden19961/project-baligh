@@ -20,6 +20,7 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/report_provider.dart';
 import '../../providers/map_provider.dart';
 import '../../utils/app_constants.dart';
@@ -55,7 +56,7 @@ class _MapViewState extends State<MapView>
   // ── Build flutter_map Marker list from the current report list ───
   List<Marker> _buildMarkers({
     required List<ReportModel> reports,
-    required String? selectedId,
+    required int? selectedId,
     required MapProvider mapProvider,
   }) {
     return reports.map((report) {
@@ -219,7 +220,7 @@ class _MapMarkerSource {
   const _MapMarkerSource({required this.reports, required this.selectedId});
 
   final List<ReportModel> reports;
-  final String? selectedId;
+  final int? selectedId;
 
   @override
   bool operator ==(Object other) =>
@@ -441,15 +442,8 @@ class _FilterChipRow extends StatelessWidget {
   final ThemeData theme;
 
   // Chip order — null sentinel = "All" pseudo-category.
-  static const List<ReportCategory?> _chipOrder = [
-    null,
-    ReportCategory.roads,
-    ReportCategory.lighting,
-    ReportCategory.waste,
-    ReportCategory.water,
-    ReportCategory.parks,
-    ReportCategory.other,
-  ];
+  static List<ReportCategory?> get _chipOrder =>
+      [null, ...ReportCategory.values];
 
   String _label(ReportCategory? cat) =>
       cat == null ? l10n.mapFilterAll : ReportCategoryMeta.label(cat, l10n);
@@ -758,11 +752,9 @@ class _ReportPreviewSheet extends StatelessWidget {
                     Expanded(
                       child: _VoteButton(
                         icon: Icons.check_circle_outline_rounded,
-                        label: '${l10n.statusResolved} (${report.credibilityScore.confirmations})',
+                        label: '${l10n.statusValidated} (${report.credibilityScore.confirmations})',
                         color: const Color(0xFF2E7D32),
-                        onTap: () {
-                          // TODO: wire to reportProvider.updateCredibility
-                        },
+                        onTap: () => _vote(context, report, true, l10n),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -770,11 +762,9 @@ class _ReportPreviewSheet extends StatelessWidget {
                     Expanded(
                       child: _VoteButton(
                         icon: Icons.cancel_outlined,
-                        label: '${l10n.statusRejected} (${report.credibilityScore.rejections})',
+                        label: '${l10n.statusFalseReport} (${report.credibilityScore.rejections})',
                         color: const Color(0xFFC62828),
-                        onTap: () {
-                          // TODO: wire to reportProvider.updateCredibility
-                        },
+                        onTap: () => _vote(context, report, false, l10n),
                       ),
                     ),
                   ],
@@ -783,6 +773,27 @@ class _ReportPreviewSheet extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+void _vote(BuildContext context, ReportModel report, bool isConfirmation,
+    AppLocalizations l10n) async {
+  final provider = context.read<ReportProvider>();
+  final userId = context.read<AuthProvider>().currentUserId ?? '';
+  final success = await provider.updateCredibility(
+    reportId: report.id!,
+    isConfirmation: isConfirmation,
+    userId: userId,
+  );
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(success
+            ? l10n.reportDetailVoteSuccess
+            : l10n.reportDetailVoteError),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

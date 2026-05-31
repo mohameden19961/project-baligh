@@ -1,53 +1,34 @@
-// lib/providers/report_provider.dart
-// ─────────────────────────────────────────────────────────────────
-// Controller layer — manages all report state for the Baligh app.
-// Consumes: ReportModel, ReportService (injected at construction).
-// Consumed by: HomeView, MapView, MyReportsView, ReportView.
-// ─────────────────────────────────────────────────────────────────
-
 import 'package:flutter/foundation.dart';
+import '../core/models/vote_model.dart';
 import '../models/report_model.dart';
 import '../services/report_service.dart';
+import '../core/services/report_service_db.dart';
 
-// ════════════════════════════════════════════════════════════════
-// ENUM: ReportProviderStatus
-// Fine-grained loading states — avoids boolean flag proliferation.
-// ════════════════════════════════════════════════════════════════
 enum ReportProviderStatus {
-  idle,       // Nothing in flight, list may or may not be populated.
-  loading,    // Initial fetch in progress (shows full-screen loader).
-  refreshing, // Silent background refresh (list is already visible).
-  submitting, // A new report is being sent to the backend.
-  updating,   // A credibility vote is being processed.
-  success,    // Last operation completed successfully (transient).
-  error,      // Last operation failed (errorMessage is set).
+  idle,
+  loading,
+  refreshing,
+  submitting,
+  updating,
+  success,
+  error,
 }
 
-// ════════════════════════════════════════════════════════════════
-// CLASS: ReportProvider
-// ════════════════════════════════════════════════════════════════
 class ReportProvider extends ChangeNotifier {
-  ReportProvider({ReportService? service})
-      : _reportService = service ?? MockReportService();
-
-  // ── Injected service (defaults to MockReportService) ─────────────
   final ReportService _reportService;
 
-  // ── Internal state ───────────────────────────────────────────────
   List<ReportModel> _reports = [];
+  final Map<int, VoteType?> _userVotes = {};
   ReportProviderStatus _status = ReportProviderStatus.idle;
   String? _errorMessage;
-
-  // ── Filters ──────────────────────────────────────────────────────
   ReportCategory? _activeCategory;
   ReportStatus? _activeStatus;
 
-  // ── Public getters ───────────────────────────────────────────────
+  ReportProvider({ReportService? service})
+      : _reportService = service ?? ReportServiceDb() as ReportService;
 
-  /// Full unfiltered list — used by the Map screen (all pins).
   List<ReportModel> get allReports => List.unmodifiable(_reports);
 
-  /// Filtered list — used by HomeView and MyReportsView.
   List<ReportModel> get filteredReports {
     return _reports.where((r) {
       final matchesCategory =
@@ -58,40 +39,26 @@ class ReportProvider extends ChangeNotifier {
     }).toList();
   }
 
-  /// Pending reports only — for the home screen summary badge.
   List<ReportModel> get pendingReports =>
       _reports.where((r) => r.status == ReportStatus.pending).toList();
 
-  /// Resolved reports — for the stats widget.
-  List<ReportModel> get resolvedReports =>
-      _reports.where((r) => r.status == ReportStatus.resolved).toList();
+  List<ReportModel> get validatedReports =>
+      _reports.where((r) => r.status == ReportStatus.validated).toList();
 
   ReportProviderStatus get status => _status;
   String? get errorMessage => _errorMessage;
   ReportCategory? get activeCategory => _activeCategory;
   ReportStatus? get activeStatus => _activeStatus;
 
-  /// True only while the very first fetch is happening.
   bool get isLoading => _status == ReportProviderStatus.loading;
-
-  /// True while a new report is being submitted.
   bool get isSubmitting => _status == ReportProviderStatus.submitting;
-
-  /// True while a credibility vote is being processed.
   bool get isUpdating => _status == ReportProviderStatus.updating;
-
-  /// True when any network operation is in flight.
   bool get isBusy =>
       _status == ReportProviderStatus.loading ||
       _status == ReportProviderStatus.submitting ||
       _status == ReportProviderStatus.updating ||
       _status == ReportProviderStatus.refreshing;
 
-  // ── 1. FETCH ──────────────────────────────────────────────────────
-
-  /// Fetches all reports via [ReportService]. Uses [loading] status on
-  /// first call, [refreshing] on subsequent calls so the existing list
-  /// stays visible.
   Future<void> fetchReports({bool silent = false}) async {
     _setStatus(
       _reports.isEmpty && !silent
@@ -101,7 +68,7 @@ class ReportProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      final data = await _reportService.fetchReports();
+      final data = await _reportService.getReports();
       _reports = data;
       _setStatus(ReportProviderStatus.idle);
     } catch (e, stackTrace) {
@@ -110,56 +77,40 @@ class ReportProvider extends ChangeNotifier {
     }
   }
 
-  // ── 2. ADD A NEW REPORT ───────────────────────────────────────────
-
-  /// Adds [report] optimistically to the local list, then simulates
-  /// sending it to the backend. Rolls back on failure.
-  ///
-  /// Returns `true` on success, `false` on failure (so the View can
-  /// show the appropriate snackbar without reading provider state).
   Future<bool> addReport(ReportModel report) async {
     _setStatus(ReportProviderStatus.submitting);
     _clearError();
 
-    // ── Optimistic insert ─────────────────────────────────────────
-    // Prepend so the new report appears at the top of the list immediately.
     _reports = [report, ..._reports];
     notifyListeners();
 
     try {
-      final synced = await _reportService.createReport(report);
-
-      // Replace the optimistic entry with the server-confirmed one.
+      final synced = await _reportService.addReport(report);
       _replaceReport(report, synced);
       _setStatus(ReportProviderStatus.success);
-
-      // Reset to idle after a brief window so the UI can react to success.
       await Future.delayed(const Duration(milliseconds: 300));
       _setStatus(ReportProviderStatus.idle);
-
       return true;
     } catch (e, stackTrace) {
       debugPrint('[ReportProvider] addReport error: $e\n$stackTrace');
-
-      // ── Rollback optimistic insert on failure ──────────────────
       _reports = _reports.where((r) => r != report).toList();
       _setError('Failed to submit report. Please try again.');
-
       return false;
     }
   }
 
-  // ── 3. UPDATE CREDIBILITY SCORE ───────────────────────────────────
+  VoteType? userVoteFor(int reportId) => _userVotes[reportId];
 
-  /// Records a [confirmation] or rejection vote for [reportId].
-  ///
-  /// Also optimistic: the badge updates instantly while the API call
-  /// runs in the background. Rolls back silently if the call fails.
-  ///
-  /// Returns `true` on success, `false` on failure.
+  Future<void> fetchUserVote(int reportId, String userId) async {
+    final vote = await _reportService.getUserVote(reportId, userId);
+    _userVotes[reportId] = vote;
+    notifyListeners();
+  }
+
   Future<bool> updateCredibility({
-    required String reportId,
+    required int reportId,
     required bool isConfirmation,
+    required String userId,
   }) async {
     final index = _reports.indexWhere((r) => r.id == reportId);
     if (index == -1) {
@@ -172,51 +123,46 @@ class ReportProvider extends ChangeNotifier {
 
     final original = _reports[index];
 
-    // ── Optimistic update ─────────────────────────────────────────
-    final optimistic = original.copyWith(
-      credibilityScore: isConfirmation
-          ? original.credibilityScore.copyWithConfirmation()
-          : original.credibilityScore.copyWithRejection(),
-    );
-    _reports = List.from(_reports)..[index] = optimistic;
-    notifyListeners();
-
     try {
-      await _reportService.voteOnReport(
-        reportId: reportId,
+      final counts = await _reportService.voteOnReport(
+        reportId: reportId.toString(),
         isConfirmation: isConfirmation,
+        userId: userId,
       );
-
+      final updated = original.copyWith(
+        credibilityScore: CredibilityScore(
+          confirmations: counts['confirm']!,
+          rejections: counts['deny']!,
+        ),
+      );
+      _reports = List.from(_reports)..[index] = updated;
+      _userVotes[reportId] = await _reportService.getUserVote(reportId, userId);
       _setStatus(ReportProviderStatus.idle);
       return true;
     } catch (e, stackTrace) {
       debugPrint('[ReportProvider] updateCredibility error: $e\n$stackTrace');
-
-      // ── Rollback to original score on failure ──────────────────
       _reports = List.from(_reports)..[index] = original;
       _setError('Failed to record your vote. Please try again.');
-
       return false;
     }
   }
 
-  // ── FILTERS ───────────────────────────────────────────────────────
+  Future<VoteType?> getUserVote(int reportId, String userId) {
+    return _reportService.getUserVote(reportId, userId);
+  }
 
-  /// Set or clear the active category filter.
   void filterByCategory(ReportCategory? category) {
     if (_activeCategory == category) return;
     _activeCategory = category;
     notifyListeners();
   }
 
-  /// Set or clear the active status filter.
   void filterByStatus(ReportStatus? status) {
     if (_activeStatus == status) return;
     _activeStatus = status;
     notifyListeners();
   }
 
-  /// Reset all filters to show every report.
   void clearFilters() {
     if (_activeCategory == null && _activeStatus == null) return;
     _activeCategory = null;
@@ -224,12 +170,7 @@ class ReportProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── SINGLE REPORT LOOKUP ──────────────────────────────────────────
-
-  /// Returns the report matching [id], or null if not found.
-  /// Used by the detail screen to avoid passing the whole object
-  /// through Navigator arguments.
-  ReportModel? getById(String id) {
+  ReportModel? getById(int id) {
     try {
       return _reports.firstWhere((r) => r.id == id);
     } catch (_) {
@@ -237,7 +178,47 @@ class ReportProvider extends ChangeNotifier {
     }
   }
 
-  // ── PRIVATE HELPERS ───────────────────────────────────────────────
+  Future<bool> deleteReport(int id) async {
+    _setStatus(ReportProviderStatus.updating);
+    _clearError();
+    final originalIndex = _reports.indexWhere((r) => r.id == id);
+    if (originalIndex == -1) return false;
+    final original = _reports[originalIndex];
+    _reports = List.from(_reports)..removeAt(originalIndex);
+    notifyListeners();
+
+    try {
+      await _reportService.deleteReport(id);
+      _setStatus(ReportProviderStatus.idle);
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('[ReportProvider] deleteReport error: $e\n$stackTrace');
+      _reports = List.from(_reports)..insert(originalIndex, original);
+      _setError('Failed to delete report.');
+      return false;
+    }
+  }
+
+  Future<bool> editReport(int id, ReportModel updated) async {
+    _setStatus(ReportProviderStatus.updating);
+    _clearError();
+    final index = _reports.indexWhere((r) => r.id == id);
+    if (index == -1) return false;
+    final original = _reports[index];
+    _reports = List.from(_reports)..[index] = updated;
+    notifyListeners();
+
+    try {
+      await _reportService.updateReport(id, updated);
+      _setStatus(ReportProviderStatus.idle);
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('[ReportProvider] editReport error: $e\n$stackTrace');
+      _reports = List.from(_reports)..[index] = original;
+      _setError('Failed to update report.');
+      return false;
+    }
+  }
 
   void _setStatus(ReportProviderStatus s) {
     _status = s;
@@ -254,7 +235,6 @@ class ReportProvider extends ChangeNotifier {
     _errorMessage = null;
   }
 
-  /// Swap [old] with [updated] in the list, preserving order.
   void _replaceReport(ReportModel old, ReportModel updated) {
     final index = _reports.indexOf(old);
     if (index != -1) {

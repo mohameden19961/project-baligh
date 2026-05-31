@@ -138,34 +138,49 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportValidationLocation => 'Veuillez indiquer la localisation';
 
   @override
-  String get categoryRoads => 'Routes et trottoirs';
+  String get categoryElectricity => 'Électricité';
 
   @override
-  String get categoryLighting => 'Éclairage public';
+  String get categoryRoad => 'Routes';
 
   @override
-  String get categoryWaste => 'Déchets et assainissement';
+  String get categoryFlood => 'Inondation';
 
   @override
-  String get categoryWater => 'Eau et électricité';
+  String get categorySecurity => 'Sécurité';
 
   @override
-  String get categoryParks => 'Parcs et espaces verts';
+  String get categoryWater => 'Eau';
 
   @override
-  String get categoryOther => 'Autre';
+  String get categoryHealth => 'Santé';
+
+  @override
+  String get categoryInternet => 'Internet';
+
+  @override
+  String get categoryMarket => 'Marché';
+
+  @override
+  String get categoryGovernment => 'Gouvernement';
+
+  @override
+  String get categoryFire => 'Incendie';
+
+  @override
+  String get categoryInfrastructure => 'Infrastructure';
+
+  @override
+  String get categoryFraud => 'Fraude';
 
   @override
   String get statusPending => 'En attente';
 
   @override
-  String get statusInProgress => 'En cours';
+  String get statusValidated => 'Validé';
 
   @override
-  String get statusResolved => 'Résolu';
-
-  @override
-  String get statusRejected => 'Rejeté';
+  String get statusFalseReport => 'Faux signalement';
 
   @override
   String get myReportsTitle => 'Mes signalements';
@@ -269,12 +284,111 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navAccount => 'Profil';
 
   @override
+  String get alertsTitle => 'Alertes';
+
+  @override
+  String get alertsEmpty => 'Aucune alerte';
+
+  @override
+  String get alertStatusUpdate => 'Mise à jour de statut';
+
+  @override
+  String get alertNewReport => 'Nouveau signalement près de chez vous';
+
+  @override
+  String get alertMarkAllRead => 'Tout marquer comme lu';
+
+  @override
+  String get alertTileTitle => 'Alerte';
+
+  @override
+  String get accountJoinDate => 'Membre depuis';
+
+  @override
+  String get accountReportsSubmitted => 'Signalements soumis';
+
+  @override
+  String get accountSettings => 'Paramètres';
+
+  @override
+  String get accountEmergencyNumbers => 'Numéros d\'urgence';
+
+  @override
+  String get accountLogout => 'Déconnexion';
+
+  @override
+  String get reportDetailVoteConfirm => 'Confirmer';
+
+  @override
+  String get reportDetailVoteReject => 'Rejeter';
+
+  @override
+  String get reportDetailVoteSuccess => 'Votre vote a été enregistré !';
+
+  @override
+  String get reportDetailVoteError => 'Échec du vote. Veuillez réessayer.';
+
+  @override
+  String get reportDetailCredibility => 'Crédibilité';
+
+  @override
+  String get reportDetailOpenMap => 'Ouvrir sur la carte';
+
+  @override
+  String get emergencyTitle => 'Numéros d\'urgence';
+
+  @override
+  String get emergencyPolice => 'Police';
+
+  @override
+  String get emergencyAmbulance => 'Ambulance';
+
+  @override
+  String get emergencyFire => 'Pompiers';
+
+  @override
+  String get emergencyCivilProtection => 'Protection civile';
+
+  @override
+  String get emergencyCall => 'Appeler';
+
+  @override
+  String get splashTitle => 'Baligh Lite';
+
+  @override
+  String get splashSubtitle => 'Votre voix fait la différence';
+
+  @override
+  String get splashStart => 'Commencer';
+
+  @override
+  String get splashSkip => 'Passer';
+
+  @override
   String get networkError =>
       'Impossible de se connecter au réseau. Vérifiez votre connexion Internet.';
 
   @override
   String get unknownError =>
       'Une erreur inattendue s\'est produite. Veuillez réessayer.';
+
+  @override
+  String get login => 'Connexion';
+
+  @override
+  String get register => 'S\'inscrire';
+
+  @override
+  String get email => 'E-mail';
+
+  @override
+  String get password => 'Mot de passe';
+
+  @override
+  String get username => 'Nom d\'utilisateur';
+
+  @override
+  String get confirmPassword => 'Confirmer le mot de passe';
 
   @override
   String reportCount(int count) {

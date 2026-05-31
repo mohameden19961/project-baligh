@@ -12,6 +12,8 @@ import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
 import '../../providers/report_provider.dart';
 import '../../widgets/report_card.dart';
+import '../report_detail/report_detail_view.dart';
+import '../../utils/report_category_meta.dart';
 
 // ════════════════════════════════════════════════════════════════
 // HomeView
@@ -62,16 +64,16 @@ class _HomeViewState extends State<HomeView> {
             // change, not on every status/filter notification.
             SliverToBoxAdapter(
               child: Selector<ReportProvider,
-                  (int total, int pending, int resolved)>(
+                  (int total, int pending, int validated)>(
                 selector: (_, p) => (
                   p.allReports.length,
                   p.pendingReports.length,
-                  p.resolvedReports.length,
+                  p.validatedReports.length,
                 ),
                 builder: (_, counts, __) => _StatsBar(
                   totalCount: counts.$1,
                   pendingCount: counts.$2,
-                  resolvedCount: counts.$3,
+                  validatedCount: counts.$3,
                   l10n: l10n,
                   theme: theme,
                 ),
@@ -148,91 +150,41 @@ class _HomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const primaryGreen = Color(0xFF2E7D32);
-    const lightGreen = Color(0xFF388E3C);
 
     return SliverAppBar(
-      // ── Audit Step 3: corrected AppBar sizing ──────────────────
-      expandedHeight: 120,
-      collapsedHeight: 56,
+      expandedHeight: 56,
       pinned: true,
       elevation: 0,
       backgroundColor: primaryGreen,
       automaticallyImplyLeading: false,
-      flexibleSpace: FlexibleSpaceBar(
-        // Parallax keeps the gradient background moving at a slower
-        // rate than the scroll, preventing the abrupt snap of CollapseMode.pin.
-        collapseMode: CollapseMode.parallax,
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [primaryGreen, lightGreen],
-            ),
-          ),
-          child: SafeArea(
-            child: Padding(
-              // Reduced top padding to fit within the smaller expandedHeight.
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.appName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          // Reduced from 26 → 22 to fit the tighter header
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        l10n.homeSubtitle,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.80),
-                          // Reduced from 12 → 11 for the tighter layout
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Reduced icon container from 42 → 36 for the tighter header
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.18),
-                      borderRadius: BorderRadius.circular(10),
-                      border:
-                          Border.all(color: Colors.white.withOpacity(0.30)),
-                    ),
-                    child: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      // Reduced from 22 → 18
-                      size: 18,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      centerTitle: true,
       title: Text(
         l10n.appName,
         style: const TextStyle(
           color: Colors.white,
+          fontSize: 20,
           fontWeight: FontWeight.w800,
-          fontSize: 17,
         ),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.18),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.white.withOpacity(0.30)),
+            ),
+            child: const Icon(
+              Icons.notifications_outlined,
+              color: Colors.white,
+              size: 18,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -246,14 +198,14 @@ class _StatsBar extends StatelessWidget {
   const _StatsBar({
     required this.totalCount,
     required this.pendingCount,
-    required this.resolvedCount,
+    required this.validatedCount,
     required this.l10n,
     required this.theme,
   });
 
   final int totalCount;
   final int pendingCount;
-  final int resolvedCount;
+  final int validatedCount;
   final AppLocalizations l10n;
   final ThemeData theme;
 
@@ -298,8 +250,8 @@ class _StatsBar extends StatelessWidget {
               thickness: 1,
             ),
             _StatPill(
-              value: resolvedCount,
-              label: l10n.statusResolved,
+              value: validatedCount,
+              label: l10n.statusValidated,
               color: const Color(0xFF2E7D32),
             ),
           ],
@@ -396,15 +348,8 @@ class _CategoryFilterBar extends StatelessWidget {
   final AppLocalizations l10n;
   final ThemeData theme;
 
-  String _label(ReportCategory? cat) => switch (cat) {
-        null                    => l10n.myReportsAll,
-        ReportCategory.roads    => l10n.categoryRoads,
-        ReportCategory.lighting => l10n.categoryLighting,
-        ReportCategory.waste    => l10n.categoryWaste,
-        ReportCategory.water    => l10n.categoryWater,
-        ReportCategory.parks    => l10n.categoryParks,
-        ReportCategory.other    => l10n.categoryOther,
-      };
+  String _label(ReportCategory? cat) =>
+      cat == null ? l10n.myReportsAll : ReportCategoryMeta.label(cat, l10n);
 
   @override
   Widget build(BuildContext context) {
@@ -472,7 +417,12 @@ class _ReportList extends StatelessWidget {
             report: report,
             animationDelay: Duration(milliseconds: 60 * index),
             onTap: () {
-              // TODO: Navigator.push to ReportDetailView once built.
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ReportDetailView(reportId: report.id!),
+                ),
+              );
             },
           );
         },

@@ -37,11 +37,11 @@ class _MainLayoutState extends State<MainLayout>
   late final Animation<double> _fabScale;
 
   // ── Tab body — IndexedStack keeps all views alive (no re-renders) ─
-  static const List<Widget> _tabBodies = [
-    HomeView(),
-    MyReportsView(),
-    AlertsView(),
-    AccountView(),
+  List<Widget> get _tabBodies => [
+    const HomeView(),
+    const MyReportsView(),
+    const AlertsView(),
+    const AccountView(),
   ];
 
   @override
@@ -93,10 +93,16 @@ class _MainLayoutState extends State<MainLayout>
         child: ScaleTransition(
           scale: _fabScale,
           child: _BalighFab(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AddReportView()),
-            ),
+            onTap: () {
+              try {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddReportView()),
+                );
+              } catch (e) {
+                debugPrint('[FAB] Navigation failed: $e');
+              }
+            },
           ),
         ),
       ),
