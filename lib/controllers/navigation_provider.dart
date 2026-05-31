@@ -1,4 +1,4 @@
-// lib/providers/navigation_provider.dart
+// lib/controllers/navigation_provider.dart
 // ─────────────────────────────────────────────────────────────────
 // Controller layer — owns the single selected tab index for the
 // entire app shell. Kept intentionally thin: no persistence needed

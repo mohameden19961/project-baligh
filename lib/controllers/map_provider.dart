@@ -1,4 +1,4 @@
-// lib/providers/map_provider.dart
+// lib/controllers/map_provider.dart
 // ─────────────────────────────────────────────────────────────────
 // Controller layer — owns all state for the Map screen.
 // Stack: flutter_map + latlong2  (OSM — no Google Maps API key)

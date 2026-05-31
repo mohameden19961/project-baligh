@@ -1,9 +1,10 @@
+// MVC - View
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../providers/alert_provider.dart';
-import '../../providers/auth_provider.dart';
+import '../../controllers/alert_controller.dart';
+import '../../controllers/auth_controller.dart';
 import '../report_detail/report_detail_view.dart';
 
 class AlertsView extends StatefulWidget {

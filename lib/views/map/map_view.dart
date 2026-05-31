@@ -1,3 +1,4 @@
+// MVC - View
 // lib/views/map/map_view.dart
 // ─────────────────────────────────────────────────────────────────
 // View layer — Map screen (Screen 13 - Carte des Signalements).
@@ -20,9 +21,9 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/report_provider.dart';
-import '../../providers/map_provider.dart';
+import '../../controllers/auth_controller.dart';
+import '../../controllers/report_controller.dart';
+import '../../controllers/map_provider.dart';
 import '../../utils/app_constants.dart';
 import '../../utils/report_category_meta.dart';
 import '../../widgets/report_card.dart';

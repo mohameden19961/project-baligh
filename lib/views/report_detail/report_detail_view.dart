@@ -1,3 +1,4 @@
+// MVC - View
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -6,8 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/models/vote_model.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/report_provider.dart';
+import '../../controllers/auth_controller.dart';
+import '../../controllers/report_controller.dart';
 import '../../utils/report_category_meta.dart';
 
 class ReportDetailView extends StatefulWidget {

@@ -1,9 +1,10 @@
+// MVC - View
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/report_provider.dart';
+import '../../controllers/auth_controller.dart';
+import '../../controllers/report_controller.dart';
 import '../auth/login_view.dart';
 import '../settings/settings_view.dart';
 import '../emergency/emergency_numbers_view.dart';

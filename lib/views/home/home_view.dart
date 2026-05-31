@@ -1,3 +1,4 @@
+// MVC - View
 // lib/views/home/home_view.dart
 // ─────────────────────────────────────────────────────────────────
 // View layer — Home feed screen (Screen 04 - Accueil).
@@ -10,7 +11,7 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
-import '../../providers/report_provider.dart';
+import '../../controllers/report_controller.dart';
 import '../../widgets/report_card.dart';
 import '../report_detail/report_detail_view.dart';
 import '../../utils/report_category_meta.dart';

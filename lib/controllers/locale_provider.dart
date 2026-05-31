@@ -1,4 +1,4 @@
-// lib/providers/locale_provider.dart
+// lib/controllers/locale_provider.dart
 // ─────────────────────────────────────────────────────────────────
 // Controller (Provider) responsible for managing the active locale.
 // Persists the user's language choice via SharedPreferences so it

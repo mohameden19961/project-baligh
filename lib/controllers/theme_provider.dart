@@ -1,4 +1,4 @@
-// lib/providers/theme_provider.dart
+// lib/controllers/theme_provider.dart
 // ─────────────────────────────────────────────────────────────────
 // Controller (Provider) responsible for managing the active theme.
 // Persists the user's theme choice via SharedPreferences.

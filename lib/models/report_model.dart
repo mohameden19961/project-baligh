@@ -1,3 +1,4 @@
+// MVC - Model
 enum ReportCategory {
   electricity,
   road,

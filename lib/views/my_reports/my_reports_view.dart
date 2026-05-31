@@ -1,11 +1,12 @@
+// MVC - View
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/report_provider.dart';
+import '../../controllers/auth_controller.dart';
+import '../../controllers/report_controller.dart';
 import '../../utils/report_category_meta.dart';
 import '../../utils/supabase_config.dart';
 import '../../widgets/report_card.dart';

@@ -1,10 +1,11 @@
+// MVC - View
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../providers/locale_provider.dart';
-import '../../providers/theme_provider.dart';
+import '../../controllers/locale_provider.dart';
+import '../../controllers/theme_provider.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});

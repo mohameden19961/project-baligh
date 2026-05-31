@@ -1,8 +1,9 @@
+// MVC - View
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../providers/auth_provider.dart';
+import '../../controllers/auth_controller.dart';
 import '../main_layout.dart';
 
 class RegisterView extends StatefulWidget {

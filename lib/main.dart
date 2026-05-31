@@ -6,16 +6,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'providers/navigation_provider.dart';
-import 'providers/report_provider.dart';
-import 'providers/alert_provider.dart';
-import 'providers/auth_provider.dart';
+import 'controllers/navigation_provider.dart';
+import 'controllers/report_controller.dart';
+import 'controllers/alert_controller.dart';
+import 'controllers/auth_controller.dart';
 import 'views/splash/splash_view.dart';
 
 import 'l10n/app_localizations.dart';
 
-import 'providers/locale_provider.dart';
-import 'providers/theme_provider.dart';
+import 'controllers/locale_provider.dart';
+import 'controllers/theme_provider.dart';
 
 import 'utils/app_constants.dart';
 import 'utils/supabase_config.dart';

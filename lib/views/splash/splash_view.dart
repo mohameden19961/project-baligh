@@ -1,9 +1,10 @@
+// MVC - View
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../providers/auth_provider.dart';
+import '../../controllers/auth_controller.dart';
 import '../auth/login_view.dart';
 import '../main_layout.dart';
 

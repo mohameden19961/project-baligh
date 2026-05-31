@@ -1,3 +1,4 @@
+// MVC - Controller
 import 'package:flutter/foundation.dart';
 import '../core/database/notification_dao.dart';
 

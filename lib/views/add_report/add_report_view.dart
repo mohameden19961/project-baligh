@@ -1,3 +1,4 @@
+// MVC - View
 // lib/views/add_report/add_report_view.dart
 // ─────────────────────────────────────────────────────────────────
 // View layer — Step 1 of the "Add Report" multi-step wizard.
@@ -24,10 +25,10 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/report_model.dart';
-import '../../providers/add_report_provider.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/map_provider.dart' show kNouakchottLatLng;
-import '../../providers/report_provider.dart';
+import '../../controllers/add_report_controller.dart';
+import '../../controllers/auth_controller.dart';
+import '../../controllers/map_provider.dart' show kNouakchottLatLng;
+import '../../controllers/report_controller.dart';
 import '../../utils/app_constants.dart';
 import '../../utils/report_category_meta.dart';
 import '../../utils/supabase_config.dart';

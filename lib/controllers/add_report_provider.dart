@@ -1,4 +1,4 @@
-// lib/providers/add_report_provider.dart
+// lib/controllers/add_report_controller.dart
 // ─────────────────────────────────────────────────────────────────
 // Scoped controller for the multi-step "Add Report" flow.
 // Lives only while the AddReportView is on screen (created inside

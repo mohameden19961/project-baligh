@@ -1,3 +1,4 @@
+// MVC - View
 // lib/views/main_layout.dart
 // ─────────────────────────────────────────────────────────────────
 // App shell: owns the persistent Scaffold that wraps every tab.
@@ -10,7 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
-import '../providers/navigation_provider.dart';
+import '../controllers/navigation_provider.dart';
 
 // ── Tab views ─────────────────────────────────────────────────────
 import 'home/home_view.dart';

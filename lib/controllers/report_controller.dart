@@ -1,3 +1,4 @@
+// MVC - Controller
 import 'package:flutter/foundation.dart';
 import '../core/models/vote_model.dart';
 import '../models/report_model.dart';
