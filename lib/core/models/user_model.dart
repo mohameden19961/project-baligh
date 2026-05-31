@@ -1,12 +1,32 @@
+// MVC - Model
+
+/// Modèle représentant un utilisateur de l'application.
+///
+/// Contient les informations du profil, le score de réputation
+/// et les statistiques de participation (signalements, confirmations).
 class UserModel {
+  /// Identifiant unique Supabase (UUID), ou `null` avant persistance.
   final String? id;
+
+  /// Nom d'utilisateur choisi à l'inscription.
   final String username;
+
+  /// Adresse e-mail de l'utilisateur.
   final String email;
+
+  /// Date et heure de création du compte.
   final DateTime createdAt;
+
+  /// Score de réputation calculé par le système.
   final int reputationScore;
+
+  /// Nombre total de signalements soumis par l'utilisateur.
   final int reportsCount;
+
+  /// Nombre de signalements confirmés par la communauté.
   final int confirmedCount;
 
+  /// Crée une instance immuable de [UserModel].
   const UserModel({
     this.id,
     required this.username,
@@ -17,8 +37,13 @@ class UserModel {
     this.confirmedCount = 0,
   });
 
+  /// Retourne `true` si l'utilisateur est considéré comme fiable
+  /// (au moins 10 signalements confirmés).
   bool get isTrusted => confirmedCount >= 10;
 
+  /// Retourne le badge de réputation correspondant au niveau de participation.
+  ///
+  /// Valeurs possibles : `'موثوق'`, `'مشارك نشط'`, `'مشارك جديد'`, `'عضو جديد'`.
   String get reputationBadge => switch (confirmedCount) {
         >= 10 => 'موثوق',
         >= 5 => 'مشارك نشط',
@@ -26,6 +51,7 @@ class UserModel {
         _ => 'عضو جديد',
       };
 
+  /// Crée un [UserModel] depuis une [Map] issue de la base de données.
   factory UserModel.fromMap(Map<String, dynamic> map) => UserModel(
         id: map['id'] as String?,
         username: map['username'] as String,
@@ -36,6 +62,7 @@ class UserModel {
         confirmedCount: (map['confirmed_count'] as num?)?.toInt() ?? 0,
       );
 
+  /// Convertit ce modèle en [Map] pour la persistance en base de données.
   Map<String, dynamic> toMap() => {
         if (id != null) 'id': id,
         'username': username,
@@ -46,6 +73,7 @@ class UserModel {
         'confirmed_count': confirmedCount,
       };
 
+  /// Retourne une copie de ce modèle avec les champs fournis mis à jour.
   UserModel copyWith({
     String? id,
     String? username,

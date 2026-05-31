@@ -1,3 +1,4 @@
+// MVC - Controller
 // lib/controllers/add_report_controller.dart
 // ─────────────────────────────────────────────────────────────────
 // Scoped controller for the multi-step "Add Report" flow.

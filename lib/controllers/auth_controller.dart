@@ -3,18 +3,41 @@ import 'package:flutter/foundation.dart';
 import '../core/models/user_model.dart';
 import '../core/services/auth_service.dart';
 
+/// Contrôleur d'authentification gérant la session utilisateur.
+///
+/// Hérite de [ChangeNotifier] pour notifier les widgets abonnés
+/// lors de tout changement d'état (connexion, déconnexion, chargement).
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
+
+  /// Utilisateur actuellement connecté, ou `null` si non authentifié.
   UserModel? _currentUser;
+
+  /// Indique si une opération asynchrone est en cours.
   bool _isLoading = false;
+
+  /// Message d'erreur de la dernière opération échouée.
   String? _errorMessage;
 
+  /// Retourne l'utilisateur connecté, ou `null`.
   UserModel? get currentUser => _currentUser;
+
+  /// Retourne `true` si un utilisateur est actuellement authentifié.
   bool get isAuthenticated => _currentUser != null;
+
+  /// Retourne `true` si une opération asynchrone est en cours.
   bool get isLoading => _isLoading;
+
+  /// Retourne le message d'erreur de la dernière opération, ou `null`.
   String? get errorMessage => _errorMessage;
+
+  /// Retourne l'identifiant unique de l'utilisateur connecté, ou `null`.
   String? get currentUserId => _currentUser?.id;
 
+  /// Tente de restaurer la session depuis les données persistées.
+  ///
+  /// Appelé au démarrage de l'application. Ne lève pas d'exception :
+  /// en cas d'échec, [currentUser] reste `null`.
   Future<void> tryAutoLogin() async {
     _isLoading = true;
     notifyListeners();
@@ -27,6 +50,10 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Inscrit un nouvel utilisateur avec [username], [email] et [password].
+  ///
+  /// Retourne `true` si l'inscription réussit et que [currentUser] est défini.
+  /// Retourne `false` et renseigne [errorMessage] en cas d'échec.
   Future<bool> register({
     required String username,
     required String email,
@@ -61,6 +88,10 @@ class AuthProvider extends ChangeNotifier {
     return false;
   }
 
+  /// Connecte un utilisateur existant avec [email] et [password].
+  ///
+  /// Retourne `true` si la connexion réussit et que [currentUser] est défini.
+  /// Retourne `false` et renseigne [errorMessage] en cas d'échec.
   Future<bool> login({
     required String email,
     required String password,
@@ -93,6 +124,10 @@ class AuthProvider extends ChangeNotifier {
     return false;
   }
 
+  /// Traduit une exception en message d'erreur lisible par l'utilisateur.
+  ///
+  /// Analyse le contenu de [e] pour identifier les erreurs connues
+  /// (timeout, identifiants invalides, email non confirmé, etc.).
   String _extractErrorMessage(Object e) {
     final msg = e.toString();
     if (msg.contains('TimeoutException') || msg.contains('انتهت المهلة')) {
@@ -113,6 +148,9 @@ class AuthProvider extends ChangeNotifier {
     return 'حدث خطأ غير متوقع. حاول مجدداً.';
   }
 
+  /// Déconnecte l'utilisateur actuel et efface la session locale.
+  ///
+  /// Après cet appel, [currentUser] est `null` et [isAuthenticated] est `false`.
   Future<void> logout() async {
     await _authService.logout();
     _currentUser = null;
