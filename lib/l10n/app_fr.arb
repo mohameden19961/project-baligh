@@ -1,0 +1,294 @@
+{
+  "@@locale": "fr",
+  "@@author": "Baligh Team",
+
+  "appName": "Baligh",
+  "@appName": { "description": "The name of the application" },
+
+  "appTagline": "Votre voix fait la différence",
+  "@appTagline": { "description": "App tagline shown on splash/onboarding" },
+
+  "language": "Langue",
+  "@language": { "description": "Language setting label" },
+
+  "arabic": "Arabe",
+  "@arabic": { "description": "Arabic language option" },
+
+  "french": "Français",
+  "@french": { "description": "French language option" },
+
+  "continueButton": "Continuer",
+  "@continueButton": { "description": "Generic continue button" },
+
+  "navAlerts": "Alertes",
+  "navAccount": "Profil",
+
+  "saveButton": "Enregistrer",
+  "@saveButton": { "description": "Generic save button" },
+
+  "cancelButton": "Annuler",
+  "@cancelButton": { "description": "Generic cancel button" },
+
+  "deleteButton": "Supprimer",
+  "@deleteButton": { "description": "Generic delete button" },
+
+  "confirmButton": "Confirmer",
+  "@confirmButton": { "description": "Generic confirm button" },
+
+  "backButton": "Retour",
+  "@backButton": { "description": "Generic back button" },
+
+  "loading": "Chargement...",
+  "@loading": { "description": "Generic loading indicator text" },
+
+  "error": "Erreur",
+  "@error": { "description": "Generic error label" },
+
+  "success": "Succès",
+  "@success": { "description": "Generic success label" },
+
+  "retry": "Réessayer",
+  "@retry": { "description": "Retry button label" },
+
+  "navHome": "Accueil",
+  "@navHome": { "description": "Bottom nav: Home tab" },
+
+  "navMap": "Carte",
+  "@navMap": { "description": "Bottom nav: Map tab" },
+
+  "navReport": "Signaler",
+  "@navReport": { "description": "Bottom nav: Report tab" },
+
+  "navMyReports": "Mes signalements",
+  "@navMyReports": { "description": "Bottom nav: My Reports tab" },
+
+  "navSettings": "Paramètres",
+  "@navSettings": { "description": "Bottom nav: Settings tab" },
+
+  "homeWelcome": "Bienvenue sur Baligh",
+  "@homeWelcome": { "description": "Home screen welcome title" },
+
+  "homeSubtitle": "Contribuez à améliorer votre ville en signalant les problèmes",
+  "@homeSubtitle": { "description": "Home screen subtitle" },
+
+  "homeRecentReports": "Signalements récents",
+  "@homeRecentReports": { "description": "Section title for recent reports on home" },
+
+  "homeNoReports": "Aucun signalement pour l'instant. Soyez le premier !",
+  "@homeNoReports": { "description": "Empty state message on home screen" },
+
+  "homeQuickReport": "Signalement rapide",
+  "@homeQuickReport": { "description": "Quick report button label on home" },
+
+  "homeViewMap": "Voir la carte",
+  "@homeViewMap": { "description": "View map button on home" },
+
+  "reportTitle": "Nouveau signalement",
+  "@reportTitle": { "description": "Title for the create report screen" },
+
+  "reportCategory": "Catégorie du problème",
+  "@reportCategory": { "description": "Report form: category field label" },
+
+  "reportSelectCategory": "Choisir une catégorie",
+  "@reportSelectCategory": { "description": "Report form: category hint text" },
+
+  "reportDescription": "Description du problème",
+  "@reportDescription": { "description": "Report form: description field label" },
+
+  "reportDescriptionHint": "Décrivez le problème en détail...",
+  "@reportDescriptionHint": { "description": "Report form: description hint text" },
+
+  "reportLocation": "Localisation",
+  "@reportLocation": { "description": "Report form: location field label" },
+
+  "reportLocationHint": "Sélectionner sur la carte",
+  "@reportLocationHint": { "description": "Report form: location hint text" },
+
+  "reportPhoto": "Photo du problème",
+  "@reportPhoto": { "description": "Report form: photo field label" },
+
+  "reportAddPhoto": "Ajouter une photo",
+  "@reportAddPhoto": { "description": "Report form: add photo button" },
+
+  "reportChangePhoto": "Changer la photo",
+  "@reportChangePhoto": { "description": "Report form: change photo button" },
+
+  "reportSubmit": "Envoyer le signalement",
+  "@reportSubmit": { "description": "Report form: submit button" },
+
+  "reportSubmitSuccess": "Votre signalement a été envoyé avec succès !",
+  "@reportSubmitSuccess": { "description": "Success message after submitting a report" },
+
+  "reportSubmitError": "Échec de l'envoi. Veuillez réessayer.",
+  "@reportSubmitError": { "description": "Error message when report submission fails" },
+
+  "reportValidationCategory": "Veuillez choisir une catégorie",
+  "@reportValidationCategory": { "description": "Validation message for category field" },
+
+  "reportValidationDescription": "Veuillez décrire le problème",
+  "@reportValidationDescription": { "description": "Validation message for description field" },
+
+  "reportValidationLocation": "Veuillez indiquer la localisation",
+  "@reportValidationLocation": { "description": "Validation message for location field" },
+
+  "categoryRoads": "Routes et trottoirs",
+  "@categoryRoads": { "description": "Report category: Roads" },
+
+  "categoryLighting": "Éclairage public",
+  "@categoryLighting": { "description": "Report category: Public Lighting" },
+
+  "categoryWaste": "Déchets et assainissement",
+  "@categoryWaste": { "description": "Report category: Waste & Sanitation" },
+
+  "categoryWater": "Eau et électricité",
+  "@categoryWater": { "description": "Report category: Water & Electricity" },
+
+  "categoryParks": "Parcs et espaces verts",
+  "@categoryParks": { "description": "Report category: Parks & Green Spaces" },
+
+  "categoryOther": "Autre",
+  "@categoryOther": { "description": "Report category: Other" },
+
+  "statusPending": "En attente",
+  "@statusPending": { "description": "Report status: Pending" },
+
+  "statusInProgress": "En cours",
+  "@statusInProgress": { "description": "Report status: In Progress" },
+
+  "statusResolved": "Résolu",
+  "@statusResolved": { "description": "Report status: Resolved" },
+
+  "statusRejected": "Rejeté",
+  "@statusRejected": { "description": "Report status: Rejected" },
+
+  "myReportsTitle": "Mes signalements",
+  "@myReportsTitle": { "description": "My Reports screen title" },
+
+  "myReportsEmpty": "Vous n'avez encore créé aucun signalement.",
+  "@myReportsEmpty": { "description": "Empty state for my reports screen" },
+
+  "myReportsFilter": "Filtrer",
+  "@myReportsFilter": { "description": "Filter button label on my reports" },
+
+  "myReportsAll": "Tous",
+  "@myReportsAll": { "description": "Filter: All reports" },
+
+  "reportDetailTitle": "Détails du signalement",
+  "@reportDetailTitle": { "description": "Report detail screen title" },
+
+  "reportDetailDate": "Date du signalement",
+  "@reportDetailDate": { "description": "Report detail: date label" },
+
+  "reportDetailStatus": "Statut",
+  "@reportDetailStatus": { "description": "Report detail: status label" },
+
+  "reportDetailCategory": "Catégorie",
+  "@reportDetailCategory": { "description": "Report detail: category label" },
+
+  "reportDetailDescription": "Description",
+  "@reportDetailDescription": { "description": "Report detail: description label" },
+
+  "reportDetailLocation": "Localisation",
+  "@reportDetailLocation": { "description": "Report detail: location label" },
+
+  "mapTitle": "Carte des signalements",
+  "@mapTitle": { "description": "Map screen title" },
+
+  "mapFilterAll": "Tous",
+  "@mapFilterAll": { "description": "Map filter: All reports" },
+
+  "mapLoading": "Chargement de la carte...",
+  "@mapLoading": { "description": "Map loading message" },
+
+  "mapNoLocation": "Impossible de déterminer votre position",
+  "@mapNoLocation": { "description": "Map: error getting user location" },
+
+  "mapSelectLocation": "Appuyez pour choisir l'emplacement",
+  "@mapSelectLocation": { "description": "Map: instruction to select a location" },
+
+  "settingsTitle": "Paramètres",
+  "@settingsTitle": { "description": "Settings screen title" },
+
+  "settingsLanguage": "Langue",
+  "@settingsLanguage": { "description": "Settings: language section label" },
+
+  "settingsNotifications": "Notifications",
+  "@settingsNotifications": { "description": "Settings: notifications toggle label" },
+
+  "settingsNotificationsSubtitle": "Recevoir des notifications lors de la mise à jour de vos signalements",
+  "@settingsNotificationsSubtitle": { "description": "Settings: notifications subtitle" },
+
+  "settingsAbout": "À propos",
+  "@settingsAbout": { "description": "Settings: about section label" },
+
+  "settingsVersion": "Version",
+  "@settingsVersion": { "description": "Settings: app version label" },
+
+  "settingsPrivacy": "Politique de confidentialité",
+  "@settingsPrivacy": { "description": "Settings: privacy policy label" },
+
+  "settingsContact": "Nous contacter",
+  "@settingsContact": { "description": "Settings: contact us label" },
+
+  "settingsTheme": "Thème",
+  "@settingsTheme": { "description": "Settings: theme label" },
+
+  "settingsThemeLight": "Clair",
+  "@settingsThemeLight": { "description": "Settings: light theme" },
+
+  "settingsThemeDark": "Sombre",
+  "@settingsThemeDark": { "description": "Settings: dark theme" },
+
+  "settingsThemeSystem": "Automatique",
+  "@settingsThemeSystem": { "description": "Settings: system theme" },
+
+  "permissionLocationTitle": "Autorisation de localisation",
+  "@permissionLocationTitle": { "description": "Location permission dialog title" },
+
+  "permissionLocationMessage": "L'application nécessite l'accès à votre position pour localiser le problème avec précision.",
+  "@permissionLocationMessage": { "description": "Location permission dialog message" },
+
+  "permissionLocationGrant": "Autoriser",
+  "@permissionLocationGrant": { "description": "Grant location permission button" },
+
+  "permissionLocationDeny": "Refuser",
+  "@permissionLocationDeny": { "description": "Deny location permission button" },
+
+  "networkError": "Impossible de se connecter au réseau. Vérifiez votre connexion Internet.",
+  "@networkError": { "description": "Generic network error message" },
+
+  "unknownError": "Une erreur inattendue s'est produite. Veuillez réessayer.",
+  "@unknownError": { "description": "Generic unknown error message" },
+
+  "reportCount": "{count, plural, =0{Aucun signalement} =1{1 signalement} other{{count} signalements}}",
+  "@reportCount": {
+    "description": "Pluralized report count",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "timeAgoMinutes": "{count, plural, =1{il y a 1 min} other{il y a {count} min}}",
+  "@timeAgoMinutes": {
+    "description": "Elapsed time in minutes (e.g. 'il y a 5 min')",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "timeAgoHours": "{count, plural, =1{il y a 1 h} other{il y a {count} h}}",
+  "@timeAgoHours": {
+    "description": "Elapsed time in hours (e.g. 'il y a 3 h')",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "timeAgoDays": "{count, plural, =1{il y a 1 j} other{il y a {count} j}}",
+  "@timeAgoDays": {
+    "description": "Elapsed time in days (e.g. 'il y a 4 j')",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  }
+}

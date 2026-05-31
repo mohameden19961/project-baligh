@@ -1,0 +1,47 @@
+name: baligh_app
+description: "Baligh (بلّغ) — Civic reporting application for Mauritania."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  google_fonts: ^8.1.0 
+  # State management
+  provider: ^6.1.2
+
+  # Persistence
+  shared_preferences: ^2.3.2
+
+  # Map (OSM stack — replaces google_maps_flutter)
+  flutter_map: ^8.3.0
+  latlong2: ^0.9.1
+
+  # Native device geolocation (used by MapProvider.goToMyLocation)
+  geolocator: ^13.0.1
+
+  # ── AUDIT ADDITIONS (Step 1) ──────────────────────────────────
+  # Tile caching for flutter_map
+  flutter_map_tile_caching: ^10.0.0
+  # ─────────────────────────────────────────────────────────────
+
+  # Localisation codegen
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  generate: true        # enables flutter gen-l10n → AppLocalizations
+  uses-material-design: true
+
+intl:
+  arb-dir: lib/l10n
+  template-arb-file: app_ar.arb
