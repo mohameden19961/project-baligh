@@ -80,6 +80,8 @@ const LANG = {
     detailPhoto: 'الصورة',
     toggleAdmin: 'تعيين كمسؤول',
     removeAdmin: 'إزالة الصلاحية',
+    noUnread: 'لا توجد إشعارات غير مقروءة أو لا تملك الصلاحية',
+    allRead: 'تم تحديد الكل كمقروء',
     userDeleted: 'تم حذف المستخدم',
     userDeleteFailed: 'فشل حذف المستخدم',
     confirmDeleteUser: 'هل أنت متأكد من حذف هذا المستخدم؟',
@@ -158,6 +160,8 @@ const LANG = {
     detailPhoto: 'Photo',
     toggleAdmin: 'Promouvoir admin',
     removeAdmin: 'Rétrograder',
+    noUnread: 'Aucune notification non lue ou action non autorisée',
+    allRead: 'Tout marquer comme lu',
     userDeleted: 'Utilisateur supprimé',
     userDeleteFailed: 'Échec de suppression',
     confirmDeleteUser: 'Confirmer la suppression ?',
@@ -260,7 +264,7 @@ function switchPage(page, el) {
   el.classList.add('active');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(`page-${page}`).classList.add('active');
-  if (page === 'reports') setTimeout(() => renderCategoryChart(), 100);
+  if (page === 'reports') setTimeout(() => renderCategoryChart(_allReports), 100);
 }
 
 function initCategoryFilter() {
@@ -593,10 +597,10 @@ async function markAllNotificationsRead() {
     const { data, error } = await sb.from('notifications').update({ is_read: true }).eq('is_read', false).select();
     if (error) throw error;
     if (!data || data.length === 0) {
-      showToast('لا توجد إشعارات غير مقروءة أو لا تملك الصلاحية', 'error'); 
+      showToast(t('noUnread'), 'error'); 
       return; 
     }
-    showToast('تم التحديث بنجاح', 'success');
+    showToast(t('allRead'), 'success');
     loadNotifications();
   } catch(e) {
     showToast(e.message, 'error');

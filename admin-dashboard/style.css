@@ -235,6 +235,7 @@ tr:nth-child(even) td { background: #f8fafc; }
 .badge-pending { background: #FFF8E1; color: #B8860B; }
 .badge-validated { background: #E6F7EC; color: #1B6B2F; }
 .badge-false { background: #FDE8E8; color: #B91C1C; }
+.badge-falseReport { background: #FDE8E8; color: #B91C1C; }
 
 /* Thumbnail */
 .thumb {
@@ -405,8 +406,10 @@ tr:nth-child(even) td { background: #f8fafc; }
   transition: right .2s;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
-.toggle.on::after { right: 22px; }
-.toggle::after { right: 2px; }
+.toggle.on::after { right: 22px; left: auto; }
+.toggle::after { right: 2px; left: auto; }
+[dir="ltr"] .toggle.on::after { left: 22px; right: auto; }
+[dir="ltr"] .toggle::after { left: 2px; right: auto; }
 
 /* Chart */
 .chart-container {
