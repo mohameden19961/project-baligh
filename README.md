@@ -263,15 +263,17 @@ Locale is persisted via `SharedPreferences` and applied at the `MaterialApp` lev
 
 ## Admin Dashboard
 
-A standalone web dashboard is available at `admin-dashboard/`. It connects directly to your Supabase project:
+A standalone web dashboard is deployed at:
 
+🔗 **[admin-dashboard-pearl-delta-63.vercel.app](https://admin-dashboard-pearl-delta-63.vercel.app)**
+
+It connects directly to your Supabase project. Features: login, report management (filter, status change, delete), user management (toggle admin, delete), notification viewer, reports-by-category chart (Chart.js). Arabic/French UI with full i18n.
+
+To redeploy after changes:
 ```bash
 cd admin-dashboard
-# Update supabaseUrl and supabaseAnonKey in index.html
-# Deploy to Vercel, Netlify, or any static host
+vercel --prod
 ```
-
-Features: login, report management (filter, status change, delete), user management, notification viewer, reports-by-category chart.
 
 ---
 
