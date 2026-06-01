@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../controllers/auth_controller.dart';
+import '../../widgets/google_button.dart';
 import 'register_view.dart';
 import '../main_layout.dart';
 
@@ -38,6 +39,25 @@ class _LoginViewState extends State<LoginView> {
 
     if (!mounted) return;
 
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainLayout()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(auth.errorMessage ?? 'فشل تسجيل الدخول'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    final auth = context.read<AuthProvider>();
+    final success = await auth.signInWithGoogle();
+    if (!mounted) return;
     if (success) {
       Navigator.pushReplacement(
         context,
@@ -138,7 +158,13 @@ class _LoginViewState extends State<LoginView> {
                           : Text(l10n.login),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: GoogleSignInButton(
+                      onPressed: auth.isLoading ? null : _signInWithGoogle,
+                      isLoading: auth.isLoading,
+                    ),
+                  ),
                   TextButton(
                     onPressed: () => Navigator.push(
                       context,
@@ -155,3 +181,5 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
+
+

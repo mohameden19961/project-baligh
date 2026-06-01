@@ -20,6 +20,9 @@
   "english": "Anglais",
   "@english": { "description": "English language option" },
 
+  "continueButton": "Continuer",
+  "@continueButton": { "description": "Generic continue button" },
+
   "navAlerts": "Alertes",
   "navAccount": "Profil",
 

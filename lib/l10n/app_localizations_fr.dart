@@ -27,7 +27,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get english => 'Anglais';
 
   @override
-  String get continueButton => 'متابعة';
+  String get continueButton => 'Continuer';
 
   @override
   String get saveButton => 'Enregistrer';
