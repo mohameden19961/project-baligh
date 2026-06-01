@@ -39,6 +39,9 @@ dependencies:
   # Launch URL (tel: for emergency calls)
   url_launcher: ^6.3.1
 
+  # Google Sign-In
+  google_sign_in: ^6.2.1
+
   # Localisation codegen
   intl: ^0.20.2
 

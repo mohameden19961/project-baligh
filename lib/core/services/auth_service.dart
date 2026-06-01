@@ -1,5 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:gotrue/gotrue.dart';
+
 import '../../utils/supabase_config.dart';
 import '../database/user_dao.dart';
 import '../models/user_model.dart';
@@ -61,6 +65,67 @@ class AuthService {
       return profile;
     } on TimeoutException {
       throw Exception('انتهت مهلة الاتصال. تحقق من اتصالك بالإنترنت.');
+    }
+  }
+
+  Future<UserModel?> signInWithGoogle() async {
+    try {
+      const googleClientId =
+          '1078869680060-as2tp55bufeadgd2tqiraj7lf0g74p4o.apps.googleusercontent.com';
+      final googleUser = await GoogleSignIn(
+        clientId: googleClientId,
+        serverClientId: googleClientId,
+      ).signIn();
+      if (googleUser == null) {
+        debugPrint('[AuthService] Google sign-in cancelled by user');
+        return null;
+      }
+
+      final googleAuth = await googleUser.authentication;
+      if (googleAuth.idToken == null) {
+        debugPrint('[AuthService] Google idToken is null after authentication');
+        throw Exception('فشل الحصول على رمز التحقق من Google');
+      }
+
+      debugPrint('[AuthService] Google idToken obtained, calling Supabase...');
+      final response = await SupabaseConfig.client.auth
+          .signInWithIdToken(
+            provider: const OAuthProvider('google'),
+            idToken: googleAuth.idToken!,
+          )
+          .timeout(const Duration(seconds: 15));
+
+      final user = response.user;
+      if (user == null) {
+        debugPrint('[AuthService] Supabase signInWithIdToken returned null user');
+        throw Exception('فشل تسجيل الدخول عبر Supabase');
+      }
+
+      debugPrint('[AuthService] Supabase user: ${user.id}, fetching profile...');
+      var profile =
+          await _userDao.getById(user.id).timeout(const Duration(seconds: 10));
+
+      if (profile == null) {
+        debugPrint('[AuthService] No profile found, creating new user...');
+        final email = user.email ?? '';
+        final username = email.split('@').first;
+        final newUser = UserModel(
+          id: user.id,
+          username: username,
+          email: email,
+          createdAt: DateTime.now(),
+        );
+        await _userDao.insert(newUser).timeout(const Duration(seconds: 10));
+        profile = newUser;
+      }
+
+      return profile;
+    } on TimeoutException {
+      debugPrint('[AuthService] Timeout in signInWithGoogle');
+      throw Exception('انتهت مهلة الاتصال. تحقق من اتصالك بالإنترنت.');
+    } catch (e) {
+      debugPrint('[AuthService] signInWithGoogle error: $e');
+      rethrow;
     }
   }
 

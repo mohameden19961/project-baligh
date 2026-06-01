@@ -145,7 +145,13 @@ lib/
    );
    ```
 
-4. **Run database migration**
+4. **Configure Google Sign-In** (Android)
+   - In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), create an **Android OAuth 2.0 Client ID**
+   - Package name: `com.baligh.baligh_app`
+   - SHA-1 fingerprint: get it with `keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android | grep SHA1`
+   - In [Supabase Dashboard](https://supabase.com/dashboard) → Authentication → Providers → Google, enable it and paste the **Web Client ID** and **Client Secret**
+
+5. **Run database migration**
    Copy the contents of `supabase_migration.sql` and execute it in your Supabase SQL Editor. This creates all tables, RLS policies, storage buckets, and the `update_vote_counts` RPC function.
 
 5. **Run the app**
@@ -159,6 +165,12 @@ lib/
 flutter build apk --release   # Android
 flutter build ios --release   # iOS (macOS only)
 ```
+
+### 📥 Download APK
+
+**[⬇️ Baligh v1.0.0 — APK](https://github.com/mohameden19961/project-baligh/releases/download/v1.0.0/Baligh-v1.0.0.apk)**
+
+> Version de test. Nécessite Android 7+ (API 24+) et Google Play Services.
 
 ---
 

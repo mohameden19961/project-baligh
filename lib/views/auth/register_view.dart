@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../controllers/auth_controller.dart';
+import '../../widgets/google_button.dart';
 import '../main_layout.dart';
 
 class RegisterView extends StatefulWidget {
@@ -53,6 +54,26 @@ class _RegisterViewState extends State<RegisterView> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(auth.errorMessage ?? 'فشل إنشاء الحساب'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    final auth = context.read<AuthProvider>();
+    final success = await auth.signInWithGoogle();
+    if (!mounted) return;
+    if (success) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MainLayout()),
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(auth.errorMessage ?? 'فشل تسجيل الدخول'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -162,7 +183,13 @@ class _RegisterViewState extends State<RegisterView> {
                           : Text(l10n.register),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: GoogleSignInButton(
+                      onPressed: auth.isLoading ? null : _signInWithGoogle,
+                      isLoading: auth.isLoading,
+                    ),
+                  ),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(l10n.login),
