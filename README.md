@@ -281,9 +281,9 @@ vercel --prod
 
 | Member | Role |
 |--------|------|
-| [Ahmed Abdy](https://github.com/ahmedou24157) | Developer |
-| [Abdsalam](https://github.com/Abdsalam-hub) | Developer |
-| [Mohameden](https://github.com/mohameden19961) | Developer |
+| [Ahmedou bedou](https://github.com/ahmedou24157) | Developer |
+| [Abdsalam abdelvetah](https://github.com/Abdsalam-hub) | Developer |
+| [Abdy Mohameden](https://github.com/mohameden19961) | Developer |
 | [Hasseen Salem](https://github.com/hasseen-salem) | Developer |
 
 ---
