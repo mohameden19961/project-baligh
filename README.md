@@ -164,15 +164,86 @@ flutter build ios --release   # iOS (macOS only)
 
 ## Database Schema
 
-| Table | Purpose |
-|-------|---------|
-| `users` | Extended user profiles (username, avatar, reputation) |
-| `reports` | Citizen reports (category, description, location, photo, confirm/deny counts, status) |
-| `votes` | Credibility votes (user_id, report_id, vote_type) |
-| `notifications` | Per-user alerts (type, message, is_read) |
-| `messages` | Per-report chat messages (sender, receiver, content, is_read) |
+```mermaid
+erDiagram
+    users {
+        uuid id PK
+        varchar username UK
+        varchar email UK
+        timestamptz created_at
+        int reputation_score
+        int reports_count
+        int confirmed_count
+        boolean is_admin
+    }
 
-RLS policies enforce: users can only modify their own data; admins have full access; vote count updates use a `SECURITY DEFINER` RPC to bypass row-level restrictions on the reports table.
+    reports {
+        bigint id PK
+        uuid user_id FK
+        text category
+        text description
+        float latitude
+        float longitude
+        text address
+        text photo_url
+        timestamptz created_at
+        text status
+        int confirm_count
+        int deny_count
+    }
+
+    votes {
+        bigint id PK
+        bigint report_id FK
+        uuid user_id FK
+        text vote_type
+        timestamptz created_at
+    }
+
+    notifications {
+        bigint id PK
+        uuid user_id FK
+        bigint report_id FK
+        text message
+        int is_read
+        timestamptz created_at
+    }
+
+    messages {
+        bigint id PK
+        bigint report_id FK
+        uuid sender_id FK
+        uuid receiver_id FK
+        text content
+        boolean is_read
+        timestamptz created_at
+    }
+
+    users ||--o{ reports : "creates"
+    users ||--o{ votes : "casts"
+    users ||--o{ notifications : "receives"
+    users ||--o{ messages : "sends"
+    users ||--o{ messages : "receives"
+    reports ||--o{ votes : "has"
+    reports ||--o{ notifications : "triggers"
+    reports ||--o{ messages : "contains"
+```
+
+**Relations clés :**
+- `users.id` → `reports.user_id` (un utilisateur peut créer plusieurs signalements)
+- `users.id` → `votes.user_id` (un utilisateur peut voter plusieurs fois)
+- `reports.id` → `votes.report_id` (un signalement reçoit plusieurs votes)
+- `users.id` → `messages.sender_id` / `messages.receiver_id` (messagerie entre utilisateurs)
+- `reports.id` → `messages.report_id` (messages liés à un signalement)
+
+**RLS (Row Level Security) :**
+- Chaque utilisateur ne voit/modifie que ses propres données
+- Les administrateurs (`is_admin = true`) ont un accès global
+- Les mises à jour des compteurs de votes passent par une fonction `SECURITY DEFINER` RPC qui contourne RLS
+- Les notifications sont insérées via une fonction `create_notification()` avec `SECURITY DEFINER`
+
+**Index clé :**
+- `votes` : contrainte `UNIQUE(report_id, user_id)` — un seul vote par utilisateur par signalement
 
 ---
 
