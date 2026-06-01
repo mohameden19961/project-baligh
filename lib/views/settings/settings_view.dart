@@ -124,7 +124,6 @@ class SettingsView extends StatelessWidget {
 
   void _showAboutDialog(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
-    final isAr = l10n.localeName == 'العربية';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -140,27 +139,15 @@ class SettingsView extends StatelessWidget {
               child: const Text('🇲🇷', style: TextStyle(fontSize: 22)),
             ),
             const SizedBox(width: 12),
-            Text('بلّغ (Baligh)'),
+            Text(l10n.aboutTitle),
           ],
         ),
         content: Text(
-          isAr
-              ? 'الإصدار: 1.0.0\n\n'
-                  'تطبيق مجتمعي للإبلاغ عن المشكلات في المدن الموريتانية.\n'
-                  'يساعد المواطنين على التواصل مع البلديات لحل المشكلات بسرعة.\n\n'
-                  'تم التطوير في المعهد الوطني للإحصاء والاقتصاد التطبيقي (SupNum)\n'
-                  'نواكشوط، موريتانيا\n'
-                  'S4 DWM 2024\n\n'
-                  'المطور: أحمد ولد بده\n'
-                  'GitHub: github.com/abdylbdt'
-              : 'Version : 1.0.0\n\n'
-                  'Application communautaire pour signaler les problèmes dans les villes mauritaniennes.\n'
-                  'Aide les citoyens à communiquer avec les municipalités pour résoudre les problèmes rapidement.\n\n'
-                  'Développé à SupNum (Institut National de Statistique et d\'Économie Appliquée)\n'
-                  'Nouakchott, Mauritanie\n'
-                  'S4 DWM 2024\n\n'
-                  'Développeur : Ahmed o/ Badah\n'
-                  'GitHub : github.com/abdylbdt',
+          '${l10n.settingsVersion} 1.0.0\n\n'
+          '${l10n.aboutDescription}\n\n'
+          '${l10n.aboutUniversity}\n\n'
+          '${l10n.aboutDeveloper}\n'
+          '${l10n.aboutGithub}',
           style: theme.textTheme.bodyMedium?.copyWith(height: 1.6),
         ),
         actions: [
@@ -175,7 +162,6 @@ class SettingsView extends StatelessWidget {
 
   void _showPrivacySheet(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
-    final isAr = l10n.localeName == 'العربية';
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -204,17 +190,12 @@ class SettingsView extends StatelessWidget {
                         fontWeight: FontWeight.w700)),
                 const SizedBox(height: 16),
                 Text(
-                  isAr
-                      ? 'تطبيق بلّغ يحترم خصوصيتك. نحن نجمع فقط البيانات الضرورية لتشغيل التطبيق:\n\n'
-                          '• الموقع الجغرافي: يستخدم لتحديد موقع البلاغ على الخريطة\n'
-                          '• الصور: يتم تخزينها بشكل آمن في السحابة\n'
-                          '• المعلومات الشخصية: تقتصر على اسم المستخدم والبريد الإلكتروني\n\n'
-                          'لا تتم مشاركة بياناتك مع أطراف ثالثة. يمكنك طلب حذف بياناتك في أي وقت بالتواصل معنا.'
-                      : 'Baligh respecte votre vie privée. Nous collectons uniquement les données nécessaires au fonctionnement de l\'application :\n\n'
-                          '• Localisation : utilisée pour situer le signalement sur la carte\n'
-                          '• Photos : stockées de manière sécurisée dans le cloud\n'
-                          '• Informations personnelles : limitées au nom d\'utilisateur et à l\'email\n\n'
-                          'Vos données ne sont pas partagées avec des tiers. Vous pouvez demander la suppression de vos données à tout moment en nous contactant.',
+                  '${l10n.privacyIntro}\n\n'
+                  '• ${l10n.privacyLocation}\n'
+                  '• ${l10n.privacyPhoto}\n'
+                  '• ${l10n.privacyPersonal}\n\n'
+                  '${l10n.privacyDataSharing}\n'
+                  '${l10n.privacyDelete}',
                   style: theme.textTheme.bodyMedium?.copyWith(height: 1.6),
                 ),
               const SizedBox(height: 20),

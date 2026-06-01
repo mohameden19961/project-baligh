@@ -452,5 +452,38 @@
   "@navChat": { "description": "Bottom nav: Chat tab" },
 
   "reportDetailVoteOwnReport": "Vous ne pouvez pas voter sur votre propre signalement",
-  "@reportDetailVoteOwnReport": { "description": "Message when user tries to vote on own report" }
+  "@reportDetailVoteOwnReport": { "description": "Message when user tries to vote on own report" },
+
+  "aboutTitle": "À propos",
+  "@aboutTitle": { "description": "About dialog: title" },
+
+  "aboutDescription": "Application communautaire pour signaler les problèmes dans les villes mauritaniennes.\nAide les citoyens à communiquer avec les municipalités pour résoudre les problèmes rapidement.",
+  "@aboutDescription": { "description": "About dialog: app description" },
+
+  "aboutDeveloper": "Équipe SupNum — L2 DWM S4",
+  "@aboutDeveloper": { "description": "About dialog: developer / team name" },
+
+  "aboutGithub": "github.com/mohameden19961/project-baligh",
+  "@aboutGithub": { "description": "About dialog: GitHub URL" },
+
+  "aboutUniversity": "Institut Supérieur du Numérique (SupNum), Nouakchott, Mauritanie",
+  "@aboutUniversity": { "description": "About dialog: university name + location" },
+
+  "privacyIntro": "Baligh respecte votre vie privée. Nous collectons uniquement les données nécessaires au fonctionnement de l'application :",
+  "@privacyIntro": { "description": "Privacy sheet: introductory text" },
+
+  "privacyLocation": "Localisation : utilisée pour situer le signalement sur la carte",
+  "@privacyLocation": { "description": "Privacy sheet: location bullet" },
+
+  "privacyPhoto": "Photos : stockées de manière sécurisée dans le cloud",
+  "@privacyPhoto": { "description": "Privacy sheet: photo bullet" },
+
+  "privacyPersonal": "Informations personnelles : limitées au nom d'utilisateur et à l'email",
+  "@privacyPersonal": { "description": "Privacy sheet: personal info bullet" },
+
+  "privacyDataSharing": "Vos données ne sont pas partagées avec des tiers",
+  "@privacyDataSharing": { "description": "Privacy sheet: data sharing statement" },
+
+  "privacyDelete": "Vous pouvez demander la suppression de vos données à tout moment en nous contactant",
+  "@privacyDelete": { "description": "Privacy sheet: deletion request" }
 }

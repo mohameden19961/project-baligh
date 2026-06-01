@@ -455,5 +455,38 @@
   "@navChat": { "description": "Bottom nav: Chat tab" },
 
   "reportDetailVoteOwnReport": "You cannot vote on your own report",
-  "@reportDetailVoteOwnReport": { "description": "Message when user tries to vote on own report" }
+  "@reportDetailVoteOwnReport": { "description": "Message when user tries to vote on own report" },
+
+  "aboutTitle": "About",
+  "@aboutTitle": { "description": "About dialog: title" },
+
+  "aboutDescription": "A community app for reporting issues in Mauritanian cities.\nHelps citizens communicate with municipalities to solve problems quickly.",
+  "@aboutDescription": { "description": "About dialog: app description" },
+
+  "aboutDeveloper": "SupNum Team — L2 DWM S4",
+  "@aboutDeveloper": { "description": "About dialog: developer / team name" },
+
+  "aboutGithub": "github.com/mohameden19961/project-baligh",
+  "@aboutGithub": { "description": "About dialog: GitHub URL" },
+
+  "aboutUniversity": "Higher Institute of Digital (SupNum), Nouakchott, Mauritania",
+  "@aboutUniversity": { "description": "About dialog: university name + location" },
+
+  "privacyIntro": "Baligh respects your privacy. We only collect data necessary to run the application:",
+  "@privacyIntro": { "description": "Privacy sheet: introductory text" },
+
+  "privacyLocation": "Location: used to locate the report on the map",
+  "@privacyLocation": { "description": "Privacy sheet: location bullet" },
+
+  "privacyPhoto": "Photos: stored securely in the cloud",
+  "@privacyPhoto": { "description": "Privacy sheet: photo bullet" },
+
+  "privacyPersonal": "Personal information: limited to username and email",
+  "@privacyPersonal": { "description": "Privacy sheet: personal info bullet" },
+
+  "privacyDataSharing": "Your data is not shared with third parties",
+  "@privacyDataSharing": { "description": "Privacy sheet: data sharing statement" },
+
+  "privacyDelete": "You can request deletion of your data at any time by contacting us",
+  "@privacyDelete": { "description": "Privacy sheet: deletion request" }
 }

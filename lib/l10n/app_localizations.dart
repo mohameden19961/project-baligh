@@ -975,6 +975,72 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'لا يمكنك التصويت على بلاغك'**
   String get reportDetailVoteOwnReport;
+
+  /// About dialog: title
+  ///
+  /// In ar, this message translates to:
+  /// **'عن التطبيق'**
+  String get aboutTitle;
+
+  /// About dialog: app description
+  ///
+  /// In ar, this message translates to:
+  /// **'تطبيق مجتمعي للإبلاغ عن المشكلات في المدن الموريتانية.\nيساعد المواطنين على التواصل مع البلديات لحل المشكلات بسرعة.'**
+  String get aboutDescription;
+
+  /// About dialog: developer / team name
+  ///
+  /// In ar, this message translates to:
+  /// **'فريق SupNum — L2 DWM S4'**
+  String get aboutDeveloper;
+
+  /// About dialog: GitHub URL
+  ///
+  /// In ar, this message translates to:
+  /// **'github.com/mohameden19961/project-baligh'**
+  String get aboutGithub;
+
+  /// About dialog: university name + location
+  ///
+  /// In ar, this message translates to:
+  /// **'المعهد العالي للرقمنة (SupNum)، نواكشوط، موريتانيا'**
+  String get aboutUniversity;
+
+  /// Privacy sheet: introductory text
+  ///
+  /// In ar, this message translates to:
+  /// **'تطبيق بلّغ يحترم خصوصيتك. نحن نجمع فقط البيانات الضرورية لتشغيل التطبيق:'**
+  String get privacyIntro;
+
+  /// Privacy sheet: location bullet
+  ///
+  /// In ar, this message translates to:
+  /// **'الموقع الجغرافي: يستخدم لتحديد موقع البلاغ على الخريطة'**
+  String get privacyLocation;
+
+  /// Privacy sheet: photo bullet
+  ///
+  /// In ar, this message translates to:
+  /// **'الصور: يتم تخزينها بشكل آمن في السحابة'**
+  String get privacyPhoto;
+
+  /// Privacy sheet: personal info bullet
+  ///
+  /// In ar, this message translates to:
+  /// **'المعلومات الشخصية: تقتصر على اسم المستخدم والبريد الإلكتروني'**
+  String get privacyPersonal;
+
+  /// Privacy sheet: data sharing statement
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تتم مشاركة بياناتك مع أطراف ثالثة'**
+  String get privacyDataSharing;
+
+  /// Privacy sheet: deletion request
+  ///
+  /// In ar, this message translates to:
+  /// **'يمكنك طلب حذف بياناتك في أي وقت بالتواصل معنا'**
+  String get privacyDelete;
 }
 
 class _AppLocalizationsDelegate

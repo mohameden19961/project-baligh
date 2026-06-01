@@ -487,4 +487,45 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get reportDetailVoteOwnReport =>
       'Vous ne pouvez pas voter sur votre propre signalement';
+
+  @override
+  String get aboutTitle => 'À propos';
+
+  @override
+  String get aboutDescription =>
+      'Application communautaire pour signaler les problèmes dans les villes mauritaniennes.\nAide les citoyens à communiquer avec les municipalités pour résoudre les problèmes rapidement.';
+
+  @override
+  String get aboutDeveloper => 'Équipe SupNum — L2 DWM S4';
+
+  @override
+  String get aboutGithub => 'github.com/mohameden19961/project-baligh';
+
+  @override
+  String get aboutUniversity =>
+      'Institut Supérieur du Numérique (SupNum), Nouakchott, Mauritanie';
+
+  @override
+  String get privacyIntro =>
+      'Baligh respecte votre vie privée. Nous collectons uniquement les données nécessaires au fonctionnement de l\'application :';
+
+  @override
+  String get privacyLocation =>
+      'Localisation : utilisée pour situer le signalement sur la carte';
+
+  @override
+  String get privacyPhoto =>
+      'Photos : stockées de manière sécurisée dans le cloud';
+
+  @override
+  String get privacyPersonal =>
+      'Informations personnelles : limitées au nom d\'utilisateur et à l\'email';
+
+  @override
+  String get privacyDataSharing =>
+      'Vos données ne sont pas partagées avec des tiers';
+
+  @override
+  String get privacyDelete =>
+      'Vous pouvez demander la suppression de vos données à tout moment en nous contactant';
 }

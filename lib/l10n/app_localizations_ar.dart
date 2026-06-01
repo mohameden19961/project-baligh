@@ -493,4 +493,42 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reportDetailVoteOwnReport => 'لا يمكنك التصويت على بلاغك';
+
+  @override
+  String get aboutTitle => 'عن التطبيق';
+
+  @override
+  String get aboutDescription =>
+      'تطبيق مجتمعي للإبلاغ عن المشكلات في المدن الموريتانية.\nيساعد المواطنين على التواصل مع البلديات لحل المشكلات بسرعة.';
+
+  @override
+  String get aboutDeveloper => 'فريق SupNum — L2 DWM S4';
+
+  @override
+  String get aboutGithub => 'github.com/mohameden19961/project-baligh';
+
+  @override
+  String get aboutUniversity =>
+      'المعهد العالي للرقمنة (SupNum)، نواكشوط، موريتانيا';
+
+  @override
+  String get privacyIntro =>
+      'تطبيق بلّغ يحترم خصوصيتك. نحن نجمع فقط البيانات الضرورية لتشغيل التطبيق:';
+
+  @override
+  String get privacyLocation =>
+      'الموقع الجغرافي: يستخدم لتحديد موقع البلاغ على الخريطة';
+
+  @override
+  String get privacyPhoto => 'الصور: يتم تخزينها بشكل آمن في السحابة';
+
+  @override
+  String get privacyPersonal =>
+      'المعلومات الشخصية: تقتصر على اسم المستخدم والبريد الإلكتروني';
+
+  @override
+  String get privacyDataSharing => 'لا تتم مشاركة بياناتك مع أطراف ثالثة';
+
+  @override
+  String get privacyDelete => 'يمكنك طلب حذف بياناتك في أي وقت بالتواصل معنا';
 }

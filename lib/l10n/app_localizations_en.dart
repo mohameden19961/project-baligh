@@ -483,4 +483,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportDetailVoteOwnReport => 'You cannot vote on your own report';
+
+  @override
+  String get aboutTitle => 'About';
+
+  @override
+  String get aboutDescription =>
+      'A community app for reporting issues in Mauritanian cities.\nHelps citizens communicate with municipalities to solve problems quickly.';
+
+  @override
+  String get aboutDeveloper => 'SupNum Team — L2 DWM S4';
+
+  @override
+  String get aboutGithub => 'github.com/mohameden19961/project-baligh';
+
+  @override
+  String get aboutUniversity =>
+      'Higher Institute of Digital (SupNum), Nouakchott, Mauritania';
+
+  @override
+  String get privacyIntro =>
+      'Baligh respects your privacy. We only collect data necessary to run the application:';
+
+  @override
+  String get privacyLocation =>
+      'Location: used to locate the report on the map';
+
+  @override
+  String get privacyPhoto => 'Photos: stored securely in the cloud';
+
+  @override
+  String get privacyPersonal =>
+      'Personal information: limited to username and email';
+
+  @override
+  String get privacyDataSharing => 'Your data is not shared with third parties';
+
+  @override
+  String get privacyDelete =>
+      'You can request deletion of your data at any time by contacting us';
 }
