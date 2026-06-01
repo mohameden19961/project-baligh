@@ -308,8 +308,6 @@ class _BalighBottomNav extends StatelessWidget {
               label: l10n.navAlerts,
               onTap: onTap,
               theme: theme,
-              // Badge — swap `false` for a real unread-count check later.
-              showBadge: false,
             ),
             _NavItem(
               index: 3,

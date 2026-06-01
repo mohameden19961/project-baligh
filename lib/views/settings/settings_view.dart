@@ -57,27 +57,27 @@ class SettingsView extends StatelessWidget {
                 icon: Icons.language_rounded,
                 title: l10n.settingsLanguage,
                 trailing: Consumer<LocaleProvider>(
-                  builder: (_, lp, __) => SegmentedButton<Locale>(
-                    segments: [
-                      ButtonSegment(
-                        value: const Locale('ar'),
-                        label: Text(l10n.arabic,
-                            style: const TextStyle(fontSize: 11)),
+                  builder: (_, lp, __) => DropdownButton<Locale>(
+                    value: lp.locale,
+                    onChanged: (locale) {
+                      if (locale != null) lp.setLocale(locale);
+                    },
+                    underline: const SizedBox(),
+                    items: [
+                      const DropdownMenuItem(
+                        value: Locale('ar'),
+                        child: Text('🇲🇷 العربية'),
                       ),
-                      ButtonSegment(
-                        value: const Locale('fr'),
-                        label: Text(l10n.french,
-                            style: const TextStyle(fontSize: 11)),
+                      const DropdownMenuItem(
+                        value: Locale('fr'),
+                        child: Text('🇫🇷 Français'),
+                      ),
+                      const DropdownMenuItem(
+                        value: Locale('en'),
+                        child: Text('🇬🇧 English'),
                       ),
                     ],
-                    selected: {lp.locale},
-                    onSelectionChanged: (locales) =>
-                        lp.setLocale(locales.first),
-                    showSelectedIcon: false,
-                    style: ButtonStyle(
-                      visualDensity: VisualDensity.compact,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
+                    isDense: true,
                   ),
                 ),
                 showDivider: false,

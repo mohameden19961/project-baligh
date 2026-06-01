@@ -1,404 +1,404 @@
 {
-  "@@locale": "ar",
+  "@@locale": "en",
   "@@author": "Baligh Team",
 
-  "appName": "بلّغ",
+  "appName": "Baligh",
   "@appName": { "description": "The name of the application" },
 
-  "appTagline": "صوتك يصنع الفرق",
+  "appTagline": "Your voice makes the difference",
   "@appTagline": { "description": "App tagline shown on splash/onboarding" },
 
-  "language": "اللغة",
+  "language": "Language",
   "@language": { "description": "Language setting label" },
 
   "arabic": "العربية",
   "@arabic": { "description": "Arabic language option" },
 
-  "french": "الفرنسية",
+  "french": "Français",
   "@french": { "description": "French language option" },
 
-  "english": "الإنجليزية",
+  "english": "English",
   "@english": { "description": "English language option" },
 
-  "continueButton": "متابعة",
+  "continueButton": "Continue",
   "@continueButton": { "description": "Generic continue button" },
 
-  "saveButton": "حفظ",
+  "saveButton": "Save",
   "@saveButton": { "description": "Generic save button" },
 
-  "cancelButton": "إلغاء",
+  "cancelButton": "Cancel",
   "@cancelButton": { "description": "Generic cancel button" },
 
-  "deleteButton": "حذف",
+  "deleteButton": "Delete",
   "@deleteButton": { "description": "Generic delete button" },
 
-  "confirmButton": "تأكيد",
+  "confirmButton": "Confirm",
   "@confirmButton": { "description": "Generic confirm button" },
 
-  "backButton": "رجوع",
+  "backButton": "Back",
   "@backButton": { "description": "Generic back button" },
 
-  "loading": "جارٍ التحميل...",
+  "loading": "Loading...",
   "@loading": { "description": "Generic loading indicator text" },
 
-  "error": "خطأ",
+  "error": "Error",
   "@error": { "description": "Generic error label" },
 
-  "success": "تم بنجاح",
+  "success": "Success",
   "@success": { "description": "Generic success label" },
 
-  "retry": "إعادة المحاولة",
+  "retry": "Retry",
   "@retry": { "description": "Retry button label" },
 
-  "navHome": "الرئيسية",
+  "navHome": "Home",
   "@navHome": { "description": "Bottom nav: Home tab" },
 
-  "navMap": "الخريطة",
+  "navMap": "Map",
   "@navMap": { "description": "Bottom nav: Map tab" },
 
-  "navReport": "إبلاغ",
+  "navReport": "Report",
   "@navReport": { "description": "Bottom nav: Report tab" },
 
-  "navMyReports": "تقاريري",
+  "navMyReports": "My Reports",
   "@navMyReports": { "description": "Bottom nav: My Reports tab" },
 
-  "navSettings": "الإعدادات",
+  "navSettings": "Settings",
   "@navSettings": { "description": "Bottom nav: Settings tab" },
 
-  "homeWelcome": "مرحباً بك في بلّغ",
+  "navAlerts": "Alerts",
+  "navAccount": "Account",
+
+  "homeWelcome": "Welcome to Baligh",
   "@homeWelcome": { "description": "Home screen welcome title" },
 
-  "homeSubtitle": "ساهم في تحسين مدينتك بالإبلاغ عن المشكلات",
+  "homeSubtitle": "Help improve your city by reporting issues",
   "@homeSubtitle": { "description": "Home screen subtitle" },
 
-  "homeRecentReports": "أحدث البلاغات",
+  "homeRecentReports": "Recent Reports",
   "@homeRecentReports": { "description": "Section title for recent reports on home" },
 
-  "homeNoReports": "لا توجد بلاغات حتى الآن. كن أول من يبلّغ!",
+  "homeNoReports": "No reports yet. Be the first to report!",
   "@homeNoReports": { "description": "Empty state message on home screen" },
 
-  "homeQuickReport": "بلاغ سريع",
+  "homeQuickReport": "Quick Report",
   "@homeQuickReport": { "description": "Quick report button label on home" },
 
-  "homeViewMap": "عرض الخريطة",
+  "homeViewMap": "View Map",
   "@homeViewMap": { "description": "View map button on home" },
 
-  "reportTitle": "إنشاء بلاغ جديد",
+  "reportTitle": "New Report",
   "@reportTitle": { "description": "Title for the create report screen" },
 
-  "reportCategory": "فئة المشكلة",
+  "reportCategory": "Problem Category",
   "@reportCategory": { "description": "Report form: category field label" },
 
-  "reportSelectCategory": "اختر فئة",
+  "reportSelectCategory": "Choose a category",
   "@reportSelectCategory": { "description": "Report form: category hint text" },
 
-  "reportDescription": "وصف المشكلة",
+  "reportDescription": "Problem Description",
   "@reportDescription": { "description": "Report form: description field label" },
 
-  "reportDescriptionHint": "اشرح المشكلة بالتفصيل...",
+  "reportDescriptionHint": "Describe the problem in detail...",
   "@reportDescriptionHint": { "description": "Report form: description hint text" },
 
-  "reportLocation": "الموقع",
+  "reportLocation": "Location",
   "@reportLocation": { "description": "Report form: location field label" },
 
-  "reportLocationHint": "اختر الموقع على الخريطة",
+  "reportLocationHint": "Select location on map",
   "@reportLocationHint": { "description": "Report form: location hint text" },
 
-  "reportPhoto": "صورة المشكلة",
+  "reportPhoto": "Problem Photo",
   "@reportPhoto": { "description": "Report form: photo field label" },
 
-  "reportAddPhoto": "إضافة صورة",
+  "reportAddPhoto": "Add Photo",
   "@reportAddPhoto": { "description": "Report form: add photo button" },
 
-  "reportChangePhoto": "تغيير الصورة",
+  "reportChangePhoto": "Change Photo",
   "@reportChangePhoto": { "description": "Report form: change photo button" },
 
-  "reportSubmit": "إرسال البلاغ",
+  "reportSubmit": "Submit Report",
   "@reportSubmit": { "description": "Report form: submit button" },
 
-  "reportSubmitSuccess": "تم إرسال بلاغك بنجاح!",
+  "reportSubmitSuccess": "Your report has been submitted successfully!",
   "@reportSubmitSuccess": { "description": "Success message after submitting a report" },
 
-  "reportSubmitError": "فشل إرسال البلاغ. حاول مجدداً.",
+  "reportSubmitError": "Failed to submit report. Please try again.",
   "@reportSubmitError": { "description": "Error message when report submission fails" },
 
-  "reportValidationCategory": "الرجاء اختيار فئة المشكلة",
+  "reportValidationCategory": "Please select a problem category",
   "@reportValidationCategory": { "description": "Validation message for category field" },
 
-  "reportValidationDescription": "الرجاء إدخال وصف للمشكلة",
+  "reportValidationDescription": "Please enter a description",
   "@reportValidationDescription": { "description": "Validation message for description field" },
 
-  "reportValidationLocation": "الرجاء تحديد موقع المشكلة",
+  "reportValidationLocation": "Please select a location",
   "@reportValidationLocation": { "description": "Validation message for location field" },
 
-  "categoryElectricity": "كهرباء",
+  "categoryElectricity": "Electricity",
   "@categoryElectricity": { "description": "Report category: Electricity" },
 
-  "categoryRoad": "طرق",
+  "categoryRoad": "Roads",
   "@categoryRoad": { "description": "Report category: Road" },
 
-  "categoryFlood": "فيضانات",
+  "categoryFlood": "Flood",
   "@categoryFlood": { "description": "Report category: Flood" },
 
-  "categorySecurity": "أمن",
+  "categorySecurity": "Security",
   "@categorySecurity": { "description": "Report category: Security" },
 
-  "categoryWater": "ماء",
+  "categoryWater": "Water",
   "@categoryWater": { "description": "Report category: Water" },
 
-  "categoryHealth": "صحة",
+  "categoryHealth": "Health",
   "@categoryHealth": { "description": "Report category: Health" },
 
-  "categoryInternet": "إنترنت",
+  "categoryInternet": "Internet",
   "@categoryInternet": { "description": "Report category: Internet" },
 
-  "categoryMarket": "أسواق",
+  "categoryMarket": "Market",
   "@categoryMarket": { "description": "Report category: Market" },
 
-  "categoryGovernment": "حكومة",
+  "categoryGovernment": "Government",
   "@categoryGovernment": { "description": "Report category: Government" },
 
-  "categoryFire": "حرائق",
+  "categoryFire": "Fire",
   "@categoryFire": { "description": "Report category: Fire" },
 
-  "categoryInfrastructure": "بنية تحتية",
+  "categoryInfrastructure": "Infrastructure",
   "@categoryInfrastructure": { "description": "Report category: Infrastructure" },
 
-  "categoryFraud": "احتيال",
+  "categoryFraud": "Fraud",
   "@categoryFraud": { "description": "Report category: Fraud" },
 
-  "statusPending": "قيد الانتظار",
+  "statusPending": "Pending",
   "@statusPending": { "description": "Report status: Pending" },
 
-  "statusValidated": "موثّق",
+  "statusValidated": "Validated",
   "@statusValidated": { "description": "Report status: Validated" },
 
-  "statusFalseReport": "بلاغ كاذب",
+  "statusFalseReport": "False Report",
   "@statusFalseReport": { "description": "Report status: False Report" },
 
-  "myReportsTitle": "تقاريري",
+  "myReportsTitle": "My Reports",
   "@myReportsTitle": { "description": "My Reports screen title" },
 
-  "myReportsEmpty": "لم تقم بإنشاء أي بلاغات بعد.",
+  "myReportsEmpty": "You haven't created any reports yet.",
   "@myReportsEmpty": { "description": "Empty state for my reports screen" },
 
-  "myReportsFilter": "تصفية",
+  "myReportsFilter": "Filter",
   "@myReportsFilter": { "description": "Filter button label on my reports" },
 
-  "myReportsAll": "الكل",
+  "myReportsAll": "All",
   "@myReportsAll": { "description": "Filter: All reports" },
 
-  "reportDetailTitle": "تفاصيل البلاغ",
+  "reportDetailTitle": "Report Details",
   "@reportDetailTitle": { "description": "Report detail screen title" },
 
-  "reportDetailDate": "تاريخ الإبلاغ",
+  "reportDetailDate": "Report Date",
   "@reportDetailDate": { "description": "Report detail: date label" },
 
-  "reportDetailStatus": "الحالة",
+  "reportDetailStatus": "Status",
   "@reportDetailStatus": { "description": "Report detail: status label" },
 
-  "reportDetailCategory": "الفئة",
+  "reportDetailCategory": "Category",
   "@reportDetailCategory": { "description": "Report detail: category label" },
 
-  "reportDetailDescription": "الوصف",
+  "reportDetailDescription": "Description",
   "@reportDetailDescription": { "description": "Report detail: description label" },
 
-  "reportDetailLocation": "الموقع",
+  "reportDetailLocation": "Location",
   "@reportDetailLocation": { "description": "Report detail: location label" },
 
-  "mapTitle": "خريطة البلاغات",
+  "mapTitle": "Reports Map",
   "@mapTitle": { "description": "Map screen title" },
 
-  "mapFilterAll": "الكل",
+  "mapFilterAll": "All",
   "@mapFilterAll": { "description": "Map filter: All reports" },
 
-  "mapLoading": "جارٍ تحميل الخريطة...",
+  "mapLoading": "Loading map...",
   "@mapLoading": { "description": "Map loading message" },
 
-  "mapNoLocation": "تعذّر تحديد موقعك",
+  "mapNoLocation": "Could not determine your location",
   "@mapNoLocation": { "description": "Map: error getting user location" },
 
-  "mapSelectLocation": "اضغط لتحديد الموقع",
+  "mapSelectLocation": "Tap to select location",
   "@mapSelectLocation": { "description": "Map: instruction to select a location" },
 
-  "settingsTitle": "الإعدادات",
+  "settingsTitle": "Settings",
   "@settingsTitle": { "description": "Settings screen title" },
 
-  "settingsLanguage": "اللغة",
+  "settingsLanguage": "Language",
   "@settingsLanguage": { "description": "Settings: language section label" },
 
-  "settingsNotifications": "الإشعارات",
+  "settingsNotifications": "Notifications",
   "@settingsNotifications": { "description": "Settings: notifications toggle label" },
 
-  "settingsNotificationsSubtitle": "استقبل إشعارات عند تحديث بلاغاتك",
+  "settingsNotificationsSubtitle": "Receive notifications when your reports are updated",
   "@settingsNotificationsSubtitle": { "description": "Settings: notifications subtitle" },
 
-  "settingsAbout": "عن التطبيق",
+  "settingsAbout": "About",
   "@settingsAbout": { "description": "Settings: about section label" },
 
-  "settingsVersion": "الإصدار",
+  "settingsVersion": "Version",
   "@settingsVersion": { "description": "Settings: app version label" },
 
-  "settingsPrivacy": "سياسة الخصوصية",
+  "settingsPrivacy": "Privacy Policy",
   "@settingsPrivacy": { "description": "Settings: privacy policy label" },
 
-  "settingsContact": "تواصل معنا",
+  "settingsContact": "Contact Us",
   "@settingsContact": { "description": "Settings: contact us label" },
 
-  "settingsTheme": "المظهر",
+  "settingsTheme": "Theme",
   "@settingsTheme": { "description": "Settings: theme label" },
 
-  "settingsThemeLight": "فاتح",
+  "settingsThemeLight": "Light",
   "@settingsThemeLight": { "description": "Settings: light theme" },
 
-  "settingsThemeDark": "داكن",
+  "settingsThemeDark": "Dark",
   "@settingsThemeDark": { "description": "Settings: dark theme" },
 
-  "settingsThemeSystem": "تلقائي",
+  "settingsThemeSystem": "System",
   "@settingsThemeSystem": { "description": "Settings: system theme" },
 
-  "permissionLocationTitle": "إذن الموقع",
+  "permissionLocationTitle": "Location Permission",
   "@permissionLocationTitle": { "description": "Location permission dialog title" },
 
-  "permissionLocationMessage": "يحتاج التطبيق إلى إذن الوصول لموقعك لتحديد مكان المشكلة بدقة.",
+  "permissionLocationMessage": "The app needs access to your location to accurately identify the problem area.",
   "@permissionLocationMessage": { "description": "Location permission dialog message" },
 
-  "permissionLocationGrant": "منح الإذن",
+  "permissionLocationGrant": "Grant Permission",
   "@permissionLocationGrant": { "description": "Grant location permission button" },
 
-  "permissionLocationDeny": "رفض",
+  "permissionLocationDeny": "Deny",
   "@permissionLocationDeny": { "description": "Deny location permission button" },
 
-  "navAlerts": "تنبيهات",
-  "navAccount": "حسابي",
-
-  "alertsTitle": "التنبيهات",
+  "alertsTitle": "Alerts",
   "@alertsTitle": { "description": "Alerts/Notifications screen title" },
 
-  "alertsEmpty": "لا توجد تنبيهات",
+  "alertsEmpty": "No alerts",
   "@alertsEmpty": { "description": "Empty state for alerts screen" },
 
-  "alertStatusUpdate": "تحديث حالة البلاغ",
+  "alertStatusUpdate": "Report Status Update",
   "@alertStatusUpdate": { "description": "Alert type: report status updated" },
 
-  "alertNewReport": "بلاغ جديد في منطقتك",
+  "alertNewReport": "New report near you",
   "@alertNewReport": { "description": "Alert type: new report nearby" },
 
-  "alertMarkAllRead": "تحديد الكل كمقروء",
+  "alertMarkAllRead": "Mark all as read",
   "@alertMarkAllRead": { "description": "Tooltip: mark all alerts as read" },
 
-  "alertTileTitle": "تنبيه",
+  "alertTileTitle": "Alert",
   "@alertTileTitle": { "description": "Generic alert/notification tile title" },
 
-  "accountJoinDate": "تاريخ الانضمام",
+  "accountJoinDate": "Join Date",
   "@accountJoinDate": { "description": "Account: join date label" },
 
-  "accountReportsSubmitted": "البلاغات المقدمة",
+  "accountReportsSubmitted": "Reports Submitted",
   "@accountReportsSubmitted": { "description": "Account: reports count label" },
 
-  "accountSettings": "الإعدادات",
+  "accountSettings": "Settings",
   "@accountSettings": { "description": "Account: settings button" },
 
-  "accountEmergencyNumbers": "أرقام الطوارئ",
+  "accountEmergencyNumbers": "Emergency Numbers",
   "@accountEmergencyNumbers": { "description": "Account: emergency numbers button" },
 
-  "accountLogout": "تسجيل الخروج",
+  "accountLogout": "Logout",
   "@accountLogout": { "description": "Account: logout button" },
 
-  "reportDetailVoteConfirm": "صحيح",
+  "reportDetailVoteConfirm": "Confirm",
   "@reportDetailVoteConfirm": { "description": "Report detail: confirm vote button" },
 
-  "reportDetailVoteReject": "خطأ",
+  "reportDetailVoteReject": "Reject",
   "@reportDetailVoteReject": { "description": "Report detail: reject vote button" },
 
-  "reportDetailVoteSuccess": "تم تسجيل صوتك!",
+  "reportDetailVoteSuccess": "Your vote has been recorded!",
   "@reportDetailVoteSuccess": { "description": "Report detail: vote success message" },
 
-  "reportDetailVoteError": "فشل تسجيل الصوت. حاول مجدداً.",
+  "reportDetailVoteError": "Vote failed. Please try again.",
   "@reportDetailVoteError": { "description": "Report detail: vote error message" },
 
-  "reportDetailCredibility": "المصداقية",
+  "reportDetailCredibility": "Credibility",
   "@reportDetailCredibility": { "description": "Report detail: credibility section label" },
 
-  "reportDetailOpenMap": "فتح على الخريطة",
+  "reportDetailOpenMap": "Open on Map",
   "@reportDetailOpenMap": { "description": "Report detail: open map button" },
 
-  "emergencyTitle": "أرقام الطوارئ",
+  "emergencyTitle": "Emergency Numbers",
   "@emergencyTitle": { "description": "Emergency numbers screen title" },
 
-  "emergencyPolice": "الشرطة",
+  "emergencyPolice": "Police",
   "@emergencyPolice": { "description": "Emergency: police" },
 
-  "emergencyAmbulance": "الإسعاف",
+  "emergencyAmbulance": "Ambulance",
   "@emergencyAmbulance": { "description": "Emergency: ambulance" },
 
-  "emergencyFire": "الدفاع المدني",
+  "emergencyFire": "Fire Department",
   "@emergencyFire": { "description": "Emergency: fire department" },
 
-  "emergencyCivilProtection": "الحماية المدنية",
+  "emergencyCivilProtection": "Civil Protection",
   "@emergencyCivilProtection": { "description": "Emergency: civil protection" },
 
-  "emergencyGendarmerie": "الدرك الوطني",
+  "emergencyGendarmerie": "Gendarmerie",
   "@emergencyGendarmerie": { "description": "Emergency: gendarmerie" },
 
-  "emergencyNationalHospital": "المستشفى الوطني",
+  "emergencyNationalHospital": "National Hospital",
   "@emergencyNationalHospital": { "description": "Emergency: national hospital" },
 
-  "emergencyElectricity": "الكهرباء",
+  "emergencyElectricity": "Electricity",
   "@emergencyElectricity": { "description": "Emergency: electricity company" },
 
-  "emergencyWater": "المياه",
+  "emergencyWater": "Water",
   "@emergencyWater": { "description": "Emergency: water company" },
 
-  "emergencyMunicipality": "البلدية",
+  "emergencyMunicipality": "Municipality",
   "@emergencyMunicipality": { "description": "Emergency: municipality" },
 
-  "emergencyChildProtection": " SOS الأطفال",
+  "emergencyChildProtection": "SOS Children",
   "@emergencyChildProtection": { "description": "Emergency: child protection" },
 
-  "emergencyAntiCorruption": "محاربة الفساد",
+  "emergencyAntiCorruption": "Anti-Corruption",
   "@emergencyAntiCorruption": { "description": "Emergency: anti-corruption" },
 
-  "emergencyCall": "اتصال",
+  "emergencyCall": "Call",
   "@emergencyCall": { "description": "Emergency: call button" },
 
-  "splashTitle": "بلّغ لايت",
+  "splashTitle": "Baligh",
   "@splashTitle": { "description": "Splash screen title" },
 
-  "splashSubtitle": "صوتك يصنع الفرق",
+  "splashSubtitle": "Your voice makes the difference",
   "@splashSubtitle": { "description": "Splash screen subtitle" },
 
-  "splashStart": "ابدأ الآن",
+  "splashStart": "Get Started",
   "@splashStart": { "description": "Splash: start button" },
 
-  "splashSkip": "تخطي",
+  "splashSkip": "Skip",
   "@splashSkip": { "description": "Splash: skip button" },
 
-  "networkError": "تعذّر الاتصال بالشبكة. تحقق من اتصالك بالإنترنت.",
+  "networkError": "Network error. Please check your internet connection.",
   "@networkError": { "description": "Generic network error message" },
 
-  "unknownError": "حدث خطأ غير متوقع. حاول مجدداً.",
+  "unknownError": "An unexpected error occurred. Please try again.",
   "@unknownError": { "description": "Generic unknown error message" },
 
-  "login": "تسجيل الدخول",
+  "login": "Login",
   "@login": { "description": "Login button label" },
 
-  "register": "إنشاء حساب",
+  "register": "Register",
   "@register": { "description": "Register button label" },
 
-  "email": "البريد الإلكتروني",
+  "email": "Email",
   "@email": { "description": "Email field label" },
 
-  "password": "كلمة المرور",
+  "password": "Password",
   "@password": { "description": "Password field label" },
 
-  "username": "اسم المستخدم",
+  "username": "Username",
   "@username": { "description": "Username field label" },
 
-  "confirmPassword": "تأكيد كلمة المرور",
+  "confirmPassword": "Confirm Password",
   "@confirmPassword": { "description": "Confirm password field label" },
 
-  "reportCount": "{count, plural, =0{لا توجد بلاغات} =1{بلاغ واحد} =2{بلاغان} few{{count} بلاغات} many{{count} بلاغاً} other{{count} بلاغ}}",
+  "reportCount": "{count, plural, =0{No reports} =1{1 report} other{{count} reports}}",
   "@reportCount": {
     "description": "Pluralized report count",
     "placeholders": {
@@ -406,54 +406,54 @@
     }
   },
 
-  "timeAgoMinutes": "{count, plural, =1{منذ دقيقة} =2{منذ دقيقتين} few{منذ {count} دقائق} many{منذ {count} دقيقة} other{منذ {count} دقيقة}}",
+  "timeAgoMinutes": "{count, plural, =1{1 min ago} other{{count} min ago}}",
   "@timeAgoMinutes": {
-    "description": "Elapsed time in minutes (e.g. 'منذ 5 دقائق')",
+    "description": "Elapsed time in minutes (e.g. '5 min ago')",
     "placeholders": {
       "count": { "type": "int" }
     }
   },
 
-  "timeAgoHours": "{count, plural, =1{منذ ساعة} =2{منذ ساعتين} few{منذ {count} ساعات} many{منذ {count} ساعة} other{منذ {count} ساعة}}",
+  "timeAgoHours": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
   "@timeAgoHours": {
-    "description": "Elapsed time in hours (e.g. 'منذ 3 ساعات')",
+    "description": "Elapsed time in hours (e.g. '3 hours ago')",
     "placeholders": {
       "count": { "type": "int" }
     }
   },
 
-  "timeAgoDays": "{count, plural, =1{منذ يوم} =2{منذ يومين} few{منذ {count} أيام} many{منذ {count} يوماً} other{منذ {count} يوم}}",
+  "timeAgoDays": "{count, plural, =1{1 day ago} other{{count} days ago}}",
   "@timeAgoDays": {
-    "description": "Elapsed time in days (e.g. 'منذ 4 أيام')",
+    "description": "Elapsed time in days (e.g. '4 days ago')",
     "placeholders": {
       "count": { "type": "int" }
     }
   },
 
-  "homeSearchHint": "ابحث في البلاغات حسب الوصف، الفئة أو العنوان...",
+  "homeSearchHint": "Search reports by description, category or address...",
   "@homeSearchHint": { "description": "Home search bar hint text" },
 
-  "emergencyFabTooltip": "أرقام الطوارئ",
+  "emergencyFabTooltip": "Emergency Numbers",
   "@emergencyFabTooltip": { "description": "Emergency FAB tooltip" },
 
-  "chatTitle": "الرسائل",
+  "chatTitle": "Messages",
   "@chatTitle": { "description": "Messages / chat screen title" },
 
-  "chatInputHint": "اكتب رسالة...",
+  "chatInputHint": "Type a message...",
   "@chatInputHint": { "description": "Chat input hint text" },
 
-  "chatNoMessages": "لا توجد رسائل بعد",
+  "chatNoMessages": "No messages yet",
   "@chatNoMessages": { "description": "Empty state when no messages in a conversation" },
 
-  "chatNoConversations": "لا توجد محادثات",
+  "chatNoConversations": "No conversations",
   "@chatNoConversations": { "description": "Empty state when no conversations exist" },
 
-  "chatMessagesForReport": "رسائل التقرير",
+  "chatMessagesForReport": "Report Messages",
   "@chatMessagesForReport": { "description": "Title for report-specific messages list" },
 
-  "navChat": "المحادثات",
+  "navChat": "Chat",
   "@navChat": { "description": "Bottom nav: Chat tab" },
 
-  "reportDetailVoteOwnReport": "لا يمكنك التصويت على بلاغك",
+  "reportDetailVoteOwnReport": "You cannot vote on your own report",
   "@reportDetailVoteOwnReport": { "description": "Message when user tries to vote on own report" }
 }

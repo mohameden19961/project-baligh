@@ -12,71 +12,71 @@ class EmergencyNumbersView extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    const contacts = [
+    final contacts = [
       _EmergencyContact(
         icon: Icons.local_police_rounded,
-        label: 'الشرطة',
+        label: l10n.emergencyPolice,
         dial: '17',
-        color: Color(0xFF1565C0),
+        color: const Color(0xFF1565C0),
       ),
       _EmergencyContact(
         icon: Icons.shield_rounded,
-        label: 'الدرك الوطني',
+        label: l10n.emergencyGendarmerie,
         dial: '12',
-        color: Color(0xFF37474F),
+        color: const Color(0xFF37474F),
       ),
       _EmergencyContact(
         icon: Icons.fire_extinguisher_rounded,
-        label: 'الحماية المدنية / الإطفاء',
+        label: l10n.emergencyFire,
         dial: '18',
-        color: Color(0xFFEF6C00),
+        color: const Color(0xFFEF6C00),
       ),
       _EmergencyContact(
         icon: Icons.local_hospital_rounded,
-        label: 'الإسعاف / SAMU',
+        label: l10n.emergencyAmbulance,
         dial: '15',
-        color: Color(0xFFC62828),
+        color: const Color(0xFFC62828),
       ),
       _EmergencyContact(
         icon: Icons.local_hotel_rounded,
-        label: 'المستشفى الوطني (CHN)',
+        label: l10n.emergencyNationalHospital,
         dial: '224525',
         display: '22 45 25',
-        color: Color(0xFF2E7D32),
+        color: const Color(0xFF2E7D32),
       ),
       _EmergencyContact(
         icon: Icons.bolt_rounded,
-        label: 'الصوملك — الكهرباء',
+        label: l10n.emergencyElectricity,
         dial: '904523',
         display: '90 45 23',
-        color: Color(0xFFF9A825),
+        color: const Color(0xFFF9A825),
       ),
       _EmergencyContact(
         icon: Icons.water_drop_rounded,
-        label: 'إدارة المياه (SNDE)',
+        label: l10n.emergencyWater,
         dial: '504529',
         display: '50 45 29',
-        color: Color(0xFF0277BD),
+        color: const Color(0xFF0277BD),
       ),
       _EmergencyContact(
         icon: Icons.location_city_rounded,
-        label: 'بلدية نواكشوط',
+        label: l10n.emergencyMunicipality,
         dial: '104525',
         display: '10 45 25',
-        color: Color(0xFF6A1B9A),
+        color: const Color(0xFF6A1B9A),
       ),
       _EmergencyContact(
         icon: Icons.child_care_rounded,
-        label: ' SOS الأطفال',
+        label: l10n.emergencyChildProtection,
         dial: '116',
-        color: Color(0xFFE91E63),
+        color: const Color(0xFFE91E63),
       ),
       _EmergencyContact(
         icon: Icons.gavel_rounded,
-        label: 'محاربة الفساد',
+        label: l10n.emergencyAntiCorruption,
         dial: '994525',
         display: '99 45 25',
-        color: Color(0xFFD84315),
+        color: const Color(0xFFD84315),
       ),
     ];
 
@@ -237,7 +237,7 @@ class _EmergencyTile extends StatelessWidget {
     } catch (_) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('لا يمكن إجراء المكالمة من هذا الجهاز'),
+          content: Text(l10n.unknownError),
           duration: const Duration(seconds: 2),
         ),
       );

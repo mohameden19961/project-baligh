@@ -10,6 +10,8 @@ import '../../core/models/report_model.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/report_controller.dart';
 import '../../utils/report_category_meta.dart';
+import '../chat/chat_view.dart';
+import '../chat/conversations_view.dart';
 
 class ReportDetailView extends StatefulWidget {
   const ReportDetailView({super.key, required this.reportId});
@@ -66,11 +68,40 @@ class _ReportDetailViewState extends State<ReportDetailView> {
         final categoryLabel = ReportCategoryMeta.label(report.category, l10n);
         final statusColor = _statusColor(report.status);
         final statusLabel = _statusLabel(report.status, l10n);
+        final currentUserId =
+            context.read<AuthProvider>().currentUserId;
+        final isOwner = currentUserId != null && report.userId == currentUserId;
 
         return Scaffold(
           appBar: AppBar(
             title: Text(l10n.reportDetailTitle),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.chat_bubble_outline_rounded),
+                onPressed: () {
+                  final currentUserId =
+                      context.read<AuthProvider>().currentUserId;
+                  if (report.userId == currentUserId) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ConversationsView(reportId: report.id!),
+                      ),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatView(
+                          reportId: report.id!,
+                          otherUserId: report.userId!,
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.share_rounded),
                 onPressed: () => _shareReport(report, l10n),
@@ -100,6 +131,7 @@ class _ReportDetailViewState extends State<ReportDetailView> {
                 l10n: l10n,
                 theme: theme,
                 userVote: provider.userVoteFor(widget.reportId),
+                isOwner: isOwner,
               ),
             ],
           ),
@@ -660,15 +692,47 @@ class _ActionButtons extends StatelessWidget {
     required this.l10n,
     required this.theme,
     required this.userVote,
+    required this.isOwner,
   });
 
   final ReportModel report;
   final AppLocalizations l10n;
   final ThemeData theme;
   final VoteType? userVote;
+  final bool isOwner;
 
   @override
   Widget build(BuildContext context) {
+    if (isOwner) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border:
+              Border.all(color: theme.colorScheme.outline.withOpacity(0.08)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.info_outline_rounded,
+                size: 18,
+                color: theme.colorScheme.onSurface.withOpacity(0.45)),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                l10n.reportDetailVoteOwnReport,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Column(
       children: [
         Row(

@@ -24,6 +24,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get french => 'الفرنسية';
 
   @override
+  String get english => 'الإنجليزية';
+
+  @override
   String get continueButton => 'متابعة';
 
   @override
@@ -347,6 +350,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get emergencyCivilProtection => 'الحماية المدنية';
 
   @override
+  String get emergencyGendarmerie => 'الدرك الوطني';
+
+  @override
+  String get emergencyNationalHospital => 'المستشفى الوطني';
+
+  @override
+  String get emergencyElectricity => 'الكهرباء';
+
+  @override
+  String get emergencyWater => 'المياه';
+
+  @override
+  String get emergencyMunicipality => 'البلدية';
+
+  @override
+  String get emergencyChildProtection => ' SOS الأطفال';
+
+  @override
+  String get emergencyAntiCorruption => 'محاربة الفساد';
+
+  @override
   String get emergencyCall => 'اتصال';
 
   @override
@@ -441,4 +465,32 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get homeSearchHint =>
+      'ابحث في البلاغات حسب الوصف، الفئة أو العنوان...';
+
+  @override
+  String get emergencyFabTooltip => 'أرقام الطوارئ';
+
+  @override
+  String get chatTitle => 'الرسائل';
+
+  @override
+  String get chatInputHint => 'اكتب رسالة...';
+
+  @override
+  String get chatNoMessages => 'لا توجد رسائل بعد';
+
+  @override
+  String get chatNoConversations => 'لا توجد محادثات';
+
+  @override
+  String get chatMessagesForReport => 'رسائل التقرير';
+
+  @override
+  String get navChat => 'المحادثات';
+
+  @override
+  String get reportDetailVoteOwnReport => 'لا يمكنك التصويت على بلاغك';
 }

@@ -27,7 +27,7 @@
 
 **Routing:** Two-tier navigation:
 - **Persistent shell:** MainLayout with IndexedStack (4 tab bodies) + BottomAppBar + center FAB. Tab switching via NavigationProvider (enum AppTab). All tabs alive simultaneously (no rebuilds on switch).
-- **Push routes:** Standard Navigator.push(context, MaterialPageRoute(...)). Currently only one push route: AddReportView from the FAB. No named routes, no Navigator 2.0, no GoRouter.
+- **Push routes:** Standard Navigator.push(context, MaterialPageRoute(...)). Current push routes: AddReportView (from FAB), ReportDetailView (from report cards), EmergencyNumbersView (from SOS FAB / Account), ChatView + ConversationsView (from chat icon in AppBar / bottom nav). No named routes, no Navigator 2.0, no GoRouter.
 
 **Theme:** Centralized in AppTheme class within main.dart:269-508. Light + dark with Material 3, Cairo Google Fonts, brand green (#2E7D32) + yellow (#FDD835). Everything defined here (AppBar, BottomNavBar, Buttons, Inputs, Cards, Chips, FAB, Divider, Typography). ThemeProvider persists selection via SharedPreferences (key `app_theme`).
 
@@ -39,56 +39,64 @@ lib/
 │ │ ├── user_dao.dart # Supabase-backed User CRUD + findByUsername/Email
 │ │ ├── report_dao.dart # Supabase-backed Report CRUD + filter by category/status + getByUserId + getNearby
 │ │ ├── vote_dao.dart # Supabase-backed Vote CRUD + getVote + vote counts + hasVoted
-│ │ └── notification_dao.dart # Supabase-backed Notification CRUD + unread count + markAllRead
+│ │ ├── notification_dao.dart # Supabase-backed Notification CRUD + unread count + markAllRead
+│ │ └── message_dao.dart # Supabase-backed Message CRUD + conversation queries + unread count + batch markRead
 │ ├── models/
 │ │ ├── user_model.dart # UserModel with reputation badge logic (String UUID id, no passwordHash)
 │ │ ├── vote_model.dart # VoteModel (confirm/deny enum, String userId)
-│ │ └── notification_model.dart # NotificationModel with isRead flag (String userId)
+│ │ ├── notification_model.dart # NotificationModel with isRead flag (String userId)
+│ │ └── message_model.dart # MessageModel (reportId, senderId, receiverId, content, isRead)
 │ └── services/
 │ ├── auth_service.dart # Supabase Auth: email+password signUp/signIn, auto session mgmt
 │ ├── report_service_db.dart # Supabase-backed ReportService implementation
 │ ├── notification_service.dart # Creates notifications for ALL users when a report is submitted
 │ └── location_service.dart # Haversine distance calculation (currently unused)
 ├── l10n/
-│ ├── app_localizations.dart # Abstract base + delegate (90+ keys, 12 categories)
+│ ├── app_localizations.dart # Abstract base + delegate (102+ keys, 12 categories)
 │ ├── app_localizations_ar.dart # Arabic impl (12 categories)
 │ ├── app_localizations_fr.dart # French impl (12 categories)
+│ ├── app_localizations_en.dart # English impl (12 categories)
 │ ├── app_ar.arb # Arabic source strings
-│ └── app_fr.arb # French source strings
+│ ├── app_fr.arb # French source strings
+│ └── app_en.arb # English source strings
 ├── models/
 │ └── report_model.dart # ReportModel + 12 categories + 3 statuses + SQLite fields (userId, confirmCount, denyCount)
 ├── services/
 │ └── report_service.dart # Abstract ReportService interface (used by providers, implemented by ReportServiceDb)
-├── providers/ # Controllers — ChangeNotifier classes
-│ ├── navigation_provider.dart # Tab index state (global)
-│ ├── locale_provider.dart # Locale + persistence (global)
-│ ├── theme_provider.dart # ThemeMode + persistence (global)
-│ ├── auth_provider.dart # Current user, register/login/logout, session persistence (global)
-│ ├── report_provider.dart # Report CRUD + filtering via ReportServiceDb (global)
-│ ├── map_provider.dart # Map camera, filters, selection, markers (scoped to MapView tab)
-│ ├── add_report_provider.dart # Wizard state: category, description, location, photo (scoped to AddReportView route)
-│ └── alert_provider.dart # DB-backed alerts via NotificationDao (global)
+├── controllers/   # ChangeNotifier classes
+│ ├── navigation_provider.dart  # Tab index state (global)
+│ ├── locale_provider.dart      # Locale + persistence (global)
+│ ├── theme_provider.dart       # ThemeMode + persistence (global)
+│ ├── auth_controller.dart      # Current user, register/login/logout, session persistence (global)
+│ ├── report_controller.dart    # Report CRUD + filtering + search via ReportServiceDb (global)
+│ ├── map_provider.dart         # Map camera, filters, selection, markers (scoped to MapView tab)
+│ ├── add_report_controller.dart # Wizard state: category, description, location, photo (scoped to AddReportView route)
+│ ├── alert_controller.dart     # DB-backed alerts via NotificationDao (global)
+│ └── chat_controller.dart      # Messages & conversations via MessageDao, real-time subscription, unread count (global)
 ├── views/
-│ ├── main_layout.dart # App shell — BottomAppBar + IndexedStack + FAB
+│ ├── main_layout.dart # App shell — BottomAppBar + IndexedStack + FAB (4 tabs: Home, MyReports, Alerts, Account)
 │ ├── splash/splash_view.dart # Animated splash — Start/Skip → MainLayout
-│ ├── home/home_view.dart # Home feed — SliverAppBar, stats bar, filter chips, report list
+│ ├── home/home_view.dart # Home feed — SliverAppBar, search bar, stats bar, filter chips, SOS FAB, report list
 │ ├── map/map_view.dart # Map tab — flutter_map, search, filter chips, markers, preview sheet
 │ ├── add_report/add_report_view.dart # Multi-step wizard (Steps 1–4 done; Step 3 photo is placeholder UI only)
 │ ├── my_reports/my_reports_view.dart # Full list + status filter bottom sheet
 │ ├── alerts/alerts_view.dart # Full notification list from AlertProvider
 │ ├── account/account_view.dart # Profile header, stats, menu → Settings/Emergency
 │ ├── settings/settings_view.dart # Theme toggle, language, about, privacy/contact
-│ ├── report_detail/report_detail_view.dart # Full report + credibility bar + confirm/reject votes
-│ └── emergency/emergency_numbers_view.dart # Emergency contact tiles with call buttons
+│ ├── report_detail/report_detail_view.dart # Full report + credibility bar + confirm/reject votes + chat icon in AppBar
+│ ├── emergency/emergency_numbers_view.dart # Emergency contact tiles with call buttons
+│ └── chat/
+│     ├── chat_view.dart # Conversation screen (message bubbles, input bar, send)
+│     └── conversations_view.dart # Conversations list (per report-otherUser, unread badges)
 └── widgets/
     ├── report_card.dart # Shared card: category icon, status chip, elapsed time, location, credibility badge
     └── empty_state.dart # Shared empty-state widget
 
 
 **"Glue" files:**
-- `main.dart` wires providers → BalighApp (MaterialApp) → MainLayout
+- `main.dart` wires providers → BalighApp (MaterialApp) → MainLayout; also subscribes ChatProvider on first auth frame
 - `main_layout.dart` wires NavigationProvider → IndexedStack + BottomNavigationBar + FAB → push to AddReportView
-- `report_provider.dart` is consumed by HomeView, MapView; also the target for AddReportProvider.buildDraft() submission
+- `report_controller.dart` is consumed by HomeView, MapView; also the target for AddReportProvider.buildDraft() submission
 - `map_provider.dart` scoped inside MapView; receives reportProvider.allReports to compute filteredReports
 - `report_card.dart` shared by HomeView (list items) and MapView (preview sheet)
 
@@ -106,6 +114,7 @@ lib/
 | NavigationProvider | AppTab enum (current tab) | navigateTo() |
 | AlertProvider | List<AppAlert>, unread count, DB-backed via NotificationDao | fetchAlerts, markAsRead, markAllAsRead, refresh |
 | AuthProvider | Current user, register/login/logout, session persistence | tryAutoLogin, register, login, logout |
+| ChatProvider | Messages, conversations, unread count, real-time subscription | loadConversations, loadConversation, sendMessage, subscribe, refreshUnreadCount |
 
 **Scoped providers:**
 
@@ -145,7 +154,7 @@ View (context.watch/Consumer/Selector)
 | Screen/Feature | Status | Details |
 |----------------|--------|---------|
 | App boot + init | ✅ | FMTC init, DB init, portrait lock, MultiProvider wiring |
-| i18n (Arabic/French) | ✅ | 90+ keys in both languages. 12 categories with Arabic/French labels. 3 new statuses. LocaleProvider persists choice. RTL auto-resolved. **Locale switch fix:** MaterialApp has `key: ValueKey(localeProvider.locale.languageCode)` to force full tree rebuild on locale change. `MainLayout._tabBodies` changed from `static const` to getter creating fresh instances. |
+| i18n (Arabic/French/English) | ✅ | 95+ keys in all 3 languages. 12 categories with Arabic/French/English labels. 3 new statuses. LocaleProvider persists choice. RTL auto-resolved for Arabic. English locale added with full translations. **Locale switch fix:** MaterialApp has `key: ValueKey(localeProvider.locale.languageCode)` to force full tree rebuild on locale change. `MainLayout._tabBodies` changed from `static const` to getter creating fresh instances. |
 | Theme (light/dark/system) | ✅ | Full Material 3 light + dark. Persisted. |
 | Bottom Navigation Shell | ✅ | MainLayout with IndexedStack (4 tabs), BottomAppBar with notch for FAB, animated nav items |
 | FAB + entrance animation | ✅ | Pulsing scale animation on first build, press-scale animation on tap. Pushes AddReportView. |
@@ -165,6 +174,14 @@ View (context.watch/Consumer/Selector)
 | AddReport — Step Progress Bar | ✅ | 4-segment animated bar in AppBar |
 | AddReport — Step 2 (Location Map) | ✅ | Full OSM map with FMTC cache, fixed center pin, instruction banner, confirm button. Auto-centers on user GPS on mount (`_autoLocate()` in `initState` post-frame callback). Falls back to Nouakchott center if permission denied or GPS fails. Reverse geocoding via Nominatim (free, no API key) — `_reverseGeocode` calls `https://nominatim.openstreetmap.org/reverse?lat=...&lon=...&format=json&accept-language=ar` with `User-Agent: BalighApp/1.0`. Extracts `display_name`, shows detected address below map, and saves it to the report's `address` field. |
 | ReportCard widget | ✅ | Shared across HomeView and MapView. Category icon, status pill (pending/validated/false_report), elapsed time, description (2 lines), location, credibility badge. Entrance animation (staggered fade+slide). |
+| HomeView — Search Bar | ✅ | Real-time text search filtering reports by description, category (enum name), or address. Clear button appears when query is non-empty. Integrated into ReportProvider.filteredReports. |
+| HomeView — SOS FAB | ✅ | Red FloatingActionButton (bottom-right) with phone icon. Navigates to EmergencyNumbersView on tap. Tooltip localized. |
+| Messaging — Conversations list | ✅ | `conversations_view.dart` shows all conversations grouped by (report, otherUser). Displays other user's username, last message preview, unread count badge, and report category icon. Filterable by report ID for owner view. |
+| Messaging — Chat view | ✅ | `chat_view.dart` shows message bubbles (sent/received styling), timestamp, scroll-to-bottom, input bar with send button. Unread messages auto-marked as read on open. |
+| Messaging — Report detail chat icon | ✅ | AppBar chat icon navigates to `ChatView` (non-owner → direct message with report owner) or `ConversationsView` (owner → shows all conversations for that report). |
+| Messaging — Bottom nav badge | ❌ Removed | Chat icon was removed from bottom nav to keep the 4-tab layout. Chat is only accessible from the report detail screen's AppBar. |
+| Messaging — Realtime | ✅ | `ChatProvider.subscribe()` opens a Supabase Realtime channel on `messages` table filtered by `receiver_id`. Incoming messages increment `_unreadCount` instantly. Subscription initiated on first auth frame in `_BalighAppState.initState()`. |
+| Messaging — Database | ✅ | `public.messages` table with RLS (read: participants, insert: authenticated, update: receiver to mark read). Added to `supabase_migration.sql`. |
 
 ### Partially Functional / Placeholder
 
@@ -179,11 +196,11 @@ View (context.watch/Consumer/Selector)
 | Map vote buttons | ❌ Not wired | `onTap` has // TODO comments |
 | ReportCard onTap | ✅ Wired | Both HomeView and MyReportsView navigate to ReportDetailView |
 | Report Detail View | ✅ | Full screen: header with category icon + status, photo card (if available), info section, description, credibility bar, confirm/reject votes, location coordinates open Google Maps via `url_launcher` (green + underlined), share via `share_plus` with formatted message (emoji, credibility %, map link) |
-| Settings Screen | ✅ | Theme toggle (Light/Dark/System), Language toggle (Arabic/French), About dialog, Privacy/Contact (coming soon), version display |
+| Settings Screen | ✅ | Theme toggle (Light/Dark/System), Language toggle (Arabic/French/English — DropdownButton with flags 🇲🇷🇫🇷🇬🇧), About dialog, Privacy/Contact (coming soon), version display |
 | Emergency Numbers Screen | ✅ | Police (17), Ambulance (101), Fire (18), Civil Protection (115) — styled tiles with call button |
 | Splash/Welcome Screen | ✅ | Animated splash with logo + title + tagline, animated entrance, Start button + Skip link → navigates to LoginView. **Auto-login wired** — `tryAutoLogin()` called on first frame; skips splash if session exists, routes to LoginView otherwise. |
 | Auth (Register/Login) | ✅ | **Supabase Auth** (email + password). AuthProvider for state management, auto session persistence. Login and Register screens at `lib/views/auth/`. Login/register are the entry point when user is not authenticated. |
-| Database (Supabase) | ✅ | 4 tables (users, reports, votes, notifications) + storage bucket "reports". RLS enabled. Supabase client with auto session management. Admin role support (`is_admin` column + policies). |
+| Database (Supabase) | ✅ | 5 tables (users, reports, votes, notifications, messages) + storage bucket "reports". RLS enabled. Supabase client with auto session management. Admin role support (`is_admin` column + policies). |
 | Admin Dashboard | ✅ | Standalone HTML/CSS/JS page deployed on Vercel at `admin-dashboard/`. Login via Supabase Auth, view/manage all reports (filter, status change, delete), view all users, view all notifications. Reports table with photo thumbnail, confirm/deny counts, credibility % bar, location (lat,lng), category color dots, zebra-striped rows. Report detail modal with full info (photo, description, votes, credibility bar, category, date, user). Users table with avatar, username, email, join date, reports/confirmed/reputation stats, is_admin toggle, delete button. Chart.js bar chart of reports by category. Arabic/French UI. RLS: added `"Admins can update any report"` policy. |
 | Geolocation | ✅ Splash + MapView + Step 2 | First launch requests location permission automatically via `Geolocator.requestPermission()` (fired from splash `_checkAuth`). `MapProvider.goToMyLocation()` wired to device GPS via `Geolocator`. Report Step 2 location picker auto-centers on user GPS on mount via `_autoLocate()` and has its own "my location" button. Platform permissions handled at both splash and Step 2. |
 | Camera / Photo | ✅ | `image_picker` wired in Step 3. Uploads to Supabase Storage "reports" public bucket. Saves public URL in `photo_url` column. |
@@ -246,6 +263,7 @@ View (context.watch/Consumer/Selector)
 | 10 | admin-dashboard/ | ✅ Done | **Feature: Admin dashboard.** Deployed on Vercel. Login, manage reports (filter/status/delete), view users, view notifications. Added `is_admin` column + RLS policies. |
 | 11 | notification_service.dart + notification_dao.dart | ✅ Fixed | **Notifications never created.** Two bugs: (1) Haversine check used hardcoded coordinates `(18.0735, -15.9582)` — filtered out ALL users. (2) `NotificationDao.insert()` did a direct `.from('notifications').insert()` but no INSERT RLS policy existed → inserts silently failed. **Fix:** Removed Haversine check entirely — creates notification for every user except the reporter. `NotificationDao.insert()` now calls the existing `create_notification()` RPC function (SECURITY DEFINER, bypasses RLS). Console prints notification count per report submission. `location_service.dart` is now dead code. |
 | 12 | AndroidManifest.xml | ✅ Fixed | **Release APK network and geolocation failure.** In `android/app/src/main/AndroidManifest.xml`, the `INTERNET` permission was accidentally nested inside an HTML/XML comment block, disabling network access on release builds and triggering unexpected errors on login ("حدث خطأ غير متوقع"). Geolocation permissions (`ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`) were also missing from the main manifest. **Fix:** Added internet and location permissions properly outside comments. |
+| 13 | vote_dao.dart + report_service_db.dart | ✅ Fixed | **Non-owner vote count updates silently fail.** Votes INSERT succeeded but `updateConfirmCount()`/`updateDenyCount()` failed because reports table RLS (`auth.uid() = user_id`) blocked non-owners from modifying `confirm_count`/`deny_count`. **Fix:** Created `update_vote_counts()` SECURITY DEFINER RPC to bypass RLS. `voteOnReport` now calls `.rpc('update_vote_counts', ...)` instead of direct table updates. Also fixed votes INSERT policy to require `auth.uid() = user_id`. |
 
 
 ### Tech Debt
@@ -259,7 +277,7 @@ View (context.watch/Consumer/Selector)
 | 6 | MapProvider not registered as global | Medium | Created per MapView via `ChangeNotifierProvider(create:)`. This means if a push route (e.g., future ReportDetailView) needs map state, it can't access it. |
 | 7 | description field isolation | Low | `setDescription` intentionally skips `notifyListeners()`. Works because only the TextField and submit action read it. But if future features need to react to description state, this breaks silently. |
 | 8 | Missing const constructors in marker list | Low | `_buildMarkers()` creates new Marker objects every time — no key optimization. Could memoize by report ID. |
-| 9 | README is generic | Low | Default Flutter template — no project-specific setup instructions. |
+| 9 | ~~README is generic~~ | ✅ Fixed | Comprehensive project-specific README created. |
 
 ### Heavy / Slow Code
 

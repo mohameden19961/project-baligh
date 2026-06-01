@@ -10,6 +10,7 @@ import 'controllers/navigation_provider.dart';
 import 'controllers/report_controller.dart';
 import 'controllers/alert_controller.dart';
 import 'controllers/auth_controller.dart';
+import 'controllers/chat_controller.dart';
 import 'views/splash/splash_view.dart';
 
 import 'l10n/app_localizations.dart';
@@ -63,6 +64,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => AlertProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
       ],
       child: const BalighApp(),
     ),
@@ -80,10 +82,12 @@ class _BalighAppState extends State<BalighApp> {
   @override
   void initState() {
     super.initState();
-    // Start Supabase Realtime subscription after the first frame so the
-    // Provider tree is fully initialised before we access it.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ReportProvider>().subscribeToRealtimeUpdates();
+      final auth = context.read<AuthProvider>();
+      if (auth.currentUserId != null) {
+        context.read<ChatProvider>().subscribe(auth.currentUserId!);
+      }
     });
   }
 

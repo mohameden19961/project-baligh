@@ -4,6 +4,7 @@ import 'report_service.dart';
 import '../models/report_model.dart';
 import '../models/vote_model.dart';
 import 'notification_service.dart';
+import '../../utils/supabase_config.dart';
 
 class ReportServiceDb extends ReportService {
   final ReportDao _reportDao = ReportDao();
@@ -79,8 +80,11 @@ class ReportServiceDb extends ReportService {
     }
 
     final counts = await _voteDao.getVoteCounts(id);
-    await _reportDao.updateConfirmCount(id, counts['confirm']!);
-    await _reportDao.updateDenyCount(id, counts['deny']!);
+    await SupabaseConfig.client.rpc('update_vote_counts', params: {
+      'p_report_id': id,
+      'p_confirm_count': counts['confirm']!,
+      'p_deny_count': counts['deny']!,
+    });
     return counts;
   }
 

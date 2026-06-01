@@ -14,6 +14,7 @@ import '../../core/models/report_model.dart';
 import '../../controllers/report_controller.dart';
 import '../../widgets/report_card.dart';
 import '../report_detail/report_detail_view.dart';
+import '../emergency/emergency_numbers_view.dart';
 import '../../utils/report_category_meta.dart';
 
 // ════════════════════════════════════════════════════════════════
@@ -49,6 +50,8 @@ class _HomeViewState extends State<HomeView> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      floatingActionButton: _SosFab(l10n: l10n),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         color: theme.colorScheme.primary,
@@ -58,6 +61,20 @@ class _HomeViewState extends State<HomeView> {
           slivers: [
             // ── AppBar: static — no provider dependency ───────────
             _HomeAppBar(l10n: l10n, theme: theme),
+
+            // ── Search bar: filters reports in real time ──────────
+            SliverToBoxAdapter(
+              child: Selector<ReportProvider, String>(
+                selector: (_, p) => p.searchQuery,
+                builder: (ctx, query, __) => _SearchBar(
+                  query: query,
+                  onChanged: (q) =>
+                      ctx.read<ReportProvider>().setSearchQuery(q),
+                  l10n: l10n,
+                  theme: theme,
+                ),
+              ),
+            ),
 
             // ── Stats bar: rebuilds only when counts change ───────
             // Selector extracts (total, pending, resolved) as a
@@ -578,6 +595,116 @@ class _ErrorBody extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// _SearchBar — glass-morphism search field that filters reports
+// ════════════════════════════════════════════════════════════════
+class _SearchBar extends StatelessWidget {
+  const _SearchBar({
+    required this.query,
+    required this.onChanged,
+    required this.l10n,
+    required this.theme,
+  });
+
+  final String query;
+  final ValueChanged<String> onChanged;
+  final AppLocalizations l10n;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: TextField(
+        controller: TextEditingController.fromValue(
+          TextEditingValue(
+            text: query,
+            selection: TextSelection.collapsed(offset: query.length),
+          ),
+        ),
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          hintText: l10n.homeSearchHint,
+          hintStyle: TextStyle(
+            fontSize: 13,
+            color: theme.colorScheme.onSurface.withOpacity(0.40),
+          ),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            size: 20,
+            color: theme.colorScheme.onSurface.withOpacity(0.45),
+          ),
+          suffixIcon: query.isNotEmpty
+              ? IconButton(
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    size: 18,
+                    color: theme.colorScheme.onSurface.withOpacity(0.45),
+                  ),
+                  onPressed: () => onChanged(''),
+                )
+              : null,
+          filled: true,
+          fillColor: theme.colorScheme.surface,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 10,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(
+              color: theme.colorScheme.outline.withOpacity(0.12),
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(
+              color: theme.colorScheme.outline.withOpacity(0.12),
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(
+              color: theme.colorScheme.primary.withOpacity(0.40),
+            ),
+          ),
+        ),
+        style: TextStyle(
+          fontSize: 14,
+          color: theme.colorScheme.onSurface,
+        ),
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// _SosFab — red floating action button for emergency numbers
+// ════════════════════════════════════════════════════════════════
+class _SosFab extends StatelessWidget {
+  const _SosFab({required this.l10n});
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      heroTag: 'sos_fab',
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const EmergencyNumbersView(),
+          ),
+        );
+      },
+      backgroundColor: const Color(0xFFD32F2F),
+      foregroundColor: Colors.white,
+      tooltip: l10n.emergencyFabTooltip,
+      child: const Icon(Icons.phone_rounded, size: 24),
     );
   }
 }

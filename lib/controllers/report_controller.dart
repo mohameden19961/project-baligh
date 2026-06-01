@@ -63,6 +63,9 @@ class ReportProvider extends ChangeNotifier {
   /// Filtre de statut actif, ou `null` si aucun filtre.
   ReportStatus? _activeStatus;
 
+  /// Texte de recherche saisi par l'utilisateur.
+  String _searchQuery = '';
+
   /// Crée un [ReportProvider] avec un [service] optionnel.
   ///
   /// Si [service] n'est pas fourni, [ReportServiceDb] est utilisé par défaut.
@@ -72,14 +75,28 @@ class ReportProvider extends ChangeNotifier {
   /// Retourne une vue non-modifiable de tous les signalements chargés.
   List<ReportModel> get allReports => List.unmodifiable(_reports);
 
-  /// Retourne les signalements filtrés selon [activeCategory] et [activeStatus].
+  /// Retourne les signalements filtrés selon [activeCategory], [activeStatus] et [_searchQuery].
   List<ReportModel> get filteredReports {
+    final query = _searchQuery.toLowerCase().trim();
     return _reports.where((r) {
-      final matchesCategory =
-          _activeCategory == null || r.category == _activeCategory;
-      final matchesStatus =
-          _activeStatus == null || r.status == _activeStatus;
-      return matchesCategory && matchesStatus;
+      if (_activeCategory != null && r.category != _activeCategory) {
+        return false;
+      }
+      if (_activeStatus != null && r.status != _activeStatus) {
+        return false;
+      }
+      if (query.isNotEmpty) {
+        final matchesDescription =
+            r.description.toLowerCase().contains(query);
+        final matchesAddress =
+            r.location.address?.toLowerCase().contains(query) ?? false;
+        final matchesCategory =
+            r.category.name.toLowerCase().contains(query);
+        if (!matchesDescription && !matchesAddress && !matchesCategory) {
+          return false;
+        }
+      }
+      return true;
     }).toList();
   }
 
@@ -102,6 +119,9 @@ class ReportProvider extends ChangeNotifier {
 
   /// Retourne le filtre de statut actif, ou `null`.
   ReportStatus? get activeStatus => _activeStatus;
+
+  /// Retourne le texte de recherche courant.
+  String get searchQuery => _searchQuery;
 
   /// Retourne `true` si un chargement initial est en cours.
   bool get isLoading => _status == ReportProviderStatus.loading;
@@ -386,6 +406,13 @@ class ReportProvider extends ChangeNotifier {
     if (_activeCategory == null && _activeStatus == null) return;
     _activeCategory = null;
     _activeStatus = null;
+    notifyListeners();
+  }
+
+  /// Met à jour le texte de recherche et notifie les listeners.
+  void setSearchQuery(String query) {
+    if (_searchQuery == query) return;
+    _searchQuery = query;
     notifyListeners();
   }
 

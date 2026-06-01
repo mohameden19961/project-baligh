@@ -24,7 +24,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get french => 'Français';
 
   @override
-  String get continueButton => 'Continuer';
+  String get english => 'Anglais';
+
+  @override
+  String get continueButton => 'متابعة';
 
   @override
   String get saveButton => 'Enregistrer';
@@ -350,6 +353,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get emergencyCivilProtection => 'Protection civile';
 
   @override
+  String get emergencyGendarmerie => 'Gendarmerie';
+
+  @override
+  String get emergencyNationalHospital => 'Hôpital national';
+
+  @override
+  String get emergencyElectricity => 'Électricité';
+
+  @override
+  String get emergencyWater => 'Eau';
+
+  @override
+  String get emergencyMunicipality => 'Mairie';
+
+  @override
+  String get emergencyChildProtection => 'SOS Enfants';
+
+  @override
+  String get emergencyAntiCorruption => 'Lutte anti-corruption';
+
+  @override
   String get emergencyCall => 'Appeler';
 
   @override
@@ -434,4 +458,33 @@ class AppLocalizationsFr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get homeSearchHint =>
+      'Rechercher des signalements par description, catégorie ou adresse...';
+
+  @override
+  String get emergencyFabTooltip => 'Numéros d\'urgence';
+
+  @override
+  String get chatTitle => 'Messages';
+
+  @override
+  String get chatInputHint => 'Tapez un message...';
+
+  @override
+  String get chatNoMessages => 'Pas encore de messages';
+
+  @override
+  String get chatNoConversations => 'Aucune conversation';
+
+  @override
+  String get chatMessagesForReport => 'Messages du signalement';
+
+  @override
+  String get navChat => 'Chat';
+
+  @override
+  String get reportDetailVoteOwnReport =>
+      'Vous ne pouvez pas voter sur votre propre signalement';
 }

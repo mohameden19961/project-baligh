@@ -223,6 +223,65 @@ CREATE POLICY "Uploaders can delete own photos"
   );
 
 -- ============================================================
+-- 6. Messages table (in-app chat)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.messages (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  report_id BIGINT NOT NULL REFERENCES public.reports(id) ON DELETE CASCADE,
+  sender_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  receiver_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  is_read BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+
+-- Users can read messages they sent or received
+CREATE POLICY "Users can read their own messages"
+  ON public.messages FOR SELECT
+  USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+
+-- Authenticated users can send messages
+CREATE POLICY "Authenticated users can insert messages"
+  ON public.messages FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Users can mark messages they received as read
+CREATE POLICY "Receivers can update messages"
+  ON public.messages FOR UPDATE
+  USING (auth.uid() = receiver_id)
+  WITH CHECK (auth.uid() = receiver_id);
+
+-- ============================================================
+-- 7. RPC: Update vote counts (bypasses RLS so any user can vote)
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.update_vote_counts(
+  p_report_id BIGINT,
+  p_confirm_count INT,
+  p_deny_count INT
+) RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'public'
+AS $$
+BEGIN
+  UPDATE public.reports
+  SET confirm_count = p_confirm_count,
+      deny_count = p_deny_count
+  WHERE id = p_report_id;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.update_vote_counts TO authenticated;
+
+-- Fix the votes INSERT RLS policy: ensure user_id matches the authenticated user
+DROP POLICY IF EXISTS "Authenticated users can vote" ON public.votes;
+CREATE POLICY "Users can insert own votes"
+  ON public.votes FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- ============================================================
 -- Seed data (create after running auth user creation)
 -- ============================================================
 -- Since we can't pre-seed auth.users UUIDs, seed data is now

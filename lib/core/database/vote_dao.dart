@@ -1,9 +1,18 @@
+import 'package:flutter/foundation.dart';
 import '../../utils/supabase_config.dart';
 import '../models/vote_model.dart';
 
 class VoteDao {
   Future<void> insert(VoteModel vote) async {
-    await SupabaseConfig.client.from('votes').insert(vote.toMap());
+    try {
+      await SupabaseConfig.client.from('votes').insert(vote.toMap());
+      debugPrint(
+          '[VoteDao] insert success: report=${vote.reportId}, user=${vote.userId}, type=${vote.voteType.name}');
+    } catch (e) {
+      debugPrint(
+          '[VoteDao] insert FAILED: report=${vote.reportId}, user=${vote.userId}, type=${vote.voteType.name}, error=$e');
+      rethrow;
+    }
   }
 
   Future<VoteModel?> getVote(int reportId, String userId) async {

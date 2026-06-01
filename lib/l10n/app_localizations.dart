@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
+import 'app_localizations_en.dart';
 import 'app_localizations_fr.dart';
 
 // ignore_for_file: type=lint
@@ -95,6 +96,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
+    Locale('en'),
     Locale('fr')
   ];
 
@@ -127,6 +129,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الفرنسية'**
   String get french;
+
+  /// English language option
+  ///
+  /// In ar, this message translates to:
+  /// **'الإنجليزية'**
+  String get english;
 
   /// Generic continue button
   ///
@@ -770,6 +778,48 @@ abstract class AppLocalizations {
   /// **'الحماية المدنية'**
   String get emergencyCivilProtection;
 
+  /// Emergency: gendarmerie
+  ///
+  /// In ar, this message translates to:
+  /// **'الدرك الوطني'**
+  String get emergencyGendarmerie;
+
+  /// Emergency: national hospital
+  ///
+  /// In ar, this message translates to:
+  /// **'المستشفى الوطني'**
+  String get emergencyNationalHospital;
+
+  /// Emergency: electricity company
+  ///
+  /// In ar, this message translates to:
+  /// **'الكهرباء'**
+  String get emergencyElectricity;
+
+  /// Emergency: water company
+  ///
+  /// In ar, this message translates to:
+  /// **'المياه'**
+  String get emergencyWater;
+
+  /// Emergency: municipality
+  ///
+  /// In ar, this message translates to:
+  /// **'البلدية'**
+  String get emergencyMunicipality;
+
+  /// Emergency: child protection
+  ///
+  /// In ar, this message translates to:
+  /// **' SOS الأطفال'**
+  String get emergencyChildProtection;
+
+  /// Emergency: anti-corruption
+  ///
+  /// In ar, this message translates to:
+  /// **'محاربة الفساد'**
+  String get emergencyAntiCorruption;
+
   /// Emergency: call button
   ///
   /// In ar, this message translates to:
@@ -871,6 +921,60 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{count, plural, =1{منذ يوم} =2{منذ يومين} few{منذ {count} أيام} many{منذ {count} يوماً} other{منذ {count} يوم}}'**
   String timeAgoDays(int count);
+
+  /// Home search bar hint text
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في البلاغات حسب الوصف، الفئة أو العنوان...'**
+  String get homeSearchHint;
+
+  /// Emergency FAB tooltip
+  ///
+  /// In ar, this message translates to:
+  /// **'أرقام الطوارئ'**
+  String get emergencyFabTooltip;
+
+  /// Messages / chat screen title
+  ///
+  /// In ar, this message translates to:
+  /// **'الرسائل'**
+  String get chatTitle;
+
+  /// Chat input hint text
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب رسالة...'**
+  String get chatInputHint;
+
+  /// Empty state when no messages in a conversation
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد رسائل بعد'**
+  String get chatNoMessages;
+
+  /// Empty state when no conversations exist
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد محادثات'**
+  String get chatNoConversations;
+
+  /// Title for report-specific messages list
+  ///
+  /// In ar, this message translates to:
+  /// **'رسائل التقرير'**
+  String get chatMessagesForReport;
+
+  /// Bottom nav: Chat tab
+  ///
+  /// In ar, this message translates to:
+  /// **'المحادثات'**
+  String get navChat;
+
+  /// Message when user tries to vote on own report
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكنك التصويت على بلاغك'**
+  String get reportDetailVoteOwnReport;
 }
 
 class _AppLocalizationsDelegate
@@ -884,7 +988,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['ar', 'fr'].contains(locale.languageCode);
+      <String>['ar', 'en', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -895,6 +999,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'ar':
       return AppLocalizationsAr();
+    case 'en':
+      return AppLocalizationsEn();
     case 'fr':
       return AppLocalizationsFr();
   }

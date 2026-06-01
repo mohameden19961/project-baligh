@@ -17,8 +17,8 @@
   "french": "Français",
   "@french": { "description": "French language option" },
 
-  "continueButton": "Continuer",
-  "@continueButton": { "description": "Generic continue button" },
+  "english": "Anglais",
+  "@english": { "description": "English language option" },
 
   "navAlerts": "Alertes",
   "navAccount": "Profil",
@@ -88,6 +88,27 @@
 
   "emergencyCivilProtection": "Protection civile",
   "@emergencyCivilProtection": { "description": "Emergency: civil protection" },
+
+  "emergencyGendarmerie": "Gendarmerie",
+  "@emergencyGendarmerie": { "description": "Emergency: gendarmerie" },
+
+  "emergencyNationalHospital": "Hôpital national",
+  "@emergencyNationalHospital": { "description": "Emergency: national hospital" },
+
+  "emergencyElectricity": "Électricité",
+  "@emergencyElectricity": { "description": "Emergency: electricity company" },
+
+  "emergencyWater": "Eau",
+  "@emergencyWater": { "description": "Emergency: water company" },
+
+  "emergencyMunicipality": "Mairie",
+  "@emergencyMunicipality": { "description": "Emergency: municipality" },
+
+  "emergencyChildProtection": "SOS Enfants",
+  "@emergencyChildProtection": { "description": "Emergency: child protection" },
+
+  "emergencyAntiCorruption": "Lutte anti-corruption",
+  "@emergencyAntiCorruption": { "description": "Emergency: anti-corruption" },
 
   "emergencyCall": "Appeler",
   "@emergencyCall": { "description": "Emergency: call button" },
@@ -404,5 +425,32 @@
     "placeholders": {
       "count": { "type": "int" }
     }
-  }
+  },
+
+  "homeSearchHint": "Rechercher des signalements par description, catégorie ou adresse...",
+  "@homeSearchHint": { "description": "Home search bar hint text" },
+
+  "emergencyFabTooltip": "Numéros d'urgence",
+  "@emergencyFabTooltip": { "description": "Emergency FAB tooltip" },
+
+  "chatTitle": "Messages",
+  "@chatTitle": { "description": "Messages / chat screen title" },
+
+  "chatInputHint": "Tapez un message...",
+  "@chatInputHint": { "description": "Chat input hint text" },
+
+  "chatNoMessages": "Pas encore de messages",
+  "@chatNoMessages": { "description": "Empty state when no messages in a conversation" },
+
+  "chatNoConversations": "Aucune conversation",
+  "@chatNoConversations": { "description": "Empty state when no conversations exist" },
+
+  "chatMessagesForReport": "Messages du signalement",
+  "@chatMessagesForReport": { "description": "Title for report-specific messages list" },
+
+  "navChat": "Chat",
+  "@navChat": { "description": "Bottom nav: Chat tab" },
+
+  "reportDetailVoteOwnReport": "Vous ne pouvez pas voter sur votre propre signalement",
+  "@reportDetailVoteOwnReport": { "description": "Message when user tries to vote on own report" }
 }
