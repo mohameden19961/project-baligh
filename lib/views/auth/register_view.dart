@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../controllers/auth_controller.dart';
 import '../../widgets/google_button.dart';
+import '../main_layout.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
