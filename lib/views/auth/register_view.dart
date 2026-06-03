@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../controllers/auth_controller.dart';
 import '../../widgets/google_button.dart';
-import '../main_layout.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -43,13 +42,15 @@ class _RegisterViewState extends State<RegisterView> {
     );
 
     if (!mounted) return;
-
     if (success) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const MainLayout()),
-        (route) => false,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('تحقق من بريدك الإلكتروني لتأكيد حسابك'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 5),
+        ),
       );
+      Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
