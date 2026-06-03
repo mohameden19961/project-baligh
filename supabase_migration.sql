@@ -153,6 +153,36 @@ $$;
 GRANT EXECUTE ON FUNCTION public.create_notification TO authenticated;
 
 -- ============================================================
+-- 8. Trigger: auto-create user profile in public.users
+--     when a new user is created in auth.users
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = ''
+AS $$
+BEGIN
+  INSERT INTO public.users (id, username, email, created_at)
+  VALUES (
+    NEW.id,
+    COALESCE(
+      NEW.raw_user_meta_data ->> 'username',
+      NEW.raw_user_meta_data ->> 'name',
+      split_part(NEW.email, '@', 1)
+    ),
+    NEW.email,
+    NOW()
+  );
+  RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_new_user();
+
+-- ============================================================
 -- Add photo_url column to existing reports tables (if missing)
 -- ============================================================
 ALTER TABLE public.reports ADD COLUMN IF NOT EXISTS photo_url TEXT;

@@ -28,21 +28,25 @@ class AuthService {
       if (emailExists != null) return null;
 
       final response = await SupabaseConfig.client.auth
-          .signUp(email: email, password: password)
+          .signUp(
+            email: email,
+            password: password,
+            emailRedirectTo: 'io.supabase.baligh://login-callback',
+            data: {'username': username},
+          )
           .timeout(const Duration(seconds: 10));
 
       final user = response.user;
       if (user == null) return null;
 
-      final newUser = UserModel(
+      await SupabaseConfig.client.auth.signOut();
+
+      return UserModel(
         id: user.id,
         username: username,
         email: email,
         createdAt: DateTime.now(),
       );
-
-      await _userDao.insert(newUser).timeout(const Duration(seconds: 10));
-      return newUser;
     } on TimeoutException {
       throw Exception('انتهت مهلة الاتصال. تحقق من اتصالك بالإنترنت.');
     }
@@ -130,7 +134,10 @@ class AuthService {
   }
 
   Future<void> logout() async {
-    await SupabaseConfig.client.auth.signOut();
+    await Future.wait([
+      SupabaseConfig.client.auth.signOut(),
+      GoogleSignIn().signOut(),
+    ]);
   }
 
   Future<UserModel?> tryAutoLogin() async {
