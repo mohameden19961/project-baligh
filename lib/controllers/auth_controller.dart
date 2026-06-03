@@ -20,9 +20,6 @@ class AuthProvider extends ChangeNotifier {
   /// Message d'erreur de la dernière opération échouée.
   String? _errorMessage;
 
-  /// Message d'erreur de la dernière opération échouée.
-  String? _errorMessage;
-
   /// Retourne l'utilisateur connecté, ou `null`.
   UserModel? get currentUser => _currentUser;
 
