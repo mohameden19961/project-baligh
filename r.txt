@@ -14,8 +14,8 @@ Your task is to replicate the EXACT UI style of this app in Flutter with 100% fi
 - Success: #43A047 (green)
 - Warning: #FB8C00 (orange)
 - Bottom nav background: white with shadow
-
-### Typography:
+- Bottom nav background: white with shadow
+### Typography:   
 - App uses Arabic RTL layout (directionality: RTL)
 - Font: use Google Fonts "Cairo" or "Tajawal" for Arabic text
 - Title size: 20sp bold
