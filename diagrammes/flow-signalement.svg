@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 620" font-family="'DejaVu Sans', 'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1B6B2F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E8B3A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="stepGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#81C784;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="stepGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#64B5F6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="stepGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFD54F;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="stepGrad4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FCE4EC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F06292;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F3E5F5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#BA68C8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="resultGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E0F7FA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4DD0E1;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#00000020"/>
+    </filter>
+    <marker id="arrowDown" markerWidth="12" markerHeight="8" refX="6" refY="8" orient="auto">
+      <polygon points="0 0, 12 0, 6 8" fill="#555"/>
+    </marker>
+    <marker id="arrowRight" markerWidth="12" markerHeight="8" refX="12" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#2E7D32"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="820" height="44" rx="6" ry="6" fill="url(#headerGrad)"/>
+  <text x="410" y="29" text-anchor="middle" fill="white" font-size="18" font-weight="bold">Flux de Création d'un Signalement — Wizard 4 Étapes</text>
+
+  <!-- Step 1 -->
+  <rect x="30" y="70" width="370" height="135" rx="12" ry="12" fill="url(#stepGrad1)" stroke="#2E7D32" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="58" cy="92" r="14" fill="#2E7D32"/>
+  <text x="58" y="98" text-anchor="middle" fill="white" font-size="16" font-weight="bold">1</text>
+  <text x="82" y="97" fill="#1B5E20" font-size="14" font-weight="bold">Catégorie + Description</text>
+  <rect x="48" y="110" width="334" height="45" rx="6" ry="6" fill="white" stroke="#2E7D32" stroke-width="1"/>
+  <text x="215" y="129" text-anchor="middle" fill="#1B5E20" font-size="10" font-weight="bold">12 catégories disponibles</text>
+  <text x="215" y="145" text-anchor="middle" fill="#555" font-size="9">Routes · Éclairage · Déchets · Eau · Électricité · Sécurité · École · Santé · Transport · Environnement · Bruit · Autre</text>
+  <rect x="48" y="160" width="334" height="35" rx="6" ry="6" fill="white" stroke="#2E7D32" stroke-width="1"/>
+  <text x="215" y="175" text-anchor="middle" fill="#1B5E20" font-size="10" font-weight="bold">Description : 280 caractères max</text>
+  <text x="215" y="188" text-anchor="middle" fill="#555" font-size="9">Validation : catégorie requise</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="400" y1="115" x2="420" y2="115" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrowRight)"/>
+  <text x="410" y="108" text-anchor="middle" fill="#2E7D32" font-size="9" font-weight="bold">→</text>
+
+  <!-- Step 2 -->
+  <rect x="420" y="70" width="370" height="135" rx="12" ry="12" fill="url(#stepGrad2)" stroke="#1565C0" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="448" cy="92" r="14" fill="#1565C0"/>
+  <text x="448" y="98" text-anchor="middle" fill="white" font-size="16" font-weight="bold">2</text>
+  <text x="472" y="97" fill="#0D47A1" font-size="14" font-weight="bold">Localisation</text>
+  <rect x="438" y="110" width="334" height="45" rx="6" ry="6" fill="white" stroke="#1565C0" stroke-width="1"/>
+  <text x="605" y="129" text-anchor="middle" fill="#0D47A1" font-size="10" font-weight="bold">Carte OpenStreetMap</text>
+  <text x="605" y="145" text-anchor="middle" fill="#555" font-size="9">Pin central fixe · Drag pour déplacer · GPS auto</text>
+  <rect x="438" y="160" width="334" height="35" rx="6" ry="6" fill="white" stroke="#1565C0" stroke-width="1"/>
+  <text x="605" y="175" text-anchor="middle" fill="#0D47A1" font-size="10" font-weight="bold">Géocodage inverse (Nominatim)</text>
+  <text x="605" y="188" text-anchor="middle" fill="#555" font-size="9">Adresse détectée automatiquement</text>
+
+  <!-- Arrow 2→3 -->
+  <line x1="200" y1="205" x2="200" y2="230" stroke="#555" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+  <line x1="200" y1="230" x2="400" y2="230" stroke="#555" stroke-width="1.5"/>
+  <line x1="400" y1="230" x2="410" y2="230" stroke="#555" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+
+  <!-- Step 3 -->
+  <rect x="30" y="240" width="370" height="110" rx="12" ry="12" fill="url(#stepGrad3)" stroke="#F57F17" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="58" cy="262" r="14" fill="#F57F17"/>
+  <text x="58" y="268" text-anchor="middle" fill="white" font-size="16" font-weight="bold">3</text>
+  <text x="82" y="267" fill="#E65100" font-size="14" font-weight="bold">Photo (optionnelle)</text>
+  <rect x="48" y="280" width="334" height="55" rx="6" ry="6" fill="white" stroke="#F57F17" stroke-width="1"/>
+  <text x="215" y="299" text-anchor="middle" fill="#E65100" font-size="10" font-weight="bold">Caméra ou Galerie</text>
+  <text x="215" y="315" text-anchor="middle" fill="#555" font-size="9">image_picker → Supabase Storage</text>
+  <text x="215" y="330" text-anchor="middle" fill="#888" font-size="9">Bucket "reports" · URL publique</text>
+
+  <!-- Step 4 -->
+  <rect x="420" y="240" width="370" height="110" rx="12" ry="12" fill="url(#stepGrad4)" stroke="#C62828" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="448" cy="262" r="14" fill="#C62828"/>
+  <text x="448" y="268" text-anchor="middle" fill="white" font-size="16" font-weight="bold">4</text>
+  <text x="472" y="267" fill="#B71C1C" font-size="14" font-weight="bold">Révision + Envoi</text>
+  <rect x="438" y="280" width="334" height="55" rx="6" ry="6" fill="white" stroke="#C62828" stroke-width="1"/>
+  <text x="605" y="299" text-anchor="middle" fill="#B71C1C" font-size="10" font-weight="bold">Récapitulatif complet</text>
+  <text x="605" y="315" text-anchor="middle" fill="#555" font-size="9">Catégorie · Description · Localisation · Photo</text>
+  <text x="605" y="330" text-anchor="middle" fill="#888" font-size="9">Bouton "Signaler" → buildDraft() → addReport()</text>
+
+  <!-- Arrow 3→4 -->
+  <line x1="400" y1="295" x2="418" y2="295" stroke="#555" stroke-width="1.5" marker-end="url(#arrowRight)"/>
+
+  <!-- Arrow 4→DB -->
+  <line x1="605" y1="350" x2="605" y2="380" stroke="#555" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+
+  <!-- Database -->
+  <rect x="450" y="385" width="310" height="70" rx="12" ry="12" fill="url(#dbGrad)" stroke="#7B1FA2" stroke-width="2" filter="url(#shadow)"/>
+  <text x="605" y="410" text-anchor="middle" fill="#4A148C" font-size="14" font-weight="bold">Supabase — Base de Données</text>
+  <text x="605" y="430" text-anchor="middle" fill="#4A148C" font-size="10">INSERT INTO reports (category, description, lat, lng, photo_url)</text>
+  <text x="605" y="445" text-anchor="middle" fill="#888" font-size="9">RLS · auth.uid() = user_id · Notifications créées</text>
+
+  <!-- Sharing / Result flow -->
+  <line x1="605" y1="455" x2="605" y2="485" stroke="#555" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+
+  <rect x="420" y="490" width="370" height="70" rx="12" ry="12" fill="url(#resultGrad)" stroke="#00838F" stroke-width="2" filter="url(#shadow)"/>
+  <text x="605" y="513" text-anchor="middle" fill="#004D40" font-size="14" font-weight="bold">Signalement Publié</text>
+  <text x="605" y="533" text-anchor="middle" fill="#004D40" font-size="10">Notification à tous les utilisateurs · Ajout à la carte · Visible dans le flux</text>
+  <text x="605" y="548" text-anchor="middle" fill="#888" font-size="9">Votes → Crédibilité · Messages → Chat</text>
+
+  <!-- Side info: AddReportProvider -->
+  <rect x="30" y="385" width="310" height="175" rx="10" ry="10" fill="#FAFAFA" stroke="#ddd" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="385" width="310" height="30" rx="10" ry="10" fill="#1B6B2F"/>
+  <text x="185" y="405" text-anchor="middle" fill="white" font-size="12" font-weight="bold">AddReportProvider (Contrôleur)</text>
+  <text x="185" y="435" text-anchor="middle" fill="#333" font-size="10">ChangeNotifier — État du wizard</text>
+  <text x="50" y="458" fill="#555" font-size="10">• currentStepIndex (0→3)</text>
+  <text x="50" y="476" fill="#555" font-size="10">• selectedCategory</text>
+  <text x="50" y="494" fill="#555" font-size="10">• description</text>
+  <text x="50" y="512" fill="#555" font-size="10">• location (latitude, longitude, address)</text>
+  <text x="50" y="530" fill="#555" font-size="10">• photoUrl</text>
+  <text x="50" y="548" fill="#555" font-size="10">• buildDraft() → ReportProvider.addReport()</text>
+</svg>

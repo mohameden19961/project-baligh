@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" font-family="'DejaVu Sans', 'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1B6B2F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E8B3A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="modelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C8E6C9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="viewGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFECB3;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="controllerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#BBDEFB;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="serviceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F3E5F5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E1BEE7;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#00000030"/>
+    </filter>
+    <marker id="arrowRight" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+    <marker id="arrowLeft" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="10 0, 0 3.5, 10 7" fill="#555"/>
+    </marker>
+    <marker id="arrowBoth" markerWidth="10" markerHeight="7" refX="5" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="800" height="44" rx="6" ry="6" fill="url(#headerGrad)"/>
+  <text x="400" y="29" text-anchor="middle" fill="white" font-size="18" font-weight="bold">Architecture MVC — Application Baligh</text>
+
+  <!-- ===== LAYER 1: MODELS ===== -->
+  <rect x="50" y="60" width="700" height="110" rx="10" ry="10" fill="url(#modelGrad)" stroke="#2E7D32" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="400" y="84" text-anchor="middle" fill="#1B5E20" font-size="14" font-weight="bold">COUCHE MODÈLE (Models)</text>
+  
+  <rect x="68" y="96" width="155" height="58" rx="6" ry="6" fill="white" stroke="#2E7D32" stroke-width="1"/>
+  <text x="145" y="118" text-anchor="middle" fill="#1B5E20" font-size="11" font-weight="bold">ReportModel</text>
+  <text x="145" y="134" text-anchor="middle" fill="#555" font-size="9">category, description, status</text>
+  <text x="145" y="147" text-anchor="middle" fill="#555" font-size="9">latitude, longitude, photo</text>
+
+  <rect x="240" y="96" width="155" height="58" rx="6" ry="6" fill="white" stroke="#2E7D32" stroke-width="1"/>
+  <text x="317" y="118" text-anchor="middle" fill="#1B5E20" font-size="11" font-weight="bold">UserModel</text>
+  <text x="317" y="134" text-anchor="middle" fill="#555" font-size="9">id, username, email</text>
+  <text x="317" y="147" text-anchor="middle" fill="#555" font-size="9">reputation, is_admin</text>
+
+  <rect x="412" y="96" width="155" height="58" rx="6" ry="6" fill="white" stroke="#2E7D32" stroke-width="1"/>
+  <text x="489" y="118" text-anchor="middle" fill="#1B5E20" font-size="11" font-weight="bold">VoteModel</text>
+  <text x="489" y="134" text-anchor="middle" fill="#555" font-size="9">report_id, user_id</text>
+  <text x="489" y="147" text-anchor="middle" fill="#555" font-size="9">vote_type</text>
+
+  <rect x="584" y="96" width="148" height="58" rx="6" ry="6" fill="white" stroke="#2E7D32" stroke-width="1"/>
+  <text x="658" y="118" text-anchor="middle" fill="#1B5E20" font-size="11" font-weight="bold">MessageModel</text>
+  <text x="658" y="134" text-anchor="middle" fill="#555" font-size="9">sender, receiver</text>
+  <text x="658" y="147" text-anchor="middle" fill="#555" font-size="9">content, is_read</text>
+
+  <!-- ===== LAYER 2: CONTROLLERS ===== -->
+  <rect x="50" y="190" width="700" height="130" rx="10" ry="10" fill="url(#controllerGrad)" stroke="#1565C0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="400" y="214" text-anchor="middle" fill="#0D47A1" font-size="14" font-weight="bold">COUCHE CONTRÔLEUR (Providers / ChangeNotifier)</text>
+
+  <rect x="60" y="228" width="110" height="40" rx="6" ry="6" fill="white" stroke="#1565C0" stroke-width="1"/>
+  <text x="115" y="253" text-anchor="middle" fill="#0D47A1" font-size="10" font-weight="bold">ReportProvider</text>
+
+  <rect x="180" y="228" width="110" height="40" rx="6" ry="6" fill="white" stroke="#1565C0" stroke-width="1"/>
+  <text x="235" y="253" text-anchor="middle" fill="#0D47A1" font-size="10" font-weight="bold">AuthProvider</text>
+
+  <rect x="300" y="228" width="110" height="40" rx="6" ry="6" fill="white" stroke="#1565C0" stroke-width="1"/>
+  <text x="355" y="253" text-anchor="middle" fill="#0D47A1" font-size="10" font-weight="bold">ChatProvider</text>
+
+  <rect x="420" y="228" width="110" height="40" rx="6" ry="6" fill="white" stroke="#1565C0" stroke-width="1"/>
+  <text x="475" y="253" text-anchor="middle" fill="#0D47A1" font-size="10" font-weight="bold">MapProvider</text>
+
+  <rect x="540" y="228" width="110" height="40" rx="6" ry="6" fill="white" stroke="#1565C0" stroke-width="1"/>
+  <text x="595" y="253" text-anchor="middle" fill="#0D47A1" font-size="10" font-weight="bold">AlertProvider</text>
+
+  <rect x="660" y="228" width="78" height="40" rx="6" ry="6" fill="white" stroke="#1565C0" stroke-width="1"/>
+  <text x="699" y="253" text-anchor="middle" fill="#0D47A1" font-size="10" font-weight="bold">+ 4</text>
+
+  <text x="400" y="290" text-anchor="middle" fill="#0D47A1" font-size="10">Gestion d'état · Logique métier · Notifications via notifyListeners()</text>
+
+  <!-- ===== LAYER 3: VIEWS ===== -->
+  <rect x="50" y="340" width="700" height="110" rx="10" ry="10" fill="url(#viewGrad)" stroke="#F57F17" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="400" y="364" text-anchor="middle" fill="#E65100" font-size="14" font-weight="bold">COUCHE VUE (Views / Widgets Flutter)</text>
+
+  <rect x="60" y="378" width="130" height="58" rx="6" ry="6" fill="white" stroke="#F57F17" stroke-width="1"/>
+  <text x="125" y="400" text-anchor="middle" fill="#E65100" font-size="11" font-weight="bold">HomeView</text>
+  <text x="125" y="420" text-anchor="middle" fill="#555" font-size="9">Liste + Recherche</text>
+  <text x="125" y="433" text-anchor="middle" fill="#555" font-size="9">+ Filtres</text>
+
+  <rect x="205" y="378" width="130" height="58" rx="6" ry="6" fill="white" stroke="#F57F17" stroke-width="1"/>
+  <text x="270" y="400" text-anchor="middle" fill="#E65100" font-size="11" font-weight="bold">MapView</text>
+  <text x="270" y="420" text-anchor="middle" fill="#555" font-size="9">Carte OSM</text>
+  <text x="270" y="433" text-anchor="middle" fill="#555" font-size="9">+ Marqueurs</text>
+
+  <rect x="350" y="378" width="130" height="58" rx="6" ry="6" fill="white" stroke="#F57F17" stroke-width="1"/>
+  <text x="415" y="400" text-anchor="middle" fill="#E65100" font-size="11" font-weight="bold">AddReportView</text>
+  <text x="415" y="420" text-anchor="middle" fill="#555" font-size="9">Wizard 4 étapes</text>
+  <text x="415" y="433" text-anchor="middle" fill="#555" font-size="9">+ Validation</text>
+
+  <rect x="495" y="378" width="130" height="58" rx="6" ry="6" fill="white" stroke="#F57F17" stroke-width="1"/>
+  <text x="560" y="400" text-anchor="middle" fill="#E65100" font-size="11" font-weight="bold">ChatView</text>
+  <text x="560" y="420" text-anchor="middle" fill="#555" font-size="9">Messagerie</text>
+  <text x="560" y="433" text-anchor="middle" fill="#555" font-size="9">Temps réel</text>
+
+  <rect x="640" y="378" width="96" height="58" rx="6" ry="6" fill="white" stroke="#F57F17" stroke-width="1"/>
+  <text x="688" y="400" text-anchor="middle" fill="#E65100" font-size="11" font-weight="bold">+ 9</text>
+  <text x="688" y="420" text-anchor="middle" fill="#555" font-size="9">autres</text>
+  <text x="688" y="433" text-anchor="middle" fill="#555" font-size="9">écrans</text>
+
+  <!-- ===== ARROWS ===== -->
+  <!-- View -> Controller -->
+  <line x1="150" y1="340" x2="150" y2="320" stroke="#555" stroke-width="1.5" marker-end="url(#arrowLeft)"/>
+  <line x1="650" y1="340" x2="650" y2="320" stroke="#555" stroke-width="1.5" marker-end="url(#arrowLeft)"/>
+  
+  <!-- Controller -> Model -->
+  <line x1="150" y1="190" x2="150" y2="170" stroke="#555" stroke-width="1.5" marker-end="url(#arrowLeft)"/>
+  <line x1="650" y1="190" x2="650" y2="170" stroke="#555" stroke-width="1.5" marker-end="url(#arrowLeft)"/>
+
+  <!-- User icon -->
+  <circle cx="65" cy="465" r="14" fill="#1B6B2F"/>
+  <path d="M65 459 c-5 0 -9 4 -9 9 c0 5 4 9 9 9 c5 0 9 -4 9 -9 c0 -5 -4 -9 -9 -9z" fill="white"/>
+  <path d="M52 484 c0 -7 6 -13 13 -13 c7 0 13 6 13 13" fill="white"/>
+  <text x="90" y="472" font-size="11" fill="#555">Utilisateur (Action → Événement → Notification)</text>
+
+  <!-- Arrows from user -->
+  <line x1="85" y1="468" x2="350" y2="455" stroke="#1B6B2F" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowRight)"/>
+
+  <!-- Bottom arrow showing data flow -->
+  <text x="400" y="510" text-anchor="middle" font-size="10" fill="#888">← Flux de données : Modèle → Contrôleur → Vue → Utilisateur</text>
+</svg>

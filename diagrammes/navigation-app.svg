@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 620" font-family="'DejaVu Sans', 'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1B6B2F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E8B3A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="splashGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A5D6A7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shellGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFE082;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="pushGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#90CAF9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="authGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FCE4EC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F48FB1;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#00000025"/>
+    </filter>
+    <marker id="arrowDown" markerWidth="10" markerHeight="7" refX="5" refY="7" orient="auto">
+      <polygon points="0 0, 10 0, 5 7" fill="#555"/>
+    </marker>
+    <marker id="arrowRight" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+    <marker id="arrowUp" markerWidth="10" markerHeight="7" refX="5" refY="0" orient="auto">
+      <polygon points="0 7, 10 7, 5 0" fill="#e53935"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="820" height="44" rx="6" ry="6" fill="url(#headerGrad)"/>
+  <text x="410" y="29" text-anchor="middle" fill="white" font-size="18" font-weight="bold">Diagramme de Navigation — Baligh</text>
+
+  <!-- ===== SPLASH ===== -->
+  <rect x="310" y="60" width="200" height="55" rx="10" ry="10" fill="url(#splashGrad)" stroke="#2E7D32" stroke-width="2" filter="url(#shadow)"/>
+  <text x="410" y="83" text-anchor="middle" fill="#1B5E20" font-size="12" font-weight="bold">SplashView</text>
+  <text x="410" y="100" text-anchor="middle" fill="#555" font-size="9">Animation + Auto-login</text>
+
+  <!-- Splash arrow -->
+  <line x1="410" y1="115" x2="410" y2="140" stroke="#555" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+
+  <!-- ===== AUTH ===== -->
+  <rect x="80" y="145" width="180" height="55" rx="10" ry="10" fill="url(#authGrad)" stroke="#C62828" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="170" y="168" text-anchor="middle" fill="#B71C1C" font-size="12" font-weight="bold">LoginView</text>
+  <text x="170" y="185" text-anchor="middle" fill="#555" font-size="9">Email / Google OAuth</text>
+
+  <rect x="300" y="145" width="180" height="55" rx="10" ry="10" fill="url(#authGrad)" stroke="#C62828" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="390" y="168" text-anchor="middle" fill="#B71C1C" font-size="12" font-weight="bold">RegisterView</text>
+  <text x="390" y="185" text-anchor="middle" fill="#555" font-size="9">Création de compte</text>
+
+  <rect x="530" y="145" width="200" height="55" rx="10" ry="10" fill="url(#authGrad)" stroke="#C62828" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="630" y="168" text-anchor="middle" fill="#B71C1C" font-size="12" font-weight="bold">Session existante</text>
+  <text x="630" y="185" text-anchor="middle" fill="#555" font-size="9">Auto-login → Accueil</text>
+
+  <!-- Auth arrows -->
+  <line x1="260" y1="172" x2="298" y2="172" stroke="#555" stroke-width="1" marker-end="url(#arrowRight)"/>
+  <line x1="480" y1="172" x2="528" y2="172" stroke="#555" stroke-width="1" marker-end="url(#arrowRight)"/>
+  <line x1="410" y1="115" x2="390" y2="143" stroke="#555" stroke-width="1" marker-end="url(#arrowDown)"/>
+
+  <!-- Auth to Main arrow -->
+  <line x1="630" y1="200" x2="630" y2="230" stroke="#555" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+  <line x1="170" y1="200" x2="410" y2="230" stroke="#555" stroke-width="1.5" marker-end="url(#arrowRight)"/>
+  <line x1="390" y1="200" x2="410" y2="230" stroke="#555" stroke-width="1.5"/>
+
+  <!-- ===== MAIN LAYOUT (4 TABS) ===== -->
+  <rect x="70" y="235" width="680" height="200" rx="12" ry="12" fill="url(#shellGrad)" stroke="#F57F17" stroke-width="2" filter="url(#shadow)"/>
+  <text x="410" y="258" text-anchor="middle" fill="#E65100" font-size="14" font-weight="bold">MainLayout — Shell principal (IndexedStack + BottomAppBar + FAB)</text>
+
+  <!-- Tab 1 -->
+  <rect x="88" y="270" width="148" height="100" rx="8" ry="8" fill="white" stroke="#F57F17" stroke-width="1.5"/>
+  <rect x="88" y="270" width="148" height="24" rx="8" ry="8" fill="#F57F17"/>
+  <text x="162" y="287" text-anchor="middle" fill="white" font-size="11" font-weight="bold">① Accueil</text>
+  <text x="162" y="312" text-anchor="middle" fill="#555" font-size="9">HomeView</text>
+  <text x="162" y="327" text-anchor="middle" fill="#777" font-size="8">Liste + Recherche</text>
+  <text x="162" y="340" text-anchor="middle" fill="#777" font-size="8">+ Filtres + Stats</text>
+  <text x="162" y="356" text-anchor="middle" fill="#777" font-size="8">+ SOS FAB</text>
+
+  <!-- Tab 2 -->
+  <rect x="248" y="270" width="148" height="100" rx="8" ry="8" fill="white" stroke="#F57F17" stroke-width="1.5"/>
+  <rect x="248" y="270" width="148" height="24" rx="8" ry="8" fill="#F57F17"/>
+  <text x="322" y="287" text-anchor="middle" fill="white" font-size="11" font-weight="bold">② Carte</text>
+  <text x="322" y="312" text-anchor="middle" fill="#555" font-size="9">MapView</text>
+  <text x="322" y="327" text-anchor="middle" fill="#777" font-size="8">OSM + FMTC Cache</text>
+  <text x="322" y="340" text-anchor="middle" fill="#777" font-size="8">Marqueurs colorés</text>
+  <text x="322" y="356" text-anchor="middle" fill="#777" font-size="8">+ Preview Sheet</text>
+
+  <!-- Tab 3 -->
+  <rect x="408" y="270" width="148" height="100" rx="8" ry="8" fill="white" stroke="#F57F17" stroke-width="1.5"/>
+  <rect x="408" y="270" width="148" height="24" rx="8" ry="8" fill="#F57F17"/>
+  <text x="482" y="287" text-anchor="middle" fill="white" font-size="11" font-weight="bold">③ Alertes</text>
+  <text x="482" y="312" text-anchor="middle" fill="#555" font-size="9">AlertsView</text>
+  <text x="482" y="327" text-anchor="middle" fill="#777" font-size="8">Notifications DB</text>
+  <text x="482" y="340" text-anchor="middle" fill="#777" font-size="8">Badge non lus</text>
+  <text x="482" y="356" text-anchor="middle" fill="#777" font-size="8">Marquer tout lu</text>
+
+  <!-- Tab 4 -->
+  <rect x="568" y="270" width="164" height="100" rx="8" ry="8" fill="white" stroke="#F57F17" stroke-width="1.5"/>
+  <rect x="568" y="270" width="164" height="24" rx="8" ry="8" fill="#F57F17"/>
+  <text x="650" y="287" text-anchor="middle" fill="white" font-size="11" font-weight="bold">④ Compte</text>
+  <text x="650" y="312" text-anchor="middle" fill="#555" font-size="9">AccountView</text>
+  <text x="650" y="327" text-anchor="middle" fill="#777" font-size="8">Profil + Stats</text>
+  <text x="650" y="340" text-anchor="middle" fill="#777" font-size="8">Paramètres</text>
+  <text x="650" y="356" text-anchor="middle" fill="#777" font-size="8">Déconnexion</text>
+
+  <!-- FAB -->
+  <circle cx="410" cy="395" r="18" fill="#2E7D32" stroke="white" stroke-width="3"/>
+  <text x="410" y="401" text-anchor="middle" fill="white" font-size="16" font-weight="bold">+</text>
+  <text x="410" y="422" text-anchor="middle" fill="#1B5E20" font-size="9" font-weight="bold">FAB</text>
+
+  <!-- ===== PUSH ROUTES ===== -->
+  <rect x="70" y="455" width="680" height="145" rx="12" ry="12" fill="url(#pushGrad)" stroke="#1565C0" stroke-width="2" filter="url(#shadow)"/>
+  <text x="410" y="478" text-anchor="middle" fill="#0D47A1" font-size="13" font-weight="bold">Routes Push (Navigator.push)</text>
+
+  <rect x="85" y="492" width="140" height="55" rx="8" ry="8" fill="white" stroke="#1565C0" stroke-width="1.5"/>
+  <text x="155" y="514" text-anchor="middle" fill="#0D47A1" font-size="11" font-weight="bold">AddReportView</text>
+  <text x="155" y="532" text-anchor="middle" fill="#555" font-size="9">Wizard 4 étapes</text>
+  <text x="155" y="545" text-anchor="middle" fill="#888" font-size="8">Depuis FAB(+)</text>
+
+  <rect x="245" y="492" width="140" height="55" rx="8" ry="8" fill="white" stroke="#1565C0" stroke-width="1.5"/>
+  <text x="315" y="514" text-anchor="middle" fill="#0D47A1" font-size="11" font-weight="bold">ReportDetailView</text>
+  <text x="315" y="532" text-anchor="middle" fill="#555" font-size="9">Détail + Votes</text>
+  <text x="315" y="545" text-anchor="middle" fill="#888" font-size="8">Depuis carte/liste</text>
+
+  <rect x="405" y="492" width="140" height="55" rx="8" ry="8" fill="white" stroke="#1565C0" stroke-width="1.5"/>
+  <text x="475" y="514" text-anchor="middle" fill="#0D47A1" font-size="11" font-weight="bold">ChatView</text>
+  <text x="475" y="532" text-anchor="middle" fill="#555" font-size="9">Messagerie temps réel</text>
+  <text x="475" y="545" text-anchor="middle" fill="#888" font-size="8">Depuis détail</text>
+
+  <rect x="565" y="492" width="170" height="55" rx="8" ry="8" fill="white" stroke="#1565C0" stroke-width="1.5"/>
+  <text x="650" y="514" text-anchor="middle" fill="#0D47A1" font-size="11" font-weight="bold">EmergencyNumbersView</text>
+  <text x="650" y="532" text-anchor="middle" fill="#555" font-size="9">Numéros d'urgence</text>
+  <text x="650" y="545" text-anchor="middle" fill="#888" font-size="8">Depuis SOS / Compte</text>
+
+  <!-- Navigation controls info -->
+  <rect x="100" y="568" width="620" height="35" rx="6" ry="6" fill="#FAFAFA" stroke="#ddd" stroke-width="1"/>
+  <text x="410" y="582" text-anchor="middle" fill="#666" font-size="10">
+    NavigationProvider (AppTab) · IndexedStack (4 tabs) · BottomAppBar avec notch · FAB avec animation
+  </text>
+  <text x="410" y="597" text-anchor="middle" fill="#888" font-size="9">
+    NavigationProvider.notifyListeners() → Selector&lt;NavigationProvider, int&gt; rebuilds IndexedStack et BottomNav
+  </text>
+
+  <!-- Connection arrows from tabs to push routes -->
+  <line x1="162" y1="370" x2="155" y2="490" stroke="#1565C0" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowDown)"/>
+  <line x1="322" y1="370" x2="315" y2="490" stroke="#1565C0" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowDown)"/>
+  <line x1="650" y1="370" x2="650" y2="490" stroke="#1565C0" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowDown)"/>
+</svg>
