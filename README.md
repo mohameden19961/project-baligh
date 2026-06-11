@@ -298,6 +298,8 @@ vercel --prod
 | [Abdy Mohameden](https://github.com/mohameden19961) | Developer |
 | [Hasseen Salem](https://github.com/hasseen-salem) | Developer |
 
+📄 **[Voir la répartition détaillée du travail →](travail.md)**
+
 ---
 
 ## License
